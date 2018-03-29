@@ -1,7 +1,7 @@
 /**
  * 
  */
-package weka.classifiers.functions;
+package weka.classifiers.functions.explicitboundaries;
 
 import java.io.Serializable;
 import java.util.Collections;

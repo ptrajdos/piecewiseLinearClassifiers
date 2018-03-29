@@ -1,6 +1,6 @@
-package weka.classifiers.functions;
+package weka.classifiers.functions.explicitboundaries;
 
-import weka.classifiers.functions.geometry.Plane;
+import weka.classifiers.functions.explicitboundaries.gemoetry.Plane;
 import weka.core.Instance;
 import weka.core.Instances;
 

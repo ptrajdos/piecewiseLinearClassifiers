@@ -1,4 +1,4 @@
-package weka.classifiers.functions.geometry;
+package weka.classifiers.functions.explicitboundaries.gemoetry;
 
 import weka.core.Instance;
 import weka.core.Instances;

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package weka.classifiers.functions.geometry;
+package weka.classifiers.functions.explicitboundaries.gemoetry;
 
 import java.io.Serializable;
 

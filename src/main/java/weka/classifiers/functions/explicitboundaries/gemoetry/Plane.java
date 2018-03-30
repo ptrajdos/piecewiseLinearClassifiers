@@ -5,6 +5,7 @@ package weka.classifiers.functions.explicitboundaries.gemoetry;
 
 import java.io.Serializable;
 
+import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
 
@@ -45,7 +46,8 @@ public class Plane implements Serializable {
 	
 	public Plane(Instances dataSpace) {
 		this.dataHeader = new Instances(dataSpace, 0);
-		this.normalVector = dataSpace.get(0);
+		this.normalVector = new DenseInstance(dataSpace.numAttributes());
+		this.normalVector.setDataset(dataSpace);
 		
 		int classIdx = dataSpace.classIndex();
 		int numAttrs = dataSpace.numAttributes();
@@ -86,7 +88,7 @@ public class Plane implements Serializable {
 	 */
 	public double sideOfThePlane(Instance vec) throws Exception{
 		double result =0 ;
-		result = this.dotProduct.dotProduct(dataHeader, normalVector, vec) + this.offset;
+		result = this.dotProduct.dotProduct(this.dataHeader, this.normalVector, vec) + this.offset;
 		return result;
 	}
 

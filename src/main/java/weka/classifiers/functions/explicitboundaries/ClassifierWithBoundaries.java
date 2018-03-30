@@ -7,7 +7,8 @@ public interface ClassifierWithBoundaries extends Classifier {
 	/**
 	 * Returns decision boundaries of the classifier
 	 * @return Decision boundaries
+	 * @throws Exception 
 	 */
-	public DecisionBoundaries getBoundaries();
+	public DecisionBoundary getBoundary() throws Exception;
 
 }

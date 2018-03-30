@@ -13,10 +13,9 @@ public class DecisionBoundaryPlane extends DecisionBoundary {
 	
 	protected Plane decisionPlane = null;
 
-	public DecisionBoundaryPlane(Instances data, int class1Idx, int class2Idx) throws Exception {
+	public DecisionBoundaryPlane(Instances data, int class1Idx, int class2Idx, Plane plane) throws Exception {
 		super(data, class1Idx, class2Idx);
-		//Initialise a new plane with zero normal vector
-		this.decisionPlane = new Plane(data);
+		this.decisionPlane = plane;
 	}
 
 	@Override
@@ -40,6 +39,11 @@ public class DecisionBoundaryPlane extends DecisionBoundary {
 		description.append(super.toString());
 		description.append(this.decisionPlane.toString());
 		return description.toString();
+	}
+
+	@Override
+	public double classify(Instance instance) throws Exception {
+		return this.getIndex(instance);
 	}
 	
 	

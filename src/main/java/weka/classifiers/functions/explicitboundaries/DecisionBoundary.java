@@ -56,6 +56,9 @@ public abstract class DecisionBoundary implements Serializable {
 	 * @throws Exception 
 	 */
 	public abstract int getIndex(Instance instance) throws Exception;
+	
+	
+	public abstract double classify(Instance instance) throws Exception;
 
 	/**
 	 * @return the datasetHeader

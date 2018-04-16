@@ -3,11 +3,8 @@
  */
 package weka.classifiers.functions.explicitboundaries.models;
 
-import java.util.LinkedList;
-
 import weka.classifiers.functions.NearestCentroidClassifier;
 import weka.classifiers.functions.explicitboundaries.ClassifierWithBoundaries;
-import weka.classifiers.functions.explicitboundaries.DecisionBoundaries;
 import weka.classifiers.functions.explicitboundaries.DecisionBoundary;
 import weka.classifiers.functions.explicitboundaries.DecisionBoundaryPlane;
 import weka.classifiers.functions.explicitboundaries.gemoetry.DotProduct;
@@ -15,7 +12,6 @@ import weka.classifiers.functions.explicitboundaries.gemoetry.DotProductEuclidea
 import weka.core.Capabilities;
 import weka.core.Capabilities.Capability;
 import weka.core.DenseInstance;
-import weka.core.EuclideanDistance;
 import weka.core.Instance;
 import weka.core.Instances;
 
@@ -79,7 +75,7 @@ public class NearestCentroidBoundary extends NearestCentroidClassifier implement
 		
 		double offset = - this.dotProduct.dotProduct(normalVec.dataset(), normalVec, middleVec);
 		
-		DecisionBoundaryPlane boundary = new DecisionBoundaryPlane(normalVec.dataset(),0, 1, null);
+		DecisionBoundaryPlane boundary = new DecisionBoundaryPlane(normalVec.dataset(),0, 1);
 		boundary.getDecisionPlane().setNormalVector(normalVec);
 		boundary.getDecisionPlane().setOffset(offset);
 		

@@ -6,7 +6,7 @@
 PackageName=Piecewise Linear Classifier
 
 # Version (required)
-Version=0.10
+Version=0.1.0
 
 #Date
 Date=2018-03-23
@@ -20,7 +20,7 @@ Category=Classification
 Author=Pawel Trajdos
 
 # Maintainer (required)
-Maintainer= Pawel Trajdos pawel.trajdos@gmail.com
+Maintainer= Pawel Trajdos pawel.trajdos{at}gmail.com
 
 # License (required)
 License=GPL 3.0

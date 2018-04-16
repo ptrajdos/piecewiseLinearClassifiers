@@ -67,7 +67,7 @@ public class SMOLinearBoundary extends SMO implements ClassifierWithBoundaries {
 		int numAttrs =this.dataHeader.numAttributes();
 		
 		Instance normalVector = new DenseInstance(numAttrs);
-		normalVector.setDataset(dataHeader);
+		normalVector.setDataset(this.dataHeader);
 		
 		for(int a =0;a<sparseIndices.length;a++){
 			if(sparseIndices[a] == classIdx)
@@ -76,11 +76,11 @@ public class SMOLinearBoundary extends SMO implements ClassifierWithBoundaries {
 			normalVector.setValue(a, -sparseWeights[a]);
 		}
 		
-		Plane plane = new Plane(dataHeader);
+		Plane plane = new Plane(this.dataHeader);
 		plane.setNormalVector(normalVector);
 		plane.setOffset(offset);
 			
-		DecisionBoundaryPlane planeBoundary = new DecisionBoundaryPlane(dataHeader, 0, 1, plane);
+		DecisionBoundaryPlane planeBoundary = new DecisionBoundaryPlane(this.dataHeader, 0, 1, plane);
 		
 		
 		return planeBoundary;

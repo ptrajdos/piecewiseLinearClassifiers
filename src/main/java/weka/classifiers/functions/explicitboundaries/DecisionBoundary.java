@@ -57,9 +57,29 @@ public abstract class DecisionBoundary implements Serializable {
 	 */
 	public abstract int getIndex(Instance instance) throws Exception;
 	
-	
+	/**
+	 * Classify instance
+	 * @param instance
+	 * @return
+	 * @throws Exception
+	 */
 	public abstract double classify(Instance instance) throws Exception;
-
+	
+	/**
+	 * Get value of the characteristic function of the decision boundary
+	 * @param instance
+	 * @return
+	 * @throws Exception
+	 */
+	public abstract double getValue(Instance instance)throws Exception;
+	
+	/**
+	 * Returns the smallest distance between the surface of the decision boundary and the instance
+	 * @param instance
+	 * @return
+	 * @throws Exception
+	 */
+	public abstract double getDistance(Instance instance)throws Exception;
 	/**
 	 * @return the datasetHeader
 	 */
@@ -97,7 +117,7 @@ public abstract class DecisionBoundary implements Serializable {
 		StringBuffer strBuff = new StringBuffer();
 		
 		strBuff.append("Decision Boundary:\n");
-		strBuff.append("Classes: " + classAttrib.value(class1Idx) + "; " + classAttrib.value(class2Idx)+"\n");
+		strBuff.append("Classes: " + classAttrib.value(this.class1Idx) + "; " + classAttrib.value(this.class2Idx)+"\n");
 		return strBuff.toString();
 	}
 	

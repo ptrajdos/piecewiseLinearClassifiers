@@ -45,6 +45,16 @@ public class DecisionBoundaryPlane extends DecisionBoundary {
 	public double classify(Instance instance) throws Exception {
 		return this.getIndex(instance);
 	}
+
+	@Override
+	public double getValue(Instance instance) throws Exception {
+		return this.decisionPlane.sideOfThePlane(instance);
+	}
+
+	@Override
+	public double getDistance(Instance instance) throws Exception {
+		return this.getDecisionPlane().distanceToPlane(instance);
+	}
 	
 	
 

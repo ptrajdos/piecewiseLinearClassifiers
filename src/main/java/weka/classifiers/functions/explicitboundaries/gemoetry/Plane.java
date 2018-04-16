@@ -89,6 +89,7 @@ public class Plane implements Serializable {
 	public double sideOfThePlane(Instance vec) throws Exception{
 		double result =0 ;
 		result = this.dotProduct.dotProduct(this.dataHeader, this.normalVector, vec) + this.offset;
+		result/= this.dotProduct.norm(this.dataHeader, this.normalVector);
 		return result;
 	}
 

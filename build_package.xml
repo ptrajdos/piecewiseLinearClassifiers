@@ -14,7 +14,8 @@
   <property name="src-test" value="src/test/java"/>
   <property name="lib" value="lib" />
   <property name="build" value="build"/>
-  <property name="dist"  value="./"/>
+  <property name="dist"  value="./dist"/>
+  <property name="dist_weka"  value="./"/>
   <property name="package"  value="PiecewiseLinearClassifiers"/>
   <property name="doc"  value="doc"/>
   <property name="javac_max_memory" value="256m"/>
@@ -151,9 +152,9 @@
   </target>
 
   <!-- Put everything in ${build}/classes into the ${package}.jar file -->
-  <target name="exejar" depends="compile, docs, init_dist"
+  <target name="exejar" depends="compile, docs, init_dist,srcjar"
    description="Create a binary jar file in ./dist">
-    <jar jarfile="${dist}/${package}.jar" 
+    <jar jarfile="${dist_weka}/${package}.jar" 
       basedir="${build}/classes">
     </jar>
   </target>

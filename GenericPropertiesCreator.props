@@ -1,0 +1,8 @@
+#Lists of combiners
+
+weka.classifiers.functions.explicitboundaries.ClassifierWithBoundaries=\
+ weka.classifiers.functions.explicitboundaries.models
+
+
+weka.classifiers.Classifier=\
+ weka.classifiers.functions.explicitboundaries.models

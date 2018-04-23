@@ -1,0 +1,3 @@
+#generators
+weka.classifiers.functions.explicitboundaries.ClassifierWithBoundaries=weka.gui.GenericObjectEditor
+

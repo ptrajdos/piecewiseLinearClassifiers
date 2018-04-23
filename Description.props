@@ -3,16 +3,16 @@
 # 
 
 # Package name (required)
-PackageName=Piecewise Linear Classifier
+PackageName= Ensemble Systems
 
 # Version (required)
 Version=0.1.0
 
 #Date
-Date=2018-03-23
+Date=2018-04-09
 
 # Title (required)
-Title= Piecewise Linear Classifier
+Title= Ensemble Systems
 
 Category=Classification
 
@@ -26,15 +26,15 @@ Maintainer= Pawel Trajdos pawel.trajdos{at}gmail.com
 License=GPL 3.0
 
 # Description (required)
-Description= The package implements the Piecewise Linear Classifiers
+Description= The package contains the system for building ensmeble classifiers
 
 Changes=---
 
 # Package URL for obtaining the package archive (required)
-PackageURL=https://github.com/ptrajdos/piecewiseLinearClassifiers
+PackageURL=https://github.com/ptrajdos/wekaEnsembleSystems
 
 # URL for further information
-URL=https://github.com/ptrajdos/piecewiseLinearClassifiers
+URL=https://github.com/ptrajdos/wekaEnsembleSystems
 
 # Enhances various other packages ?
 # Enhances=packageName1,packageName2,...

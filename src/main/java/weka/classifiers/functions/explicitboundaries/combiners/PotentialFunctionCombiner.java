@@ -41,7 +41,6 @@ public class PotentialFunctionCombiner implements DecisionBoundaryCombiner, Seri
 	 */
 	@Override
 	public int getDecision(Instance inst) throws Exception {
-		// TODO Auto-generated method stub
 		//value >0 -> index1
 		double combinedValue =0;
 		List<DecisionBoundary> boundariesList = this.boundaries.getBoundaries();

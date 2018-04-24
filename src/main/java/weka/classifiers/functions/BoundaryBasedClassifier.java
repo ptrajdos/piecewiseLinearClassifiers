@@ -96,6 +96,7 @@ public class BoundaryBasedClassifier extends SingleClassifierEnhancer
 			DecisionBoundary boundary = this.getBoundary();
 			for(int i=0;i<numInstances;i++){
 				tmpInstance = data.get(i);
+				vals = new double[2];
 				vals[1] = tmpInstance.classValue();
 				vals[0] = boundary.getValue(tmpInstance);
 				transData.add(new DenseInstance(tmpInstance.weight(), vals));
@@ -103,7 +104,6 @@ public class BoundaryBasedClassifier extends SingleClassifierEnhancer
 			
 		}else{
 			//Perform crossvalidation
-			//TODO something is wrong here
 			Instances tmpData = new Instances(data);
 			Random random = new Random(this.seed);
 			tmpData.randomize(random);
@@ -122,7 +122,8 @@ public class BoundaryBasedClassifier extends SingleClassifierEnhancer
 				boundary = tmpModel.getBoundary();
 				for(int i=0;i<numValInstances;i++){
 					tmpInstance = test.get(i);
-					vals[1] = tmpInstance.classValue();//TODO discrepancy between label index and label value
+					vals  =new double[2];
+					vals[1] = tmpInstance.classValue();
 					vals[0] = boundary.getValue(tmpInstance);
 					transData.add(new DenseInstance(tmpInstance.weight(), vals));
 				}

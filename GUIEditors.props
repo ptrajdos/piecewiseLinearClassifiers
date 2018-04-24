@@ -1,3 +1,9 @@
 #generators
 weka.classifiers.functions.explicitboundaries.ClassifierWithBoundaries=weka.gui.GenericObjectEditor
 
+weka.classifiers.meta.customizableBagging.OutputCombiner=weka.gui.GenericObjectEditor
+
+weka.classifiers.functions.explicitboundaries.combiners.PotentialFunction=weka.gui.GenericObjectEditor
+
+weka.classifiers.functions.explicitboundaries.DecisionBoundaryCombiner=weka.gui.GenericObjectEditor
+

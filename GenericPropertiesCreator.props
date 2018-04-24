@@ -6,3 +6,13 @@ weka.classifiers.functions.explicitboundaries.ClassifierWithBoundaries=\
 
 weka.classifiers.Classifier=\
  weka.classifiers.functions.explicitboundaries.models
+
+ 
+weka.classifiers.meta.customizableBagging.OutputCombiner=\
+ weka.classifiers.meta.customizableBagging
+ 
+weka.classifiers.functions.explicitboundaries.combiners.PotentialFunction=\
+ weka.classifiers.functions.explicitboundaries.combiners
+
+weka.classifiers.functions.explicitboundaries.DecisionBoundaryCombiner=\
+ weka.classifiers.functions.explicitboundaries.combiners

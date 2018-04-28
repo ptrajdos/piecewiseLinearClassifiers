@@ -11,13 +11,11 @@ import weka.classifiers.SingleClassifierEnhancer;
 import weka.classifiers.functions.explicitboundaries.ClassifierWithBoundaries;
 import weka.classifiers.functions.explicitboundaries.DecisionBoundary;
 import weka.classifiers.functions.explicitboundaries.models.NearestCentroidBoundary;
-import weka.classifiers.functions.explicitboundaries.models.SMOLinearBoundary;
 import weka.core.Attribute;
 import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.Randomizable;
-import weka.core.SelectedTag;
 import weka.core.Utils;
 import weka.tools.SerialCopier;
 
@@ -178,6 +176,11 @@ public class BoundaryBasedClassifier extends SingleClassifierEnhancer
 	public void setCalibrator(Classifier calibrator) {
 		this.calibrator = calibrator;
 	}
+	
+	public String calibratorTipText() {
+		return "Callibrator that is used";
+	}
+	
 	/**
 	 * @return the numFolds
 	 */
@@ -190,10 +193,15 @@ public class BoundaryBasedClassifier extends SingleClassifierEnhancer
 	public void setNumFolds(int numFolds) {
 		this.numFolds = numFolds;
 	}
+	public String numFoldsTipText() {
+		return "The number of folds that are used to build the calibrator";
+	}
 	@Override
 	public void setSeed(int seed) {
 		this.seed = seed;
-		
+	}
+	public String seedTipText() {
+		return "Random seed to be used by the classifier";
 	}
 	@Override
 	public int getSeed() {
@@ -202,7 +210,7 @@ public class BoundaryBasedClassifier extends SingleClassifierEnhancer
 	/**
 	 * @return the useCalibrator
 	 */
-	public boolean isUseCalibrator() {
+	public boolean getUseCalibrator() {
 		return this.useCalibrator;
 	}
 	/**
@@ -212,5 +220,13 @@ public class BoundaryBasedClassifier extends SingleClassifierEnhancer
 		this.useCalibrator = useCalibrator;
 	}
 	
+	public String useCalibratorTipText() {
+		return "Determines whether the callibration is used";
+	}
+
+	public String globalInfo() {
+		return "Class that allows using boundary based classifiers as normal classifiers"+
+				"Boundary based predictions are transformed into response based ones";
+	}
 
 }

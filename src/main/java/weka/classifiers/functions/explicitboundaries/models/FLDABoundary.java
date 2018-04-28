@@ -65,6 +65,7 @@ public class FLDABoundary extends FLDA implements ClassifierWithBoundaries {
 	public Capabilities getCapabilities() {
 		Capabilities base = super.getCapabilities();
 		base.disable(Capability.NOMINAL_CLASS);
+		base.disable(Capability.NUMERIC_CLASS);
 		base.enable(Capability.BINARY_CLASS);
 		return base;
 	}

@@ -28,6 +28,10 @@ public class PotentialTester {
 		}
 		values.add(Double.MAX_VALUE);
 		values.add(-Double.MAX_VALUE);
+		values.add(Double.MIN_NORMAL);
+		values.add(-Double.MIN_NORMAL);
+		values.add(Double.MIN_VALUE);
+		values.add(-Double.MIN_VALUE);
 		for (Double value : values) {
 			try {
 				response = fun.getPotentialValue(value);
@@ -38,9 +42,6 @@ public class PotentialTester {
 				fail("An Exception has ben caught");
 			}
 		}
-		/**
-		 * Extremal cases
-		 */
 		
 		
 	}

@@ -8,9 +8,11 @@ import weka.classifiers.functions.explicitboundaries.ClassifierWithBoundaries;
 import weka.classifiers.functions.explicitboundaries.DecisionBoundary;
 import weka.classifiers.functions.explicitboundaries.DecisionBoundaryPlane;
 import weka.classifiers.functions.explicitboundaries.gemoetry.Plane;
+import weka.classifiers.rules.ZeroR;
 import weka.core.Capabilities;
 import weka.core.DenseInstance;
 import weka.core.Instance;
+import weka.core.Instances;
 import weka.core.Capabilities.Capability;
 
 /**
@@ -23,12 +25,21 @@ public class FLDABoundary extends FLDA implements ClassifierWithBoundaries {
 	 * 
 	 */
 	private static final long serialVersionUID = 8290678589313422047L;
+	
+	/**
+	 * Default model
+	 */
+	protected MajorityPlaneBoundaryModel defaultModel = null;
+	
+	protected ZeroR  alternativeModel = null;
 
 	/**
 	 * 
 	 */
 	public FLDABoundary() {
 		super();
+		this.defaultModel = new MajorityPlaneBoundaryModel();
+		this.alternativeModel = new ZeroR();
 	}
 
 	/* (non-Javadoc)
@@ -36,6 +47,10 @@ public class FLDABoundary extends FLDA implements ClassifierWithBoundaries {
 	 */
 	@Override
 	public DecisionBoundary getBoundary() throws Exception {
+		if(this.defaultModel.isUseDefault()) {
+			return this.defaultModel.getPlaneModel();
+		}
+		
 		double offset = -this.m_Threshold;
 		Instance normalVec = new DenseInstance(this.m_Data.numAttributes());
 		normalVec.setDataset(this.m_Data);
@@ -68,6 +83,36 @@ public class FLDABoundary extends FLDA implements ClassifierWithBoundaries {
 		base.disable(Capability.NUMERIC_CLASS);
 		base.enable(Capability.BINARY_CLASS);
 		return base;
+	}
+	
+	
+
+	/* (non-Javadoc)
+	 * @see weka.classifiers.functions.FLDA#buildClassifier(weka.core.Instances)
+	 */
+	@Override
+	public void buildClassifier(Instances insts) throws Exception {
+		super.buildClassifier(insts);
+		this.defaultModel.buildDefaultModelPlane(insts);
+		if(this.defaultModel.isUseDefault())
+			this.alternativeModel.buildClassifier(insts);
+	}
+	
+	
+
+	/* (non-Javadoc)
+	 * @see weka.classifiers.functions.FLDA#distributionForInstance(weka.core.Instance)
+	 */
+	@Override
+	public double[] distributionForInstance(Instance inst) throws Exception {
+		double[] distribution = null;
+		if(this.defaultModel.isUseDefault()) {
+			distribution = this.alternativeModel.distributionForInstance(inst);
+		}else {
+			distribution = super.distributionForInstance(inst); 
+		}
+		
+		return distribution;
 	}
 
 	/**

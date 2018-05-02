@@ -29,12 +29,14 @@ public class NearestCentroidBoundary extends NearestCentroidClassifier implement
 	private static final long serialVersionUID = -5904651566938429421L;
 	
 	protected DotProduct dotProduct = new DotProductEuclidean();
+	
+	protected MajorityPlaneBoundaryModel defaultModel = null;
 
 	/**
 	 * 
 	 */
 	public NearestCentroidBoundary() {
-		
+		this.defaultModel = new MajorityPlaneBoundaryModel();
 	}
 	
 	
@@ -45,6 +47,8 @@ public class NearestCentroidBoundary extends NearestCentroidClassifier implement
 	@Override
 	public void buildClassifier(Instances data) throws Exception {
 		super.buildClassifier(data);
+		this.defaultModel.buildDefaultModelPlane(data);
+		
 	}
 
 
@@ -54,6 +58,9 @@ public class NearestCentroidBoundary extends NearestCentroidClassifier implement
 	 */
 	@Override
 	public DecisionBoundary getBoundary() throws Exception {
+		if(this.defaultModel.isUseDefault()) {
+			return this.defaultModel.planeModel;
+		}
 		
 		Instance normalVec = new DenseInstance(this.centroids[0]);
 		normalVec.setDataset(this.centroids[0].dataset());

@@ -8,6 +8,7 @@ import java.io.Serializable;
 import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
+import weka.core.Utils;
 
 /**
  * @author pawel
@@ -75,7 +76,11 @@ public class Plane implements Serializable {
 	public double distanceToPlane(Instance vec) throws Exception{
 		double result =0;
 		result = Math.abs(this.dotProduct.dotProduct(this.dataHeader, this.normalVector, vec) + this.getOffset());
-		result/= this.dotProduct.norm(this.dataHeader, this.normalVector);
+		double normalVecNorm =this.dotProduct.norm(this.dataHeader, this.normalVector);
+		if(!Utils.eq(normalVecNorm, 0)) {
+			result/= normalVecNorm;
+		}
+		 
 		return result;
 	}
 	
@@ -89,7 +94,10 @@ public class Plane implements Serializable {
 	public double sideOfThePlane(Instance vec) throws Exception{
 		double result =0 ;
 		result = this.dotProduct.dotProduct(this.dataHeader, this.normalVector, vec) + this.offset;
-		result/= this.dotProduct.norm(this.dataHeader, this.normalVector);
+		double normalVecNorm =this.dotProduct.norm(this.dataHeader, this.normalVector);
+		if(!Utils.eq(normalVecNorm, 0)) {
+			result/= normalVecNorm;
+		}
 		return result;
 	}
 

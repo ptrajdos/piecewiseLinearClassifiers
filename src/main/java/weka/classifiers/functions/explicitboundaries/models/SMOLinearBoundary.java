@@ -32,6 +32,8 @@ public class SMOLinearBoundary extends SMO implements ClassifierWithBoundaries {
 	 * Header of the dataset
 	 */
 	protected Instances dataHeader = null;
+	
+	protected MajorityPlaneBoundaryModel defaultModel = null;
 
 	/**
 	 * 
@@ -41,6 +43,7 @@ public class SMOLinearBoundary extends SMO implements ClassifierWithBoundaries {
 		PolyKernel linKernel  = new PolyKernel();
 		linKernel.setExponent(1.0);
 		this.setKernel(linKernel);
+		this.defaultModel = new MajorityPlaneBoundaryModel();
 		
 	}
 
@@ -49,6 +52,9 @@ public class SMOLinearBoundary extends SMO implements ClassifierWithBoundaries {
 	 */
 	@Override
 	public DecisionBoundary getBoundary() throws Exception {
+		if(this.defaultModel.isUseDefault()) {
+			return this.defaultModel.getPlaneModel();
+		}
 		//There is only one model in the binary classifier
 		SMO.BinarySMO binaryModel = this.m_classifiers[0][1];
 		
@@ -97,6 +103,7 @@ public class SMOLinearBoundary extends SMO implements ClassifierWithBoundaries {
 	public void buildClassifier(Instances insts) throws Exception {
 		super.buildClassifier(insts);
 		this.dataHeader = new Instances(insts, 0);
+		this.defaultModel.buildDefaultModelPlane(insts);
 	}
 
 	/**

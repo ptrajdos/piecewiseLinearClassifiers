@@ -17,6 +17,10 @@ public class DecisionBoundaryPlane extends DecisionBoundary {
 		super(data, class1Idx, class2Idx);
 		this.decisionPlane = plane;
 	}
+	
+	public DecisionBoundaryPlane(Instances data, int class1Idx, int class2Idx)throws Exception{
+		this(data, class1Idx, class2Idx, new Plane(data));
+	}
 
 	@Override
 	public int getIndex(Instance instance) throws Exception {

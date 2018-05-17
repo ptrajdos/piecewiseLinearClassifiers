@@ -20,7 +20,6 @@ public abstract class DecisionBoundary implements Serializable {
 	 */
 	private static final long serialVersionUID = -2027243933463044232L;
 	
-	//TODO change the implementation
 	/*
 	 * Use plane and abstract class for non-plane decision boundaries
 	 */

@@ -22,7 +22,7 @@ public class PlaneTest {
 		ArrayList<Attribute> atts = new ArrayList<Attribute>(3);
 	      atts.add(new Attribute("X1"));
 	      atts.add(new Attribute("X2"));
-	      LinkedList<String> valList = new LinkedList<>();
+	      LinkedList<String> valList = new LinkedList<String>();
 	      valList.add("1");
 	      valList.add("2");
 	      atts.add(new Attribute("Class", valList));

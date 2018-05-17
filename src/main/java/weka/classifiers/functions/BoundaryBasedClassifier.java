@@ -229,5 +229,9 @@ public class BoundaryBasedClassifier extends SingleClassifierEnhancer
 		return "Class that allows using boundary based classifiers as normal classifiers"+
 				"Boundary based predictions are transformed into response based ones";
 	}
+	
+	public static void main(String[] args) {
+		runClassifier(new BoundaryBasedClassifier(), args);
+	}
 
 }

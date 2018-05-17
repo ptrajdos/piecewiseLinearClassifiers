@@ -49,6 +49,7 @@ public class MultilayerPerceptronBoundary extends MultilayerPerceptron implement
 	public void buildClassifier(Instances i) throws Exception {
 		//Only linear models are allowed
 		this.setHiddenLayers("0");
+		this.setNormalizeNumericClass(false);
 		super.buildClassifier(i);
 		
 		/**
@@ -107,6 +108,8 @@ public class MultilayerPerceptronBoundary extends MultilayerPerceptron implement
 		return base;
 	}
 	
-	
+	public static void main(String[] args) {
+		runClassifier(new MultilayerPerceptronBoundary(), args);
+	}
 
 }

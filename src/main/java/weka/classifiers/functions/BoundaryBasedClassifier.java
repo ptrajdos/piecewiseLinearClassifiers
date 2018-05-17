@@ -34,7 +34,7 @@ public class BoundaryBasedClassifier extends SingleClassifierEnhancer
 	/**
 	 * Calibrator for calculating soft outputs using given boundaries;
 	 */
-	protected Classifier calibrator  = new Logistic();
+	protected Classifier calibrator ;
 	
 	protected boolean useCalibrator = false;
 	protected boolean calibratorLearned = false;
@@ -54,6 +54,7 @@ public class BoundaryBasedClassifier extends SingleClassifierEnhancer
 	 */
 	public BoundaryBasedClassifier(ClassifierWithBoundaries boundClass) {
 		this.m_Classifier = boundClass;
+		this.calibrator = new Logistic();
 	}
 	public BoundaryBasedClassifier() {
 		this.setClassifier(new NearestCentroidBoundary());

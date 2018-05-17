@@ -28,7 +28,7 @@ public class NearestCentroidBoundary extends NearestCentroidClassifier implement
 	 */
 	private static final long serialVersionUID = -5904651566938429421L;
 	
-	protected DotProduct dotProduct = new DotProductEuclidean();
+	protected DotProduct dotProduct;
 	
 	protected MajorityPlaneBoundaryModel defaultModel = null;
 
@@ -36,6 +36,7 @@ public class NearestCentroidBoundary extends NearestCentroidClassifier implement
 	 * 
 	 */
 	public NearestCentroidBoundary() {
+		this.dotProduct = new DotProductEuclidean();
 		this.defaultModel = new MajorityPlaneBoundaryModel();
 	}
 	

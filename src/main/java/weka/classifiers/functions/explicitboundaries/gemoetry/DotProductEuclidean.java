@@ -7,6 +7,7 @@ import java.io.Serializable;
 
 import weka.core.Instance;
 import weka.core.Instances;
+import weka.tools.InstancesTools;
 
 /**
  * @author pawel
@@ -31,9 +32,9 @@ public class DotProductEuclidean implements DotProduct, Serializable {
 	 */
 	@Override
 	public double dotProduct(Instances dataSet, Instance inst1, Instance inst2) throws Exception {
-		// TODO Auto-generated method stub
-		if( (!dataSet.checkInstance(inst1)) | (!dataSet.checkInstance(inst2)))
-			throw new Exception("Incompatible instances");
+		
+		InstancesTools.checkCompatibility(dataSet, inst1);
+		InstancesTools.checkCompatibility(dataSet, inst2);
 		
 		int numAttrs = dataSet.numAttributes();
 		int classIdx = dataSet.classIndex();

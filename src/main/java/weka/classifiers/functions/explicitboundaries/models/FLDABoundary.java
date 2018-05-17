@@ -19,6 +19,9 @@ import weka.core.Capabilities.Capability;
  * @author pawel
  *
  */
+//TODO There is an issue with incompatible instances produced by this classifiers.
+//It bothers the following datasets Faults, optdigits and glass
+//TODO fix it!!!
 public class FLDABoundary extends FLDA implements ClassifierWithBoundaries {
 
 	/**

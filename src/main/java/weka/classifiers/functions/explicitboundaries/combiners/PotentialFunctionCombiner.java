@@ -29,7 +29,7 @@ public class PotentialFunctionCombiner implements DecisionBoundaryCombiner, Seri
 	/**
 	 * Decision boundaries
 	 */
-	protected PotentialFunction potential = new PotentialFunctionSign();
+	protected PotentialFunction potential;
 	
 	protected DecisionBoundaries boundaries = null;
 	
@@ -39,6 +39,7 @@ public class PotentialFunctionCombiner implements DecisionBoundaryCombiner, Seri
 	 * 
 	 */
 	public PotentialFunctionCombiner() {
+		this.potential = new PotentialFunctionSign();
 	}
 
 	/* (non-Javadoc)

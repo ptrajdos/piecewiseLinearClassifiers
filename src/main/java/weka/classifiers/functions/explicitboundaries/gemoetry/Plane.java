@@ -40,12 +40,13 @@ public class Plane implements Serializable {
 	/**
 	 * The dot product defined in the space
 	 */
-	protected DotProduct dotProduct = new DotProductEuclidean();
+	protected DotProduct dotProduct ;
 	
 	
 	
 	
 	public Plane(Instances dataSpace) {
+		this.dotProduct = new DotProductEuclidean();
 		this.dataHeader = new Instances(dataSpace, 0);
 		this.normalVector = new DenseInstance(dataSpace.numAttributes());
 		this.normalVector.setDataset(dataSpace);

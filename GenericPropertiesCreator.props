@@ -8,8 +8,9 @@ weka.classifiers.Classifier=\
  weka.classifiers.functions.explicitboundaries.models
 
  
-weka.classifiers.meta.customizableBagging.OutputCombiner=\
- weka.classifiers.meta.customizableBagging
+weka.classifiers.meta.simpleVotingLikeCombiners.OutputCombiner=\
+ weka.classifiers.meta.simpleVotingLikeCombiners
+
  
 weka.classifiers.functions.explicitboundaries.combiners.PotentialFunction=\
  weka.classifiers.functions.explicitboundaries.combiners

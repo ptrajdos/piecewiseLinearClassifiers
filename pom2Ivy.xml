@@ -1,0 +1,13 @@
+<project
+  name="convertPomToIvy"
+  basedir="." default="all"
+  xmlns:ivy="antlib:org.apache.ivy.ant">
+
+    <target name="convert">
+        <ivy:convertpom pomFile="pom.xml" ivyFile="ivy.xml" />
+    </target>
+    
+    <target name="createpom" >
+            <ivy:makepom ivyfile="ivy.xml" pomfile="xxx.pom"/>
+    </target>
+</project> 

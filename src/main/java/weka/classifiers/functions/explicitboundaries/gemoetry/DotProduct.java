@@ -22,8 +22,6 @@ public interface DotProduct {
 	 * @return
 	 * @throws Exception 
 	 */
-	default	public double norm(Instances dataSet,Instance vec) throws Exception{
-		return Math.sqrt(dotProduct(dataSet, vec, vec));
-	}
+	public double norm(Instances dataSet,Instance vec) throws Exception;
 
 }

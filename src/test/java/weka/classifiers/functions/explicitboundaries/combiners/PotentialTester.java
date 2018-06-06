@@ -20,7 +20,7 @@ public class PotentialTester {
 		double  increment =1;
 		double val=minVal;
 		double response =0;
-		LinkedList<Double> values = new LinkedList<>();
+		LinkedList<Double> values = new LinkedList<Double>();
 		
 		while(val<=maxVal) {
 			values.add(val);

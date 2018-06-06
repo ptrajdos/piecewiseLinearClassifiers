@@ -55,4 +55,9 @@ public class DotProductEuclidean implements DotProduct, Serializable {
 		return product;
 	}
 
+	@Override
+	public double norm(Instances dataSet, Instance vec) throws Exception {
+		return Math.sqrt(this.dotProduct(dataSet, vec, vec));
+	}
+
 }

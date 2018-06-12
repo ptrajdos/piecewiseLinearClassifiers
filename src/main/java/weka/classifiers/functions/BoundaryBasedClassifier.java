@@ -59,7 +59,7 @@ public class BoundaryBasedClassifier extends SingleClassifierEnhancer
 		this.calibrator = new Logistic();
 	}
 	public BoundaryBasedClassifier() {
-		this.setClassifier(new NearestCentroidBoundary());
+		this(new NearestCentroidBoundary());
 	}
 
 	/* (non-Javadoc)

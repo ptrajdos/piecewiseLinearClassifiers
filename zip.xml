@@ -12,6 +12,7 @@
          <outputDirectory>package</outputDirectory>
             <excludes>
                 <exclude>**/*.zip</exclude>
+                <exclude>surefire/*</exclude>
             </excludes>
             <includes>
                 <include>**/*.jar</include>

@@ -60,6 +60,7 @@ public class BoundaryBasedClassifier extends SingleClassifierEnhancer
 	}
 	public BoundaryBasedClassifier() {
 		this(new NearestCentroidBoundary());
+		
 	}
 
 	/* (non-Javadoc)

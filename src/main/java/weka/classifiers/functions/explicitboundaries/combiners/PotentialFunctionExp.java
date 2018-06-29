@@ -30,7 +30,7 @@ public class PotentialFunctionExp implements PotentialFunction, Serializable {
 	 */
 	@Override
 	public double getPotentialValue(double x) throws Exception {
-		return x*Math.exp(-this.alpha*x*x);
+		return x*Math.exp(-this.alpha*x*x + 0.5)*Math.sqrt(2.0*this.alpha);
 	}
 
 	/**

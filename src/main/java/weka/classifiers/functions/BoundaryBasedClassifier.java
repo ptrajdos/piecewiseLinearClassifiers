@@ -4,6 +4,7 @@
 package weka.classifiers.functions;
 
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Random;
 
 import weka.classifiers.Classifier;
@@ -15,6 +16,7 @@ import weka.core.Attribute;
 import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
+import weka.core.Option;
 import weka.core.Randomizable;
 import weka.core.Utils;
 import weka.tools.SerialCopier;
@@ -57,7 +59,8 @@ public class BoundaryBasedClassifier extends SingleClassifierEnhancer
 		this.calibrator = new Logistic();
 	}
 	public BoundaryBasedClassifier() {
-		this.setClassifier(new NearestCentroidBoundary());
+		this(new NearestCentroidBoundary());
+		
 	}
 
 	/* (non-Javadoc)
@@ -228,6 +231,36 @@ public class BoundaryBasedClassifier extends SingleClassifierEnhancer
 	public String globalInfo() {
 		return "Class that allows using boundary based classifiers as normal classifiers"+
 				"Boundary based predictions are transformed into response based ones";
+	}
+	
+	
+	
+	/* (non-Javadoc)
+	 * @see weka.classifiers.SingleClassifierEnhancer#listOptions()
+	 */
+	@Override
+	public Enumeration<Option> listOptions() {
+		// TODO Auto-generated method stub
+		return super.listOptions();
+	}
+	/* (non-Javadoc)
+	 * @see weka.classifiers.SingleClassifierEnhancer#setOptions(java.lang.String[])
+	 */
+	@Override
+	public void setOptions(String[] options) throws Exception {
+		// TODO Auto-generated method stub
+		super.setOptions(options);
+	}
+	/* (non-Javadoc)
+	 * @see weka.classifiers.SingleClassifierEnhancer#getOptions()
+	 */
+	@Override
+	public String[] getOptions() {
+		// TODO Auto-generated method stub
+		return super.getOptions();
+	}
+	public static void main(String[] args) {
+		runClassifier(new BoundaryBasedClassifier(), args);
 	}
 
 }

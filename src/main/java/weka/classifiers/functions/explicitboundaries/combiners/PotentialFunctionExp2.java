@@ -30,7 +30,7 @@ public class PotentialFunctionExp2 implements PotentialFunction, Serializable {
 	@Override
 	public double getPotentialValue(double x) throws Exception {
 		double signum = x==0? 0: (x>0? 1:-1);
-		double result = signum*Math.exp(-this.alpha*x*x);
+		double result = signum* (1- Math.exp(-this.alpha*x*x));
 		return result;
 	}
 

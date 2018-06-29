@@ -42,6 +42,8 @@ public class Plane implements Serializable {
 	 */
 	protected DotProduct dotProduct ;
 	
+	protected boolean normalizeDistance=true;
+	
 	
 	
 	
@@ -82,6 +84,10 @@ public class Plane implements Serializable {
 			result/= normalVecNorm;
 		}
 		 
+		if(this.normalizeDistance) {
+			double normalizer = vec.numAttributes();
+			result/= Math.sqrt(normalizer);
+		}
 		return result;
 	}
 	
@@ -98,6 +104,11 @@ public class Plane implements Serializable {
 		double normalVecNorm =this.dotProduct.norm(this.dataHeader, this.normalVector);
 		if(!Utils.eq(normalVecNorm, 0)) {
 			result/= normalVecNorm;
+		}
+		
+		if(this.normalizeDistance) {
+			double romalizer = vec.numAttributes();
+			result/= Math.sqrt(romalizer);
 		}
 		return result;
 	}
@@ -181,6 +192,20 @@ public class Plane implements Serializable {
 		description.append("Plane:\nNormal Vector: " + this.normalVector +"\nOffset: " + this.offset);
 		
 		return description.toString();
+	}
+
+	/**
+	 * @return the normalizeDistance
+	 */
+	public boolean isNormalizeDistance() {
+		return this.normalizeDistance;
+	}
+
+	/**
+	 * @param normalizeDistance the normalizeDistance to set
+	 */
+	public void setNormalizeDistance(boolean normalizeDistance) {
+		this.normalizeDistance = normalizeDistance;
 	}
 	
 	

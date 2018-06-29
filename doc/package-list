@@ -3,5 +3,5 @@ weka.classifiers.functions.explicitboundaries
 weka.classifiers.functions.explicitboundaries.combiners
 weka.classifiers.functions.explicitboundaries.gemoetry
 weka.classifiers.functions.explicitboundaries.models
-weka.classifiers.meta.customizableBagging
+weka.classifiers.meta.simpleVotingLikeCombiners
 weka.tools

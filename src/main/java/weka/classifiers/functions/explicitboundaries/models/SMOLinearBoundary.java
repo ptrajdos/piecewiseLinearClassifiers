@@ -16,6 +16,7 @@ import weka.core.Capabilities.Capability;
 import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
+import weka.core.SelectedTag;
 
 /**
  * @author pawel
@@ -101,6 +102,11 @@ public class SMOLinearBoundary extends SMO implements ClassifierWithBoundaries {
 	 */
 	@Override
 	public void buildClassifier(Instances insts) throws Exception {
+		
+		/**
+		 * Set no data normalization 
+		 */
+		this.setFilterType(new SelectedTag(SMO.FILTER_NONE, SMO.TAGS_FILTER));
 		super.buildClassifier(insts);
 		this.dataHeader = new Instances(insts, 0);
 		this.defaultModel.buildDefaultModelPlane(insts);

@@ -34,6 +34,7 @@ public class PotentialFunctionCombiner implements DecisionBoundaryCombiner, Seri
 	protected DecisionBoundaries boundaries = null;
 	
 	
+	
 
 	/**
 	 * 

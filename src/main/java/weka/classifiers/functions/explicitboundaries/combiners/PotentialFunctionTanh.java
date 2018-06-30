@@ -9,7 +9,7 @@ import java.io.Serializable;
  * @author pawel
  *
  */
-public class PotentialFunctionTahn implements PotentialFunction, Serializable {
+public class PotentialFunctionTanh implements PotentialFunction, Serializable {
 
 	/**
 	 * 
@@ -21,7 +21,7 @@ public class PotentialFunctionTahn implements PotentialFunction, Serializable {
 	/**
 	 * 
 	 */
-	public PotentialFunctionTahn() {
+	public PotentialFunctionTanh() {
 		// TODO Auto-generated constructor stub
 	}
 

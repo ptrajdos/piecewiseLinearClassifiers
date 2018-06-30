@@ -7,10 +7,10 @@ import org.junit.Test;
 
 public class PotentialFunctionTahnTest {
 
-	PotentialFunctionTahn potFun = null;
+	PotentialFunctionTanh potFun = null;
 	@Before
 	public void setUp() throws Exception {
-		this.potFun = new PotentialFunctionTahn();
+		this.potFun = new PotentialFunctionTanh();
 	}
 
 	@Test

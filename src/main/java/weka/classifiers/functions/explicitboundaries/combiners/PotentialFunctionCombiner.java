@@ -11,6 +11,8 @@ import java.util.Vector;
 import weka.classifiers.functions.explicitboundaries.DecisionBoundaries;
 import weka.classifiers.functions.explicitboundaries.DecisionBoundary;
 import weka.classifiers.functions.explicitboundaries.DecisionBoundaryCombiner;
+import weka.classifiers.functions.explicitboundaries.combiners.potentialCombiners.PotentialCombiner;
+import weka.classifiers.functions.explicitboundaries.combiners.potentialCombiners.PotentialCombinerSum;
 import weka.core.Instance;
 import weka.core.Option;
 import weka.core.OptionHandler;
@@ -33,6 +35,8 @@ public class PotentialFunctionCombiner implements DecisionBoundaryCombiner, Seri
 	
 	protected DecisionBoundaries boundaries = null;
 	
+	protected PotentialCombiner potCombiner =  null;
+	
 	
 	
 
@@ -41,6 +45,7 @@ public class PotentialFunctionCombiner implements DecisionBoundaryCombiner, Seri
 	 */
 	public PotentialFunctionCombiner() {
 		this.potential = new PotentialFunctionSign();
+		this.potCombiner = new PotentialCombinerSum();
 	}
 
 	/* (non-Javadoc)
@@ -53,23 +58,13 @@ public class PotentialFunctionCombiner implements DecisionBoundaryCombiner, Seri
 			throw new Exception("No boundaries have been set");
 		
 			
-		double combinedValue =0;
-		List<DecisionBoundary> boundariesList = this.boundaries.getBoundaries();
-		int numBoundaries = boundariesList.size();
-		if(numBoundaries <= 0 )
-			throw new Exception("Set contains no boundaries");
 		
-		int idx1 = boundariesList.get(0).getClass1Idx();
-		int idx2 = boundariesList.get(0).getClass2Idx();
 		
-		double signDist = 0;
-		for(int i=0;i<numBoundaries;i++){
-			signDist = boundariesList.get(i).getValue(inst);
-			combinedValue += this.potential.getPotentialValue(signDist);
-		}
-		combinedValue/=numBoundaries;
 		
-		return combinedValue>0? idx1:idx2;
+		int classIdx;
+		classIdx = this.potCombiner.getCombinedBoundaries(inst, this.boundaries);
+		
+		return classIdx;
 	}
 
 	/* (non-Javadoc)
@@ -112,6 +107,8 @@ public class PotentialFunctionCombiner implements DecisionBoundaryCombiner, Seri
 		int index = this.getDecision(inst);
 		return index;
 	}
+	
+	
 
 	@Override
 	public Enumeration<Option> listOptions() {
@@ -121,13 +118,20 @@ public class PotentialFunctionCombiner implements DecisionBoundaryCombiner, Seri
 			      "\t Potenitial function to use "+
 		          "(default:"+PotentialFunctionSign.class.toGenericString()  +" ).\n",
 			      "PF", 0, "-PF"));
+		 
+		 newVector.addElement(new Option(
+			      "\t Potenitial combiner to use "+
+		          "(default:"+PotentialCombinerSum.class.toGenericString()  +" ).\n",
+			      "PC", 0, "-PC"));
 		    
 		return newVector.elements();
 	}
 
 	@Override
 	public void setOptions(String[] options) throws Exception {
-		String potentialString = Utils.getOption("BC", options);
+		
+		String potentialString = Utils.getOption("PF", options);
+		
 	    if(potentialString.length() != 0) {
 	      String combinerClassSpec[] = Utils.splitOptions(potentialString);
 	      if(combinerClassSpec.length == 0) { 
@@ -143,7 +147,23 @@ public class PotentialFunctionCombiner implements DecisionBoundaryCombiner, Seri
 	                                        );
 	    }
 	    else 
-	      this.setPotential(new PotentialFunctionSign()); 
+	      this.setPotential(new PotentialFunctionSign());
+	    
+	    String potentialCombinerString = Utils.getOption("PC", options);
+	    if(potentialCombinerString.length()!=0) {
+	    	String combinerClassSpec[] = Utils.splitOptions(potentialString);
+		      if(combinerClassSpec.length == 0) { 
+		        throw new Exception("Invalid Class combiner."); 
+		      }
+		      String className = combinerClassSpec[0];
+		      combinerClassSpec[0] = "";
+	    	this.setPotCombiner((PotentialCombiner) 
+                    Utils.forName( PotentialCombiner.class, 
+                                 className, 
+                                 combinerClassSpec)
+                                        );
+	    }else
+	    	this.setPotCombiner(new PotentialCombinerSum());
 		
 	}
 
@@ -156,6 +176,22 @@ public class PotentialFunctionCombiner implements DecisionBoundaryCombiner, Seri
 	    
 	    return options.toArray(new String[0]);
 	}
+
+	/**
+	 * @return the potCombiner
+	 */
+	public PotentialCombiner getPotCombiner() {
+		return this.potCombiner;
+	}
+
+	/**
+	 * @param potCombiner the potCombiner to set
+	 */
+	public void setPotCombiner(PotentialCombiner potCombiner) {
+		this.potCombiner = potCombiner;
+	}
+	
+	
 	
 
 }

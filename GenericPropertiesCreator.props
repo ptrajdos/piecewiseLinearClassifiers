@@ -12,3 +12,7 @@ weka.classifiers.functions.explicitboundaries.combiners.PotentialFunction=\
  
 weka.classifiers.functions.explicitboundaries.DecisionBoundaryCombiner=\
  weka.classifiers.functions.explicitboundaries.combiners
+
+ 
+weka.classifiers.functions.explicitboundaries.combiners.potentialCombiners.PotentialCombiner=\
+weka.classifiers.functions.explicitboundaries.combiners.potentialCombiners

@@ -19,7 +19,8 @@ import weka.core.OptionHandler;
 import weka.core.Utils;
 
 /**
- * @author pawel
+ * @author pawel trajdos
+ * @version 1.1.1
  *
  */
 public class PotentialFunctionCombiner implements DecisionBoundaryCombiner, Serializable,OptionHandler {
@@ -62,7 +63,7 @@ public class PotentialFunctionCombiner implements DecisionBoundaryCombiner, Seri
 		
 		
 		int classIdx;
-		classIdx = this.potCombiner.getCombinedBoundaries(inst, this.boundaries);
+		classIdx = this.potCombiner.getCombinedBoundaries(inst, this.boundaries, this.potential);
 		
 		return classIdx;
 	}

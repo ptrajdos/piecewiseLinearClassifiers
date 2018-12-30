@@ -8,11 +8,12 @@ import java.util.List;
 
 import weka.classifiers.functions.explicitboundaries.DecisionBoundaries;
 import weka.classifiers.functions.explicitboundaries.DecisionBoundary;
+import weka.classifiers.functions.explicitboundaries.combiners.PotentialFunction;
 import weka.core.Instance;
 
 /**
  * @author pawel trajdos
- * @version 1.1.0
+ * @version 1.2.0
  * Combines the boundaries-specific outputs using max-sum rule
  *
  */
@@ -27,7 +28,7 @@ public class PotentialCombinerSum implements PotentialCombiner, Serializable {
 	 * @see weka.classifiers.functions.explicitboundaries.combiners.potentialCombiners.PotentialCombiner#getCombinedBoundaries(weka.core.Instance, weka.classifiers.functions.explicitboundaries.DecisionBoundaries)
 	 */
 	@Override
-	public int getCombinedBoundaries(Instance inst, DecisionBoundaries boundaries) throws Exception {
+	public int getCombinedBoundaries(Instance inst, DecisionBoundaries boundaries, PotentialFunction potFunction) throws Exception {
 		List<DecisionBoundary> boundariesList = boundaries.getBoundaries();
 		int boundNumber = boundariesList.size();
 		if(boundNumber == 0)
@@ -36,7 +37,7 @@ public class PotentialCombinerSum implements PotentialCombiner, Serializable {
 		double tmpVal=0;
 		double sum=0;
 		for(int i=0;i<boundNumber;i++) {
-			tmpVal = boundariesList.get(i).getValue(inst);
+			tmpVal = potFunction.getPotentialValue( boundariesList.get(i).getValue(inst));
 			sum+=tmpVal;
 		}
 		int idx1 = boundariesList.get(0).getClass1Idx();

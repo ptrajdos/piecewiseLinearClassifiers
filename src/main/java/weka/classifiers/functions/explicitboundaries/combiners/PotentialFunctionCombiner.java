@@ -174,6 +174,12 @@ public class PotentialFunctionCombiner implements DecisionBoundaryCombiner, Seri
 	    String combinerOptions = (this.potential instanceof OptionHandler)? Utils.joinOptions(((OptionHandler)this.potential).getOptions()):"";
 	    options.add(this.potential.getClass().getName()+" "+combinerOptions); 
 	    
+	    
+	    options.add("-PC");
+	    String potCombOptions = (this.potCombiner instanceof OptionHandler)? Utils.joinOptions( ((OptionHandler)this.potCombiner).getOptions() ):"";
+	    options.add(this.potCombiner.getClass().getName()  + " " + potCombOptions);
+	    
+	    
 	    return options.toArray(new String[0]);
 	}
 

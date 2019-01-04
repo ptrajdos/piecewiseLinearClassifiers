@@ -11,15 +11,17 @@ import weka.classifiers.functions.explicitboundaries.DecisionBoundaries;
 import weka.classifiers.functions.explicitboundaries.DecisionBoundary;
 import weka.classifiers.functions.explicitboundaries.combiners.PotentialFunction;
 import weka.core.Instance;
+import weka.core.Statistics;
+import weka.core.Utils;
 import weka.core.UtilsPT;
 
 /**
  * @author Pawel Trajdos
- * @version 1.3.0
+ * @version 1.2.0
  * Combines the boundaries-specific outputs using max-max rule
  *
  */
-public class PotentialCombinerMaxMed implements PotentialCombiner, Serializable {
+public class PotentialCombinerMaxTMean implements PotentialCombiner, Serializable {
 
 	/**
 	 * 
@@ -71,10 +73,12 @@ public class PotentialCombinerMaxMed implements PotentialCombiner, Serializable 
 			positiveArray[i] = positives.get(i);
 		}
 		
-		double negMedian  = UtilsPT.median(negativeArray);
-		double posMedian = UtilsPT.median(positiveArray);
+		double negTMean  = UtilsPT.truncatedMean(negativeArray);
+		double posTMean = UtilsPT.truncatedMean(positiveArray);
+		
 	
-		return (posMedian - negMedian)>0? idx1:idx2;
+	
+		return (posTMean - negTMean)>0? idx1:idx2;
 	}
 
 }

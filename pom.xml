@@ -238,12 +238,10 @@
             </includes>
             <disableXmlReport>true</disableXmlReport>
             <redirectTestOutputToFile>true</redirectTestOutputToFile>
-            <!-- FAILING TESTS?? -->
-            <testFailureIgnore>true</testFailureIgnore>
-            <reuseForks>false</reuseForks>
-            <forkCount>1</forkCount>
-            <showSuccess>true</showSuccess>
-            <enableAssertions>false</enableAssertions>
+            <systemPropertyVariables>
+              <weka.test.Regression.root>src/test/resources/wekarefs</weka.test.Regression.root>
+              <weka.test.maventest>true</weka.test.maventest>
+            </systemPropertyVariables>
           </configuration>
         </plugin>
 

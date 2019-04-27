@@ -48,13 +48,16 @@ public class PlaneTest {
 		try {
 			this.plane.setNormalVector(nV);
 			this.plane.setOffset(offset);
+			this.plane.setNormalizeDistance(false);
+			double val =1;
 			
 			double dist = this.plane.distanceToPlane(test1);
-			assertEquals(1, dist,1E-6);
+			
+			assertEquals("Plane dist 1, t1",val, dist,1E-6);
 			assertEquals(3, this.plane.distanceToPlane(test2),1e-6);
 			assertTrue(this.plane.sideOfThePlane(test1)>0);
 			assertTrue(this.plane.sideOfThePlane(test2)<0);
-			assertEquals(1, this.plane.distanceToPlane(test1),1e-6);
+			assertEquals("Plane dist 1, t2",val, this.plane.distanceToPlane(test1),1e-6);
 			
 		} catch (Exception e) {
 			e.printStackTrace();

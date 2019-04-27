@@ -63,14 +63,14 @@ public class NearestCentroidBoundary extends NearestCentroidClassifier implement
 			return this.defaultModel.planeModel;
 		}
 		
-		Instance normalVec = new DenseInstance(this.centroids[0]);
-		normalVec.setDataset(this.centroids[0].dataset());
-		Instance middleVec = new DenseInstance(this.centroids[0]);
-		middleVec.setDataset(this.centroids[0].dataset());
+		Instance normalVec = new DenseInstance(this.centFinder.getCentroid(0));
+		normalVec.setDataset(this.centFinder.getCentroid(0).dataset());
+		Instance middleVec = new DenseInstance(this.centFinder.getCentroid(0));
+		middleVec.setDataset(this.centFinder.getCentroid(0).dataset());
 		
 		int classAttrib = normalVec.classIndex();
-		double[] cent0D = this.centroids[0].toDoubleArray();
-		double[] cent1D = this.centroids[1].toDoubleArray();
+		double[] cent0D = this.centFinder.getCentroid(0).toDoubleArray();
+		double[] cent1D = this.centFinder.getCentroid(1).toDoubleArray();
 		
 		for(int a=0;a<classAttrib;a++){
 			if(a == classAttrib){

@@ -12,7 +12,8 @@ import weka.core.Utils;
 
 /**
  * @author pawel
- *
+ * @since 0.1.0
+ * @version 0.1.0
  */
 public class Plane implements Serializable {
 

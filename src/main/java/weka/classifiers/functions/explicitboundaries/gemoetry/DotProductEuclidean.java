@@ -4,13 +4,14 @@
 package weka.classifiers.functions.explicitboundaries.gemoetry;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.tools.InstancesTools;
 
 /**
- * @author pawel
+ * @author pawel trajdos
  *
  */
 public class DotProductEuclidean implements DotProduct, Serializable {
@@ -58,6 +59,23 @@ public class DotProductEuclidean implements DotProduct, Serializable {
 	@Override
 	public double norm(Instances dataSet, Instance vec) throws Exception {
 		return Math.sqrt(this.dotProduct(dataSet, vec, vec));
+	}
+
+	@Override
+	public Instance projection(Instances dataSet, Instance inst1, Instance inst2) throws Exception {
+		double[] tmp = inst2.toDoubleArray();
+		double[] representation =  Arrays.copyOf(tmp, tmp.length) ;
+		
+		double weight = this.dotProduct(dataSet, inst1, inst2)/this.norm(dataSet, inst2);
+		
+		int attNum = dataSet.numAttributes();
+		for(int a=0;a<attNum;a++) {
+			if(!dataSet.attribute(a).isNumeric())
+				continue;
+			representation[a]*=weight;
+		}
+		Instance result = inst2.copy(representation);
+		return result;
 	}
 
 }

@@ -8,7 +8,7 @@ import weka.core.Instance;
 import weka.core.Instances;
 
 /**
- * @author pawel
+ * @author pawel trajdos
  *
  */
 public class InstancesTools {
@@ -89,6 +89,36 @@ public class InstancesTools {
 				throw new Exception(msg);
 			}
 			
+		}
+		
+		return true;
+	}
+	
+	/**
+	 * Check whether the instances are equall
+	 * @param inst1 -- instance 1
+	 * @param inst2 --  instance 2
+	 * @param checkClass -- determines if the class attribute is checked
+	 * @return -- boolean
+	 * @throws Exception if something goes wrong
+	 * 
+	 * @since 1.4.0
+	 * @version 1.4.0
+	 */
+	public static boolean checkEquall(Instance inst1, Instance inst2, boolean checkClass) throws Exception{
+		if(!checkCompatibility(inst1, inst2))return false;
+		Instances dataset = inst1.dataset();
+		if(!checkCompatibility(dataset, inst2))return false;
+		
+		int numAttrs = dataset.numAttributes();
+		
+		double[] rep1 = inst1.toDoubleArray();
+		double[] rep2 = inst2.toDoubleArray();
+		int classIdx = dataset.classIndex();
+		for(int a=0; a<numAttrs;a++) {
+			if(a == classIdx && !checkClass )continue;
+			if(rep1[a] != rep2[a])
+				return false;
 		}
 		
 		return true;

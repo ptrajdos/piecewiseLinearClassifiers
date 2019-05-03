@@ -81,7 +81,7 @@ public class NearestCentroidBoundary extends NearestCentroidClassifier implement
 			middleVec.setValue(a, 0.5*(cent0D[a] + cent1D[a]));
 		}
 		
-		double offset = - this.dotProduct.dotProduct(normalVec.dataset(), normalVec, middleVec);
+		double offset = - this.dotProduct.dotProduct(normalVec, middleVec);
 		
 		DecisionBoundaryPlane boundary = new DecisionBoundaryPlane(normalVec.dataset(),0, 1);
 		boundary.getDecisionPlane().setNormalVector(normalVec);

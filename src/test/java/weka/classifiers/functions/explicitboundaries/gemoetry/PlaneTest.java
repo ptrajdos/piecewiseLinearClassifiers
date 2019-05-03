@@ -12,6 +12,7 @@ import weka.core.Attribute;
 import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
+import weka.tools.InstancesTools;
 
 public class PlaneTest {
 
@@ -37,6 +38,7 @@ public class PlaneTest {
 		double offset = -1;
 		Instance nV = new DenseInstance(1.0, new double[] {1,0,1});
 		nV.setDataset(dataset);
+		
 		
 		Instance test1 = new DenseInstance(1.0, new double[] {2,0,1});
 		test1.setDataset(dataset);
@@ -116,6 +118,39 @@ public class PlaneTest {
 	@Test
 	public void testGetDataHeader() {
 		assertEquals(this.dataset, this.plane.getDataHeader());
+		
+	}
+	
+	@Test
+	public void testPlaneBase() {
+		Instance nV = new DenseInstance(1.0, new double[] {1,0,1});
+		nV.setDataset(dataset);
+		
+		Instance base = new DenseInstance(1.0, new double[] {0,1,1});
+		base.setDataset(dataset);
+		
+		Instance tInst = new DenseInstance(1.0, new double[] {6.5,-3,1});
+		tInst.setDataset(dataset);
+		
+		Instance tInstProj = new DenseInstance(1.0, new double[] {0,-3,1});
+		tInstProj.setDataset(dataset);
+		
+		
+		
+		Instance[] b1 = null;
+		Instance projT = null;
+		
+		try {
+			this.plane.setNormalVector(nV);
+			b1 = this.plane.planeBase;
+			assertTrue("Check plane base", InstancesTools.checkEquall(base, b1[0], false));
+			projT  = this.plane.projectOnPlane(tInst);
+			assertTrue("Check plane projection", InstancesTools.checkEquall(projT, tInstProj, false));
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail("Exception has been caught");
+		}
+		
 		
 	}
 

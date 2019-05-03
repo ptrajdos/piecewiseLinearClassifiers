@@ -16,6 +16,7 @@ import weka.core.Instances;
 
 /**
  * @author pawel trajdos
+ * @since 1.3.0
  * @version 1.3.0
  *
  */

@@ -16,6 +16,14 @@ import weka.core.Instance;
 import weka.core.Instances;
 import weka.tools.InstancesTools;
 
+/**
+ * 
+ * @author pawel trajdos
+ * @since 0.1.0
+ * @version 1.4.0
+ *
+ */
+
 public class DotProductEuclideanTest {
 
 	DotProduct dotP = null;
@@ -65,10 +73,10 @@ public class DotProductEuclideanTest {
 	      DotProduct dotP = new DotProductEuclidean();
 	      
 	      try {
-			Instance res1 =  dotP.projection(dataset, test5, test1);
+			Instance res1 =  dotP.projection(test5, test1);
 			assertTrue("Check projection 1", InstancesTools.checkEquall(res1, test6,false));
 			assertFalse("Check projection 1 -F ", InstancesTools.checkEquall(res1, test7,false));
-			res1 =  dotP.projection(dataset, test5, test3);
+			res1 =  dotP.projection(test5, test3);
 			assertTrue("Check projection 2", InstancesTools.checkEquall(res1, test7,false));
 			assertFalse("Check projection 2 -F ", InstancesTools.checkEquall(res1, test6,false));
 			

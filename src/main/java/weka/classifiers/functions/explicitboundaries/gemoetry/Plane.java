@@ -34,6 +34,11 @@ public class Plane implements Serializable {
 	protected Instance normalVector = null;
 	
 	/**
+	 * Orthonormal base of the plane
+	 */
+	protected Instance[] planeBase;
+	
+	/**
 	 * Offset of the plane
 	 */
 	protected double offset = 0;
@@ -44,6 +49,8 @@ public class Plane implements Serializable {
 	protected DotProduct dotProduct ;
 	
 	protected boolean normalizeDistance=true;
+	
+	protected GrammShmidtOrthonormal gsOrth;
 	
 	
 	
@@ -68,6 +75,14 @@ public class Plane implements Serializable {
 			this.normalVector.setValue(a, 1);
 			
 		}
+		this.gsOrth = new GrammShmidtOrthonormal();
+		
+		try {
+			this.createPlaneBase();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 	}
 	
@@ -79,8 +94,8 @@ public class Plane implements Serializable {
 	 */
 	public double distanceToPlane(Instance vec) throws Exception{
 		double result =0;
-		result = Math.abs(this.dotProduct.dotProduct(this.dataHeader, this.normalVector, vec) + this.getOffset());
-		double normalVecNorm =this.dotProduct.norm(this.dataHeader, this.normalVector);
+		result = Math.abs(this.dotProduct.dotProduct(this.normalVector, vec) + this.getOffset());
+		double normalVecNorm =this.dotProduct.norm(this.normalVector);
 		if(!Utils.eq(normalVecNorm, 0)) {
 			result/= normalVecNorm;
 		}
@@ -101,19 +116,90 @@ public class Plane implements Serializable {
 	 */
 	public double sideOfThePlane(Instance vec) throws Exception{
 		double result =0 ;
-		result = this.dotProduct.dotProduct(this.dataHeader, this.normalVector, vec) + this.offset;
-		double normalVecNorm =this.dotProduct.norm(this.dataHeader, this.normalVector);
+		result = this.dotProduct.dotProduct(this.normalVector, vec) + this.offset;
+		double normalVecNorm =this.dotProduct.norm(this.normalVector);
 		if(!Utils.eq(normalVecNorm, 0)) {
 			result/= normalVecNorm;
 		}
-		
+		//TODO check it!!
 		if(this.normalizeDistance) {
-			double romalizer = vec.numAttributes();
-			result/= Math.sqrt(romalizer);
+			double normFactor = vec.numAttributes();
+			result/= Math.sqrt(normFactor);
 		}
 		return result;
 	}
 
+	
+	private void createPlaneBase() throws Exception {
+		Instance[] base = createBase();
+		this.planeBase = this.gsOrth.createOrthonormalBase(base);
+	}
+	
+	private Instance[] createBase() {
+		int numAttrs = this.dataHeader.numAttributes()  - (this.dataHeader.classIndex()>=0? 1:0);
+		if(numAttrs<=1) {
+			return new Instance[] {this.normalVector.copy(this.normalVector.toDoubleArray())};
+		}
+		Instance[] base = new Instance[numAttrs-1];
+		
+		int classIdx = this.dataHeader.classIndex();
+		double[] nVecRep = this.normalVector.toDoubleArray();
+		
+		int coefIdx = getNonzeroNormVecPosIdx();
+		if(coefIdx<0) {
+			return new Instance[] {this.normalVector.copy(this.normalVector.toDoubleArray())};
+		}
+		
+		double coef = nVecRep[coefIdx];
+		double[] instRep = null;
+		
+		int baseCount =0;
+		for(int a=0;a<numAttrs;a++) {
+			if(coefIdx == a || a== classIdx || (!this.dataHeader.attribute(a).isNumeric()) )continue;
+			instRep = new double[nVecRep.length];
+			instRep[a] =1.0;
+			instRep[coefIdx] = -(nVecRep[a] + this.offset)/coef;
+			base[baseCount++] = this.normalVector.copy(instRep);
+		}
+		return base;
+	}
+	
+	/**
+	 * Find first nonzero position of the normal vector.
+	 * If none has been found, returns -1
+	 * @return 
+	 */
+	private int getNonzeroNormVecPosIdx() {
+		int numAttrs = this.dataHeader.numAttributes();
+		int classIdx = this.dataHeader.classIndex();
+		double[] nVecRep = this.normalVector.toDoubleArray();
+		
+		
+		for(int a =0;a<numAttrs;a++) {
+			if(a==classIdx)
+				continue;
+			if(!Utils.eq(nVecRep[a], 0)) {
+				return a;
+			}
+		}
+		return -1;
+	}
+	
+	public Instance projectOnPlane(Instance inst)throws Exception {
+		
+		Instance projection =null;
+		Instance tmp;
+		projection = this.dotProduct.projection(inst, this.planeBase[0]);
+		for(int i=1;i<this.planeBase.length;i++) {
+			tmp = this.dotProduct.projection(inst, this.planeBase[i]);
+			InstancesGeometricOperations.addInstances(projection, tmp);
+		}
+	
+		InstancesGeometricOperations.scale(projection, 1.0/this.planeBase.length);
+			
+		
+		return projection;
+	}
 
 
 
@@ -135,6 +221,8 @@ public class Plane implements Serializable {
 		if(!this.dataHeader.checkInstance(normalVector))
 			throw new Exception("Invalid Normal Vector");
 		this.normalVector = normalVector;
+		
+		this.createPlaneBase();
 	}
 
 

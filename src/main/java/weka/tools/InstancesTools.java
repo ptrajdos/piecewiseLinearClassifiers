@@ -42,6 +42,9 @@ public class InstancesTools {
 		
 		if(inst.classIndex() != dataset.classIndex())
 			throw new Exception("The class index does not match");
+		
+		if(!inst.dataset().equals(dataset))
+			throw new Exception("Dataset is incompatible!");
 
 		
 		Attribute instAttr;
@@ -75,7 +78,9 @@ public class InstancesTools {
 		
 		if(inst2.classIndex() != inst1.classIndex())
 			throw new Exception("The class index does not match");
-
+		
+		if(!checkCompatibility(inst1.dataset(), inst2))
+			throw new Exception("Datasets does not match");
 		
 		Attribute inst2Attr;
 		Attribute inst1Attr;
@@ -108,7 +113,6 @@ public class InstancesTools {
 	public static boolean checkEquall(Instance inst1, Instance inst2, boolean checkClass) throws Exception{
 		if(!checkCompatibility(inst1, inst2))return false;
 		Instances dataset = inst1.dataset();
-		if(!checkCompatibility(dataset, inst2))return false;
 		
 		int numAttrs = dataset.numAttributes();
 		
@@ -123,7 +127,20 @@ public class InstancesTools {
 		
 		return true;
 	}
-	
+	/**
+	 * Creates a copy of the instance
+	 * @author pawel trajdos
+	 * 
+	 * @param inst
+	 * @return
+	 * 
+	 * @since 1.4.0
+	 * @version 1.4.0
+	 */
+	public static Instance copyInstance(Instance inst) {
+		Instance result = inst.copy(inst.toDoubleArray());
+		return result;
+	}
 	
 
 }

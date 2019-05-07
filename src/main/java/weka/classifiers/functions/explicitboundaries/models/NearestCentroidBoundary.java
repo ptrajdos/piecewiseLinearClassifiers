@@ -3,6 +3,7 @@
  */
 package weka.classifiers.functions.explicitboundaries.models;
 
+
 import weka.classifiers.functions.NearestCentroidClassifier;
 import weka.classifiers.functions.explicitboundaries.ClassifierWithBoundaries;
 import weka.classifiers.functions.explicitboundaries.DecisionBoundary;
@@ -63,14 +64,14 @@ public class NearestCentroidBoundary extends NearestCentroidClassifier implement
 			return this.defaultModel.planeModel;
 		}
 		
-		Instance normalVec = new DenseInstance(this.centFinder.getCentroid(0));
-		normalVec.setDataset(this.centFinder.getCentroid(0).dataset());
-		Instance middleVec = new DenseInstance(this.centFinder.getCentroid(0));
-		middleVec.setDataset(this.centFinder.getCentroid(0).dataset());
+		Instance normalVec = new DenseInstance(this.getCentroids()[0]);
+		normalVec.setDataset(this.getCentroids()[0].dataset());
+		Instance middleVec = new DenseInstance(this.getCentroids()[0]);
+		middleVec.setDataset(this.getCentroids()[0].dataset());
 		
 		int classAttrib = normalVec.classIndex();
-		double[] cent0D = this.centFinder.getCentroid(0).toDoubleArray();
-		double[] cent1D = this.centFinder.getCentroid(1).toDoubleArray();
+		double[] cent0D = this.getCentroids()[0].toDoubleArray();
+		double[] cent1D = this.getCentroids()[1].toDoubleArray();
 		
 		for(int a=0;a<classAttrib;a++){
 			if(a == classAttrib){
@@ -98,8 +99,10 @@ public class NearestCentroidBoundary extends NearestCentroidClassifier implement
 	@Override
 	public Capabilities getCapabilities() {
 		Capabilities base = super.getCapabilities();
-		base.disable(Capability.NOMINAL_CLASS);
+		base.disableAll();
+		base.enable(Capability.NUMERIC_ATTRIBUTES);
 		base.enable(Capability.BINARY_CLASS);
+		base.setMinimumNumberInstances(2);
 		return base;
 	}
 
@@ -129,5 +132,6 @@ public class NearestCentroidBoundary extends NearestCentroidClassifier implement
 		runClassifier(new NearestCentroidBoundary(), args);
 
 	}
+
 
 }

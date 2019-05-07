@@ -10,10 +10,10 @@ import weka.classifiers.functions.explicitboundaries.DecisionBoundaryPlane;
 import weka.classifiers.functions.explicitboundaries.gemoetry.Plane;
 import weka.classifiers.rules.ZeroR;
 import weka.core.Capabilities;
+import weka.core.Capabilities.Capability;
 import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
-import weka.core.Capabilities.Capability;
 
 /**
  * @author pawel

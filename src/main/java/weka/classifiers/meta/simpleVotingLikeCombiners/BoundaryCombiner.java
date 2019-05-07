@@ -16,7 +16,6 @@ import weka.classifiers.functions.explicitboundaries.DecisionBoundaries;
 import weka.classifiers.functions.explicitboundaries.DecisionBoundary;
 import weka.classifiers.functions.explicitboundaries.DecisionBoundaryCombiner;
 import weka.classifiers.functions.explicitboundaries.combiners.PotentialFunctionCombiner;
-import weka.classifiers.meta.simpleVotingLikeCombiners.OutputCombinerBase;
 import weka.classifiers.meta.tools.CommitteeExtractor;
 import weka.core.Instance;
 import weka.core.Instances;

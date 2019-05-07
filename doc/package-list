@@ -5,4 +5,3 @@ weka.classifiers.functions.explicitboundaries.combiners.potentialCombiners
 weka.classifiers.functions.explicitboundaries.gemoetry
 weka.classifiers.functions.explicitboundaries.models
 weka.classifiers.meta.simpleVotingLikeCombiners
-weka.tools

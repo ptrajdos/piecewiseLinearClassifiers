@@ -128,6 +128,7 @@ public class SMOLinearBoundary extends SMO implements ClassifierWithBoundaries {
 		Capabilities base = super.getCapabilities();
 		base.disable(Capability.NOMINAL_CLASS);
 		base.enable(Capability.BINARY_CLASS);
+		base.disable(Capability.NOMINAL_ATTRIBUTES);
 		return base;
 	}
 

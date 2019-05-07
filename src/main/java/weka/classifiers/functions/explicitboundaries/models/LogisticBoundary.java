@@ -96,7 +96,8 @@ public class LogisticBoundary extends Logistic implements ClassifierWithBoundari
 	@Override
 	public Capabilities getCapabilities() {
 		Capabilities base = super.getCapabilities();
-		base.disable(Capability.NOMINAL_CLASS);
+		base.disableAll();
+		base.enable(Capability.NUMERIC_ATTRIBUTES);
 		base.enable(Capability.BINARY_CLASS);
 		return base;
 	}

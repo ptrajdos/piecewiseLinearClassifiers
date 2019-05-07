@@ -11,7 +11,10 @@ import weka.classifiers.Classifier;
 import weka.classifiers.SingleClassifierEnhancer;
 import weka.classifiers.functions.explicitboundaries.ClassifierWithBoundaries;
 import weka.classifiers.functions.explicitboundaries.DecisionBoundary;
+import weka.classifiers.functions.explicitboundaries.models.LinearRegressionBoundary;
+import weka.classifiers.functions.explicitboundaries.models.LogisticBoundary;
 import weka.classifiers.functions.explicitboundaries.models.NearestCentroidBoundary;
+import weka.classifiers.functions.explicitboundaries.models.SMOLinearBoundary;
 import weka.core.Attribute;
 import weka.core.DenseInstance;
 import weka.core.Instance;
@@ -22,7 +25,8 @@ import weka.core.Utils;
 import weka.tools.SerialCopier;
 
 /**
- * @author pawel
+ * @author pawel trajdos
+ * @version 1.4.0
  *
  */
 public class BoundaryBasedClassifier extends SingleClassifierEnhancer
@@ -59,7 +63,12 @@ public class BoundaryBasedClassifier extends SingleClassifierEnhancer
 		this.calibrator = new Logistic();
 	}
 	public BoundaryBasedClassifier() {
-		this(new NearestCentroidBoundary());
+		this(new NearestCentroidBoundary());//TODO something wrong with Nearest Centroid for example
+		//FLDA + 
+		//SMO -- NullPointer exceptions
+		//LinearRegression + 
+		//Logistic  -- NullPointer exceptions
+		//Nearest centroid -- strange test failure
 		
 	}
 
@@ -68,7 +77,7 @@ public class BoundaryBasedClassifier extends SingleClassifierEnhancer
 	 */
 	@Override
 	public void buildClassifier(Instances data) throws Exception {
-		this.tmpClassifier = (ClassifierWithBoundaries) SerialCopier.makeCopy(m_Classifier);
+		this.tmpClassifier = (ClassifierWithBoundaries) SerialCopier.makeCopy(this.m_Classifier);
 		this.m_Classifier.buildClassifier(data);
 		if(this.useCalibrator)
 			this.buildCalibrator(data);

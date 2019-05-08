@@ -12,6 +12,7 @@ import weka.core.Attribute;
 import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
+import weka.tools.InstancesTools;
 
 public class PlaneTest {
 
@@ -38,6 +39,7 @@ public class PlaneTest {
 		Instance nV = new DenseInstance(1.0, new double[] {1,0,1});
 		nV.setDataset(dataset);
 		
+		
 		Instance test1 = new DenseInstance(1.0, new double[] {2,0,1});
 		test1.setDataset(dataset);
 		
@@ -48,13 +50,16 @@ public class PlaneTest {
 		try {
 			this.plane.setNormalVector(nV);
 			this.plane.setOffset(offset);
+			this.plane.setNormalizeDistance(false);
+			double val =1;
 			
 			double dist = this.plane.distanceToPlane(test1);
-			assertEquals(1, dist,1E-6);
+			
+			assertEquals("Plane dist 1, t1",val, dist,1E-6);
 			assertEquals(3, this.plane.distanceToPlane(test2),1e-6);
 			assertTrue(this.plane.sideOfThePlane(test1)>0);
 			assertTrue(this.plane.sideOfThePlane(test2)<0);
-			assertEquals(1, this.plane.distanceToPlane(test1),1e-6);
+			assertEquals("Plane dist 1, t2",val, this.plane.distanceToPlane(test1),1e-6);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -113,6 +118,39 @@ public class PlaneTest {
 	@Test
 	public void testGetDataHeader() {
 		assertEquals(this.dataset, this.plane.getDataHeader());
+		
+	}
+	
+	@Test
+	public void testPlaneBase() {
+		Instance nV = new DenseInstance(1.0, new double[] {1,0,1});
+		nV.setDataset(dataset);
+		
+		Instance base = new DenseInstance(1.0, new double[] {0,1,1});
+		base.setDataset(dataset);
+		
+		Instance tInst = new DenseInstance(1.0, new double[] {6.5,-3,1});
+		tInst.setDataset(dataset);
+		
+		Instance tInstProj = new DenseInstance(1.0, new double[] {0,-3,1});
+		tInstProj.setDataset(dataset);
+		
+		
+		
+		Instance[] b1 = null;
+		Instance projT = null;
+		
+		try {
+			this.plane.setNormalVector(nV);
+			b1 = this.plane.planeBase;
+			assertTrue("Check plane base", InstancesTools.checkEquall(base, b1[0], false));
+			projT  = this.plane.projectOnPlane(tInst);
+			assertTrue("Check plane projection", InstancesTools.checkEquall(projT, tInstProj, false));
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail("Exception has been caught");
+		}
+		
 		
 	}
 

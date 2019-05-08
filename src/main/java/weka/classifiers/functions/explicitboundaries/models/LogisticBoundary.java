@@ -16,6 +16,7 @@ import weka.core.Instances;
 
 /**
  * @author pawel trajdos
+ * @since 1.3.0
  * @version 1.3.0
  *
  */
@@ -95,7 +96,8 @@ public class LogisticBoundary extends Logistic implements ClassifierWithBoundari
 	@Override
 	public Capabilities getCapabilities() {
 		Capabilities base = super.getCapabilities();
-		base.disable(Capability.NOMINAL_CLASS);
+		base.disableAll();
+		base.enable(Capability.NUMERIC_ATTRIBUTES);
 		base.enable(Capability.BINARY_CLASS);
 		return base;
 	}

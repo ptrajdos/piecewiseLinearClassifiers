@@ -81,13 +81,13 @@
     <dependency>
     <groupId>com.github.ptrajdos</groupId>
     <artifactId>WekaNearestCentroid</artifactId>
-    <version>[1.2.6,)</version>
+    <version>[3.0.0,)</version>
     </dependency>
     
     <dependency>
         <groupId>com.github.ptrajdos</groupId>
         <artifactId>WekaNearestCentroid</artifactId>
-        <version>[1.2.6,)</version>
+        <version>[3.0.0,)</version>
         <type>test-jar</type>
         <scope>test</scope>
     </dependency>
@@ -95,7 +95,7 @@
     <dependency>
         <groupId>com.github.ptrajdos</groupId>
         <artifactId>WekaTools</artifactId>
-        <version>0.3.0</version>
+        <version>[0.4.0,)</version>
     </dependency>
     
     <dependency>
@@ -238,12 +238,10 @@
             </includes>
             <disableXmlReport>true</disableXmlReport>
             <redirectTestOutputToFile>true</redirectTestOutputToFile>
-            <!-- FAILING TESTS?? -->
-            <testFailureIgnore>true</testFailureIgnore>
-            <reuseForks>false</reuseForks>
-            <forkCount>1</forkCount>
-            <showSuccess>true</showSuccess>
-            <enableAssertions>false</enableAssertions>
+            <systemPropertyVariables>
+              <weka.test.Regression.root>src/test/resources/wekarefs</weka.test.Regression.root>
+              <weka.test.maventest>true</weka.test.maventest>
+            </systemPropertyVariables>
           </configuration>
         </plugin>
 
@@ -274,6 +272,7 @@
                 <include>**/*~</include>
                 <include>**/.attach_pid*</include>
                 <include>**/hs_err_pid*</include>
+                <include>src/test/resources/wekarefs/</include>
               </includes>
               <followSymlinks>false</followSymlinks>
             </fileset>
@@ -381,13 +380,4 @@
         
     </plugins>
 </build>
-  <dependencyManagement>
-  	<dependencies>
-  		<dependency>
-  			<groupId>com.github.ptrajdos</groupId>
-  			<artifactId>WekaTools</artifactId>
-  			<version>0.2.0</version>
-  		</dependency>
-  	</dependencies>
-  </dependencyManagement>
 </project>

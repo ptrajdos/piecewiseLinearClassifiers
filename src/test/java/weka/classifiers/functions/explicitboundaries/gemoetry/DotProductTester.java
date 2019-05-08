@@ -44,13 +44,13 @@ public class DotProductTester {
 	      try {
 	    	//assume that the value does not depend on class variable
 	    	  
-	    	  double d1 = dotP.dotProduct(dataset, test1, test2);
-	    	  double d2 = dotP.dotProduct(dataset, test1, test3);
+	    	  double d1 = dotP.dotProduct(test1, test2);
+	    	  double d2 = dotP.dotProduct(test1, test3);
 	    	  assertEquals(d1, d2,1E-6);
 	    	  
 	    	  //commutative
-	    	  d1 =dotP.dotProduct(dataset, test1, test2);
-	    	  d2 =dotP.dotProduct(dataset, test2, test1);
+	    	  d1 =dotP.dotProduct(test1, test2);
+	    	  d2 =dotP.dotProduct(test2, test1);
 	    	  assertEquals(d1, d2,1E-6);
 	    	  
 	    	  //scalar multiplication
@@ -63,8 +63,8 @@ public class DotProductTester {
 	    	  Instance test5 = new DenseInstance(1, new double[] {s2,s2,1});
 	    	  test5.setDataset(dataset);
 	    	  //scalar
-	    	  d1 = dotP.dotProduct(dataset, test1, test1);
-	    	  d2 = dotP.dotProduct(dataset, test4, test5);
+	    	  d1 = dotP.dotProduct(test1, test1);
+	    	  d2 = dotP.dotProduct(test4, test5);
 	    	  assertEquals(d1*s1*s2, d2,1e-16);
 	    	  //orthogonal
 	    	  
@@ -74,7 +74,7 @@ public class DotProductTester {
 	    	  Instance test7 = new DenseInstance(1, new double[] {0,1,1});
 	    	  test7.setDataset(dataset);
 	    	  
-	    	  d1 = dotP.dotProduct(dataset, test6, test7);
+	    	  d1 = dotP.dotProduct(test6, test7);
 	    	  assertEquals(d1, 0,1E-6);
 	    	  
 	    	  //distributive over vector addition
@@ -83,8 +83,8 @@ public class DotProductTester {
 	    	  Instance test8 = new DenseInstance(1, new double[] {s1+s2,s1+s2,1});
 	    	  test8.setDataset(dataset);
 	    	  
-	    	  d1 = dotP.dotProduct(dataset, test1, test8);
-	    	  d2 = dotP.dotProduct(dataset, test1, test4) + dotP.dotProduct(dataset, test1, test5);
+	    	  d1 = dotP.dotProduct(test1, test8);
+	    	  d2 = dotP.dotProduct(test1, test4) + dotP.dotProduct(test1, test5);
 	    	  assertEquals(d1, d2,1E-6);
 	    	  
 	    	  

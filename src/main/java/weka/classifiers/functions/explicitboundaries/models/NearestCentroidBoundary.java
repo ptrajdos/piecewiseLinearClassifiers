@@ -3,6 +3,7 @@
  */
 package weka.classifiers.functions.explicitboundaries.models;
 
+
 import weka.classifiers.functions.NearestCentroidClassifier;
 import weka.classifiers.functions.explicitboundaries.ClassifierWithBoundaries;
 import weka.classifiers.functions.explicitboundaries.DecisionBoundary;
@@ -63,14 +64,14 @@ public class NearestCentroidBoundary extends NearestCentroidClassifier implement
 			return this.defaultModel.planeModel;
 		}
 		
-		Instance normalVec = new DenseInstance(this.centroids[0]);
-		normalVec.setDataset(this.centroids[0].dataset());
-		Instance middleVec = new DenseInstance(this.centroids[0]);
-		middleVec.setDataset(this.centroids[0].dataset());
+		Instance normalVec = new DenseInstance(this.getCentroids()[0]);
+		normalVec.setDataset(this.getCentroids()[0].dataset());
+		Instance middleVec = new DenseInstance(this.getCentroids()[0]);
+		middleVec.setDataset(this.getCentroids()[0].dataset());
 		
 		int classAttrib = normalVec.classIndex();
-		double[] cent0D = this.centroids[0].toDoubleArray();
-		double[] cent1D = this.centroids[1].toDoubleArray();
+		double[] cent0D = this.getCentroids()[0].toDoubleArray();
+		double[] cent1D = this.getCentroids()[1].toDoubleArray();
 		
 		for(int a=0;a<classAttrib;a++){
 			if(a == classAttrib){
@@ -81,7 +82,7 @@ public class NearestCentroidBoundary extends NearestCentroidClassifier implement
 			middleVec.setValue(a, 0.5*(cent0D[a] + cent1D[a]));
 		}
 		
-		double offset = - this.dotProduct.dotProduct(normalVec.dataset(), normalVec, middleVec);
+		double offset = - this.dotProduct.dotProduct(normalVec, middleVec);
 		
 		DecisionBoundaryPlane boundary = new DecisionBoundaryPlane(normalVec.dataset(),0, 1);
 		boundary.getDecisionPlane().setNormalVector(normalVec);
@@ -98,8 +99,10 @@ public class NearestCentroidBoundary extends NearestCentroidClassifier implement
 	@Override
 	public Capabilities getCapabilities() {
 		Capabilities base = super.getCapabilities();
-		base.disable(Capability.NOMINAL_CLASS);
+		base.disableAll();
+		base.enable(Capability.NUMERIC_ATTRIBUTES);
 		base.enable(Capability.BINARY_CLASS);
+		base.setMinimumNumberInstances(2);
 		return base;
 	}
 
@@ -129,5 +132,6 @@ public class NearestCentroidBoundary extends NearestCentroidClassifier implement
 		runClassifier(new NearestCentroidBoundary(), args);
 
 	}
+
 
 }

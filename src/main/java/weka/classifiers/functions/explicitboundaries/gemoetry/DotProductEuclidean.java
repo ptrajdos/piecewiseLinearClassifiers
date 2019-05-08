@@ -4,13 +4,17 @@
 package weka.classifiers.functions.explicitboundaries.gemoetry;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 import weka.core.Instance;
 import weka.core.Instances;
+import weka.core.Utils;
 import weka.tools.InstancesTools;
 
 /**
- * @author pawel
+ * @author pawel trajdos
+ * @since 0.1.0
+ * @version 1.4.0
  *
  */
 public class DotProductEuclidean implements DotProduct, Serializable {
@@ -31,10 +35,10 @@ public class DotProductEuclidean implements DotProduct, Serializable {
 	 * @see weka.classifiers.functions.dotProducts.DotProductCalculator#dotProduct(weka.core.Instances, weka.core.Instance, weka.core.Instance)
 	 */
 	@Override
-	public double dotProduct(Instances dataSet, Instance inst1, Instance inst2) throws Exception {
+	public double dotProduct(Instance inst1, Instance inst2) throws Exception {
 		
-		InstancesTools.checkCompatibility(dataSet, inst1);
-		InstancesTools.checkCompatibility(dataSet, inst2);
+		InstancesTools.checkCompatibility(inst1, inst2);
+		Instances dataSet = inst1.dataset();
 		
 		int numAttrs = dataSet.numAttributes();
 		int classIdx = dataSet.classIndex();
@@ -56,8 +60,38 @@ public class DotProductEuclidean implements DotProduct, Serializable {
 	}
 
 	@Override
-	public double norm(Instances dataSet, Instance vec) throws Exception {
-		return Math.sqrt(this.dotProduct(dataSet, vec, vec));
+	public double norm(Instance vec) throws Exception {
+		return Math.sqrt(this.dotProduct(vec, vec));
+	}
+
+	@Override
+	public Instance projection(Instance inst1, Instance inst2) throws Exception {
+		double[] tmp = inst2.toDoubleArray();
+		double[] representation =  Arrays.copyOf(tmp, tmp.length) ;
+		Instances dataSet = inst1.dataset();
+		double weight=0;
+		double i2Norm = this.norm(inst2);
+		if(!Utils.eq(i2Norm, 0))
+			weight= this.dotProduct(inst1, inst2)/i2Norm;
+		
+		int attNum = dataSet.numAttributes();
+		int classIdx = dataSet.classIndex();
+		for(int a=0;a<attNum;a++) {
+			if(!dataSet.attribute(a).isNumeric() || a == classIdx)
+				continue;
+			representation[a]*=weight;
+		}
+		Instance result = inst2.copy(representation);
+		return result;
+	}
+
+	@Override
+	public Instance normalize(Instance inst) throws Exception {
+		double norm = this.norm(inst);
+		if(!Utils.eq(norm, 0))
+			return InstancesGeometricOperations.scale(inst, 1.0/norm);
+		
+		return inst.copy(inst.toDoubleArray());
 	}
 
 }

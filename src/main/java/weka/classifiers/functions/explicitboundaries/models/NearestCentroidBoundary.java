@@ -37,6 +37,7 @@ public class NearestCentroidBoundary extends NearestCentroidClassifier implement
 	 * 
 	 */
 	public NearestCentroidBoundary() {
+		super();
 		this.dotProduct = new DotProductEuclidean();
 		this.defaultModel = new MajorityPlaneBoundaryModel();
 	}
@@ -123,6 +124,9 @@ public class NearestCentroidBoundary extends NearestCentroidClassifier implement
 		this.dotProduct = dotProduct;
 	}
 
+	public String dotProductTipText() {
+		return "Set object to calculate the dot product";
+	}
 
 
 	/**

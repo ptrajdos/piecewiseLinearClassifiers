@@ -46,8 +46,12 @@ public class MajorityPlaneBoundaryModel implements Serializable {
 		
 		this.useDefault = (counters[0]>0 & counters[1]>0)? false:true;
 		
-		DecisionBoundaryPlane decBound = new DecisionBoundaryPlane(dataset, 0, 1);
 		int numAttrs = dataset.numAttributes();
+		int classIdx = dataset.classIndex();
+		
+		this.useDefault = this.useDefault || (numAttrs==1 & classIdx>=0); // no instances or class only
+		
+		DecisionBoundaryPlane decBound = new DecisionBoundaryPlane(dataset, 0, 1);
 		Instance zeroVec = new DenseInstance(numAttrs);
 		for(int a=0;a<numAttrs;a++) {
 			zeroVec.setValue(a, 0);

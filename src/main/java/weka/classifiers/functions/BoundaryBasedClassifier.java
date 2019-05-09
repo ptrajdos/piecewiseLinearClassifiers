@@ -13,9 +13,15 @@ import weka.classifiers.Classifier;
 import weka.classifiers.SingleClassifierEnhancer;
 import weka.classifiers.functions.explicitboundaries.ClassifierWithBoundaries;
 import weka.classifiers.functions.explicitboundaries.DecisionBoundary;
+import weka.classifiers.functions.explicitboundaries.models.FLDABoundary;
+import weka.classifiers.functions.explicitboundaries.models.LinearRegressionBoundary;
+import weka.classifiers.functions.explicitboundaries.models.LogisticBoundary;
+import weka.classifiers.functions.explicitboundaries.models.MultilayerPerceptronBoundary;
 import weka.classifiers.functions.explicitboundaries.models.NearestCentroidBoundary;
 import weka.classifiers.functions.explicitboundaries.models.SMOLinearBoundary;
 import weka.core.Attribute;
+import weka.core.Capabilities;
+import weka.core.Capabilities.Capability;
 import weka.core.DenseInstance;
 import weka.core.DistanceFunction;
 import weka.core.EuclideanDistance;
@@ -65,6 +71,8 @@ public class BoundaryBasedClassifier extends SingleClassifierEnhancer
 	public BoundaryBasedClassifier(ClassifierWithBoundaries boundClass) {
 		this.m_Classifier = boundClass;
 		try {
+			//TODO this fails under weka GUI call
+			//ClassCastException only for NearestNeighbourBoundary Mahalanobis prototype
 			this.tmpClassifier = (ClassifierWithBoundaries) SerialCopier.makeCopy(boundClass);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -86,6 +94,8 @@ public class BoundaryBasedClassifier extends SingleClassifierEnhancer
 	}
 	
 	protected void buildCalibrator(Instances data)throws Exception{
+		//TODO something goes wrong when the callibrator model is built
+		//Incompatible instances
 		int numInstances = data.numInstances();
 		if(this.numFolds> numInstances)
 			this.numFolds = numInstances;
@@ -333,6 +343,28 @@ public class BoundaryBasedClassifier extends SingleClassifierEnhancer
 		
 		Collections.addAll(options, super.getOptions());
 	    return options.toArray(new String[0]);
+	}
+	
+	
+	/* (non-Javadoc)
+	 * @see weka.classifiers.SingleClassifierEnhancer#getCapabilities()
+	 */
+	@Override
+	public Capabilities getCapabilities() {
+		Capabilities caps =super.getCapabilities();
+		caps.disableAll();
+		caps.enable(Capability.NUMERIC_ATTRIBUTES);
+		caps.enable(Capability.BINARY_CLASS);
+
+		return caps;
+	}
+	/* (non-Javadoc)
+	 * @see java.lang.Object#clone()
+	 */
+	@Override
+	protected Object clone() throws CloneNotSupportedException {
+		// TODO Auto-generated method stub
+		return super.clone();
 	}
 	public static void main(String[] args) {
 		runClassifier(new BoundaryBasedClassifier(), args);

@@ -35,6 +35,7 @@ public class SMOLinearBoundary extends SMO implements ClassifierWithBoundaries {
 	protected Instances dataHeader = null;
 	
 	protected MajorityPlaneBoundaryModel defaultModel = null;
+	
 
 	/**
 	 * 
@@ -45,6 +46,7 @@ public class SMOLinearBoundary extends SMO implements ClassifierWithBoundaries {
 		linKernel.setExponent(1.0);
 		this.setKernel(linKernel);
 		this.defaultModel = new MajorityPlaneBoundaryModel();
+		
 		
 	}
 
@@ -80,7 +82,7 @@ public class SMOLinearBoundary extends SMO implements ClassifierWithBoundaries {
 			if(sparseIndices[a] == classIdx)
 				continue;
 			
-			normalVector.setValue(a, -sparseWeights[a]);
+			normalVector.setValue(sparseIndices[a], -sparseWeights[a]);
 		}
 		
 		Plane plane = new Plane(this.dataHeader);
@@ -110,6 +112,7 @@ public class SMOLinearBoundary extends SMO implements ClassifierWithBoundaries {
 		super.buildClassifier(insts);
 		this.dataHeader = new Instances(insts, 0);
 		this.defaultModel.buildDefaultModelPlane(insts);
+		
 	}
 
 	/**
@@ -126,9 +129,9 @@ public class SMOLinearBoundary extends SMO implements ClassifierWithBoundaries {
 	@Override
 	public Capabilities getCapabilities() {
 		Capabilities base = super.getCapabilities();
-		base.disable(Capability.NOMINAL_CLASS);
+		base.disableAll();
+		base.enable(Capability.NUMERIC_ATTRIBUTES);
 		base.enable(Capability.BINARY_CLASS);
-		base.disable(Capability.NOMINAL_ATTRIBUTES);
 		return base;
 	}
 

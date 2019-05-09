@@ -8,5 +8,4 @@
 
 weka.classifiers.meta.simpleVotingLikeCombiners.BoundaryCombiner=weka.gui.GenericObjectEditor
 
-weka.classifiers.meta.simpleVotingLikeCombiners.X=weka.gui.GenericObjectEditor
 

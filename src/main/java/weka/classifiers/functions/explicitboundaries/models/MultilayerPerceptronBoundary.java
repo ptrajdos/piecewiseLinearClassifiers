@@ -32,6 +32,8 @@ public class MultilayerPerceptronBoundary extends MultilayerPerceptron implement
 	 * Only data header -- without instances
 	 */
 	protected Instances m_Data;
+	
+	protected DecisionBoundary boundary;
 
 	/**
 	 * 
@@ -52,6 +54,9 @@ public class MultilayerPerceptronBoundary extends MultilayerPerceptron implement
 		this.setNormalizeNumericClass(false);
 		super.buildClassifier(i);
 		
+		this.m_Data = i;
+		calcBoundary();
+		
 		/**
 		 * Data header without instances
 		 */
@@ -60,10 +65,21 @@ public class MultilayerPerceptronBoundary extends MultilayerPerceptron implement
 
 
 
-	@Override
-	public DecisionBoundary getBoundary() throws Exception {
 	
+	public void calcBoundary() throws Exception {
+		
 		int numAttrs = this.m_Data.numAttributes();
+		int classAttrNum = this.m_Data.classIndex();
+		
+		if(numAttrs ==1 & classAttrNum>=0) {
+			MajorityPlaneBoundaryModel majPlane = new MajorityPlaneBoundaryModel();
+			majPlane.buildDefaultModelPlane(this.m_Data);
+			this.boundary = majPlane.getPlaneModel();
+			return;
+		}
+		
+		
+		
 		Instance normalVec  = new DenseInstance(numAttrs);
 		normalVec.setDataset(this.m_Data);
 		
@@ -73,16 +89,23 @@ public class MultilayerPerceptronBoundary extends MultilayerPerceptron implement
 		 
 		 double offset = weights[0];
 		 
-		 int conAttrs = con.getNumInputs();
-		 for(int i=1;i<=conAttrs;i++) {
-			 normalVec.setValue(i-1, weights[i]);
+	
+		 int weiCount=1;
+		 
+		 double[] nVrep = normalVec.toDoubleArray();
+		 for(int a=0;a<numAttrs;a++) {
+			 if(a== classAttrNum)
+				 continue;
+			 nVrep[a] = weights[weiCount++];
+			 
 		 }
+		 normalVec = normalVec.copy(nVrep);
 		 
 		 DecisionBoundaryPlane boundary = new DecisionBoundaryPlane(normalVec.dataset(),0, 1);
 		 boundary.getDecisionPlane().setNormalVector(normalVec);
 		 boundary.getDecisionPlane().setOffset(offset);
 		 
-		return boundary;
+		this.boundary = boundary;
 	}
 	
 	protected NeuralConnection[] getNeuralConnections()throws Exception {
@@ -102,14 +125,22 @@ public class MultilayerPerceptronBoundary extends MultilayerPerceptron implement
 	@Override
 	public Capabilities getCapabilities() {
 		Capabilities base = super.getCapabilities();
-		base.disable(Capability.NOMINAL_CLASS);
-		base.disable(Capability.NUMERIC_CLASS);
+		base.disableAll();
+		base.enable(Capability.NUMERIC_ATTRIBUTES);
 		base.enable(Capability.BINARY_CLASS);
+		base.setMinimumNumberInstances(2);
 		return base;
 	}
 	
 	public static void main(String[] args) {
 		runClassifier(new MultilayerPerceptronBoundary(), args);
+	}
+
+
+
+	@Override
+	public DecisionBoundary getBoundary() throws Exception {
+		return this.boundary;
 	}
 
 }

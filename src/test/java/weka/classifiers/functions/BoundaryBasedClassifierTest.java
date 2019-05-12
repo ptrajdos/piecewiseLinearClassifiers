@@ -5,6 +5,7 @@ import junit.framework.TestSuite;
 import weka.classifiers.AbstractClassifier;
 import weka.classifiers.AbstractClassifierTest;
 import weka.classifiers.Classifier;
+import weka.classifiers.SingleClassifierEnhancer;
 
 public class BoundaryBasedClassifierTest extends AbstractClassifierTest {
 
@@ -33,6 +34,8 @@ public class BoundaryBasedClassifierTest extends AbstractClassifierTest {
 			fail("Classifier forName Exception has been caught");
 		}
 	 }
+	 
+	
 
 	public static void main(String[] args){
 		    junit.textui.TestRunner.run(suite());

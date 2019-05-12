@@ -49,6 +49,7 @@ public class MultilayerPerceptronBoundary extends MultilayerPerceptron implement
 	 */
 	@Override
 	public void buildClassifier(Instances i) throws Exception {
+		this.getCapabilities().testWithFail(i);
 		//Only linear models are allowed
 		this.setHiddenLayers("0");
 		this.setNormalizeNumericClass(false);

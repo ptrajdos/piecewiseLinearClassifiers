@@ -6,8 +6,9 @@ package weka.classifiers.functions.explicitboundaries.combiners;
 import java.io.Serializable;
 
 /**
- * @author pawel
- *
+ * @author pawel trajdos
+ * @since 0.1.0
+ * @version 2.0.0
  */
 public class PotentialFunctionLinear implements PotentialFunction, Serializable {
 
@@ -16,12 +17,7 @@ public class PotentialFunctionLinear implements PotentialFunction, Serializable 
 	 */
 	private static final long serialVersionUID = -9026060542026964841L;
 
-	/**
-	 * 
-	 */
-	public PotentialFunctionLinear() {
-		// TODO Auto-generated constructor stub
-	}
+	
 
 	/* (non-Javadoc)
 	 * @see weka.classifiers.functions.explicitboundaries.combiners.PotentialFunction#getPotentialValue(double)

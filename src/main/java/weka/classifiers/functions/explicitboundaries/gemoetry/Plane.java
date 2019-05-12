@@ -48,7 +48,7 @@ public class Plane implements Serializable {
 	 */
 	protected DotProduct dotProduct ;
 	
-	protected boolean normalizeDistance=true;
+	protected boolean normalizeDistance=false;
 	
 	protected GrammShmidtOrthonormal gsOrth;
 	
@@ -152,11 +152,11 @@ public class Plane implements Serializable {
 		
 		double coef = nVecRep[coefIdx];
 		double[] instRep = null;
-		
+		instRep = new double[nVecRep.length];
 		int baseCount =0;
-		for(int a=0;a<numAttrs;a++) {
+		for(int a=0;a<nVecRep.length;a++) {
 			if(coefIdx == a || a== classIdx || (!this.dataHeader.attribute(a).isNumeric()) )continue;
-			instRep = new double[nVecRep.length];
+			
 			instRep[a] =1.0;
 			instRep[coefIdx] = -(nVecRep[a] + this.offset)/coef;
 			base[baseCount++] = this.normalVector.copy(instRep);

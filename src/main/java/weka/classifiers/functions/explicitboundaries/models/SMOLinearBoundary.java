@@ -104,7 +104,7 @@ public class SMOLinearBoundary extends SMO implements ClassifierWithBoundaries {
 	 */
 	@Override
 	public void buildClassifier(Instances insts) throws Exception {
-		
+		this.getCapabilities().testWithFail(insts);
 		/**
 		 * Set no data normalization 
 		 */

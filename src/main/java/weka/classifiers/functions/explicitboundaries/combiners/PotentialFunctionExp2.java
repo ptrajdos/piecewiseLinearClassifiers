@@ -3,26 +3,21 @@
  */
 package weka.classifiers.functions.explicitboundaries.combiners;
 
-import java.io.Serializable;
-
 /**
- * @author pawel
+ * @author pawel trajdos
+ * @since 0.1.0
+ * @version 2.0.0
  *
  */
-public class PotentialFunctionExp2 implements PotentialFunction, Serializable {
+public class PotentialFunctionExp2 extends APotentialFunctionSingleParam {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -7439426502047267694L;
-	protected double alpha=1;
 
-	/**
-	 * 
-	 */
-	public PotentialFunctionExp2() {
-		// TODO Auto-generated constructor stub
-	}
+
+
 
 	/* (non-Javadoc)
 	 * @see weka.classifiers.functions.explicitboundaries.combiners.PotentialFunction#getPotentialValue(double)
@@ -33,21 +28,4 @@ public class PotentialFunctionExp2 implements PotentialFunction, Serializable {
 		double result = signum* (1- Math.exp(-this.alpha*x*x));
 		return result;
 	}
-
-	/**
-	 * @return the alpha
-	 */
-	public double getAlpha() {
-		return this.alpha;
-	}
-
-	/**
-	 * @param alpha the alpha to set
-	 */
-	public void setAlpha(double alpha) {
-		this.alpha = alpha;
-	}
-	
-	
-
 }

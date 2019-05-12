@@ -49,6 +49,7 @@ public class NearestCentroidBoundary extends NearestCentroidClassifier implement
 	 */
 	@Override
 	public void buildClassifier(Instances data) throws Exception {
+		this.getCapabilities().testWithFail(data);
 		super.buildClassifier(data);
 		this.defaultModel.buildDefaultModelPlane(data);
 		

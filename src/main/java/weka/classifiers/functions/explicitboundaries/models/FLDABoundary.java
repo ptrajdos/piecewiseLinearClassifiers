@@ -95,6 +95,7 @@ public class FLDABoundary extends FLDA implements ClassifierWithBoundaries {
 	 */
 	@Override
 	public void buildClassifier(Instances insts) throws Exception {
+		this.getCapabilities().testWithFail(insts);
 		super.buildClassifier(insts);
 		this.defaultModel.buildDefaultModelPlane(insts);
 		if(this.defaultModel.isUseDefault())

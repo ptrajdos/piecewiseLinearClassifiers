@@ -10,24 +10,15 @@ import java.util.Random;
 import java.util.Vector;
 
 import weka.classifiers.Classifier;
-import weka.classifiers.SingleClassifierEnhancer;
 import weka.classifiers.functions.explicitboundaries.ClassifierWithBoundaries;
 import weka.classifiers.functions.explicitboundaries.DecisionBoundary;
-import weka.classifiers.functions.explicitboundaries.models.FLDABoundary;
-import weka.classifiers.functions.explicitboundaries.models.LinearRegressionBoundary;
-import weka.classifiers.functions.explicitboundaries.models.LogisticBoundary;
-import weka.classifiers.functions.explicitboundaries.models.MultilayerPerceptronBoundary;
 import weka.classifiers.functions.explicitboundaries.models.NearestCentroidBoundary;
-import weka.classifiers.functions.explicitboundaries.models.SMOLinearBoundary;
 import weka.core.Attribute;
 import weka.core.Capabilities;
 import weka.core.Capabilities.Capability;
 import weka.core.DenseInstance;
-import weka.core.DistanceFunction;
-import weka.core.EuclideanDistance;
 import weka.core.Instance;
 import weka.core.Instances;
-import weka.core.NormalizableDistance;
 import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.Randomizable;
@@ -36,10 +27,10 @@ import weka.tools.SerialCopier;
 
 /**
  * @author pawel trajdos
- * @version 1.4.0
+ * @version 2.0.0
  *
  */
-public class BoundaryBasedClassifier extends SingleClassifierEnhancer
+public class BoundaryBasedClassifier extends SingleClassifierEnhancerBoundary
 		implements ClassifierWithBoundaries, Randomizable {
 
 	/**
@@ -69,10 +60,9 @@ public class BoundaryBasedClassifier extends SingleClassifierEnhancer
 	 * 
 	 */
 	public BoundaryBasedClassifier(ClassifierWithBoundaries boundClass) {
-		this.m_Classifier = boundClass;
+		super();
+		this.setClassifier(boundClass);
 		try {
-			//TODO this fails under weka GUI call
-			//ClassCastException only for NearestNeighbourBoundary Mahalanobis prototype
 			this.tmpClassifier = (ClassifierWithBoundaries) SerialCopier.makeCopy(boundClass);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -94,8 +84,6 @@ public class BoundaryBasedClassifier extends SingleClassifierEnhancer
 	}
 	
 	protected void buildCalibrator(Instances data)throws Exception{
-		//TODO something goes wrong when the callibrator model is built
-		//Incompatible instances
 		int numInstances = data.numInstances();
 		if(this.numFolds> numInstances)
 			this.numFolds = numInstances;
@@ -266,18 +254,18 @@ public class BoundaryBasedClassifier extends SingleClassifierEnhancer
 		 newVector.addElement(new Option(
 			      "\tDetermines whether the callibrator is used "+
 		          "(default: F).\n",
-			      "CA", 0, "-CA"));
+			      "CA", 1, "-CA"));
 		 
 		 newVector.addElement(new Option(
 			      "\tThe Callibrator model to use "+
 		          "(default: weka.classifiers.functions.Logistic.Logistic ).\n",
-			      "CAM", 0, "-CAM"));
+			      "CAM", 1, "-CAM"));
 		
 		 
 		 newVector.addElement(new Option(
 			      "\tThe number of crossvalidation folds for the callibrator "+
 		          "(default: F).\n",
-			      "CV", 0, "-CV"));
+			      "CV", 1, "-CV"));
 		 
 		 
 		 newVector.addAll(Collections.list(super.listOptions()));
@@ -346,18 +334,7 @@ public class BoundaryBasedClassifier extends SingleClassifierEnhancer
 	}
 	
 	
-	/* (non-Javadoc)
-	 * @see weka.classifiers.SingleClassifierEnhancer#getCapabilities()
-	 */
-	@Override
-	public Capabilities getCapabilities() {
-		Capabilities caps =super.getCapabilities();
-		caps.disableAll();
-		caps.enable(Capability.NUMERIC_ATTRIBUTES);
-		caps.enable(Capability.BINARY_CLASS);
 
-		return caps;
-	}
 	/* (non-Javadoc)
 	 * @see java.lang.Object#clone()
 	 */

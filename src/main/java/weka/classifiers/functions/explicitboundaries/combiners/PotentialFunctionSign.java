@@ -6,7 +6,9 @@ package weka.classifiers.functions.explicitboundaries.combiners;
 import java.io.Serializable;
 
 /**
- * @author pawel
+ * @author pawel trajdos
+ * @since 0.1.0
+ * @version 2.0.0
  *
  */
 public class PotentialFunctionSign implements PotentialFunction, Serializable {

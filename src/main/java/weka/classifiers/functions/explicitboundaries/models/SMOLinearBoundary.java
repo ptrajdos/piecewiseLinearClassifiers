@@ -13,13 +13,16 @@ import weka.classifiers.functions.explicitboundaries.gemoetry.Plane;
 import weka.classifiers.functions.supportVector.PolyKernel;
 import weka.core.Capabilities;
 import weka.core.Capabilities.Capability;
+import weka.core.DebugSetter;
 import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.SelectedTag;
 
 /**
- * @author pawel
+ * @author pawel trajdos
+ * @since 0.1.0
+ * @version 2.1.0
  *
  */
 public class SMOLinearBoundary extends SMO implements ClassifierWithBoundaries {
@@ -35,6 +38,8 @@ public class SMOLinearBoundary extends SMO implements ClassifierWithBoundaries {
 	protected Instances dataHeader = null;
 	
 	protected MajorityPlaneBoundaryModel defaultModel = null;
+	
+	protected DecisionBoundaryPlane boundary;
 	
 
 	/**
@@ -58,9 +63,13 @@ public class SMOLinearBoundary extends SMO implements ClassifierWithBoundaries {
 		if(this.defaultModel.isUseDefault()) {
 			return this.defaultModel.getPlaneModel();
 		}
-		//There is only one model in the binary classifier
+		return this.boundary;
+	}
+	
+	protected void calculateBoundary()throws Exception{
 		SMO.BinarySMO binaryModel = this.m_classifiers[0][1];
 		
+		@SuppressWarnings("rawtypes")
 		Class modClass = binaryModel.getClass();
 		Field m_bF = modClass.getDeclaredField("m_b");
 		m_bF.setAccessible(true);
@@ -89,10 +98,7 @@ public class SMOLinearBoundary extends SMO implements ClassifierWithBoundaries {
 		plane.setNormalVector(normalVector);
 		plane.setOffset(offset);
 			
-		DecisionBoundaryPlane planeBoundary = new DecisionBoundaryPlane(this.dataHeader, 0, 1, plane);
-		
-		
-		return planeBoundary;
+		this.boundary = new DecisionBoundaryPlane(this.dataHeader, 0, 1, plane);
 	}
 	
 	
@@ -104,7 +110,8 @@ public class SMOLinearBoundary extends SMO implements ClassifierWithBoundaries {
 	 */
 	@Override
 	public void buildClassifier(Instances insts) throws Exception {
-		this.getCapabilities().testWithFail(insts);
+		if(!this.getDoNotCheckCapabilities())
+			this.getCapabilities().testWithFail(insts);
 		/**
 		 * Set no data normalization 
 		 */
@@ -112,6 +119,7 @@ public class SMOLinearBoundary extends SMO implements ClassifierWithBoundaries {
 		super.buildClassifier(insts);
 		this.dataHeader = new Instances(insts, 0);
 		this.defaultModel.buildDefaultModelPlane(insts);
+		this.calculateBoundary();
 		
 	}
 
@@ -134,5 +142,16 @@ public class SMOLinearBoundary extends SMO implements ClassifierWithBoundaries {
 		base.enable(Capability.BINARY_CLASS);
 		return base;
 	}
+
+	/* (non-Javadoc)
+	 * @see weka.classifiers.AbstractClassifier#setDebug(boolean)
+	 */
+	@Override
+	public void setDebug(boolean debug) {
+		super.setDebug(debug);
+		DebugSetter.setDebug(this.boundary, debug);
+		DebugSetter.setDebug(this.defaultModel, debug);
+	}
+	
 
 }

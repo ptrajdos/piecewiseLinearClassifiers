@@ -8,7 +8,7 @@ import java.util.Enumeration;
 import java.util.Vector;
 
 import weka.classifiers.functions.explicitboundaries.ClassifierWithBoundaries;
-import weka.classifiers.functions.explicitboundaries.DecisionBoundary;
+import weka.classifiers.functions.explicitboundaries.IDecisionBoundary;
 import weka.classifiers.functions.explicitboundaries.combiners.PotentialFunction;
 import weka.classifiers.functions.explicitboundaries.combiners.PotentialFunctionExp4;
 import weka.classifiers.functions.explicitboundaries.models.NearestCentroidBoundary;
@@ -98,7 +98,7 @@ public class BoundaryAndCentroidClassifier extends SingleClassifierEnhancerBound
 		classProtos = new IClusterPrototype[numClasses];
 		protoPlaneSide = new double[numClasses];
 		stdDevs = new double[numClasses];
-		DecisionBoundary bnd = this.boundClassRef.getBoundary();
+		IDecisionBoundary bnd = this.boundClassRef.getBoundary();
 		proto2Bnd = new double[numClasses];
 		double[] inst2CentDist;
 		Instance tmpInst;
@@ -134,7 +134,7 @@ public class BoundaryAndCentroidClassifier extends SingleClassifierEnhancerBound
 		
 		int numClasses = this.stdDevs.length;
 		double[] potentials  = new double[numClasses];
-		DecisionBoundary bnd = this.boundClassRef.getBoundary();
+		IDecisionBoundary bnd = this.boundClassRef.getBoundary();
 		
 		double centDist=0;
 		double planeDirDist =0;

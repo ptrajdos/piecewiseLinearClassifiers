@@ -12,6 +12,7 @@ import weka.classifiers.functions.explicitboundaries.gemoetry.DotProduct;
 import weka.classifiers.functions.explicitboundaries.gemoetry.DotProductEuclidean;
 import weka.core.Capabilities;
 import weka.core.Capabilities.Capability;
+import weka.core.DebugSetter;
 import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -20,6 +21,8 @@ import weka.core.Instances;
  * Nearest Centroind Classifier with explicit boundaries
  * Only binary classifiers.
  * @author Pawel Trajdos
+ * @since 0.1.0
+ * @version 2.1.0
  *
  */
 public class NearestCentroidBoundary extends NearestCentroidClassifier implements ClassifierWithBoundaries {
@@ -32,6 +35,8 @@ public class NearestCentroidBoundary extends NearestCentroidClassifier implement
 	protected DotProduct dotProduct;
 	
 	protected MajorityPlaneBoundaryModel defaultModel = null;
+	
+	protected DecisionBoundaryPlane boundary;
 
 	/**
 	 * 
@@ -49,10 +54,11 @@ public class NearestCentroidBoundary extends NearestCentroidClassifier implement
 	 */
 	@Override
 	public void buildClassifier(Instances data) throws Exception {
-		this.getCapabilities().testWithFail(data);
+		if(!this.getDoNotCheckCapabilities())
+			this.getCapabilities().testWithFail(data);
 		super.buildClassifier(data);
 		this.defaultModel.buildDefaultModelPlane(data);
-		
+		this.calculateBoundary();	
 	}
 
 
@@ -65,7 +71,11 @@ public class NearestCentroidBoundary extends NearestCentroidClassifier implement
 		if(this.defaultModel.isUseDefault()) {
 			return this.defaultModel.planeModel;
 		}
+		return this.boundary;
 		
+	}
+	
+	protected void calculateBoundary()throws Exception {
 		Instance normalVec = new DenseInstance(this.getCentroids()[0]);
 		normalVec.setDataset(this.getCentroids()[0].dataset());
 		Instance middleVec = new DenseInstance(this.getCentroids()[0]);
@@ -86,11 +96,10 @@ public class NearestCentroidBoundary extends NearestCentroidClassifier implement
 		
 		double offset = - this.dotProduct.dotProduct(normalVec, middleVec);
 		
-		DecisionBoundaryPlane boundary = new DecisionBoundaryPlane(normalVec.dataset(),0, 1);
-		boundary.getDecisionPlane().setNormalVector(normalVec);
-		boundary.getDecisionPlane().setOffset(offset);
-		
-		return boundary;
+		this.boundary = new DecisionBoundaryPlane(normalVec.dataset(),0, 1);
+		this.boundary.getDecisionPlane().setNormalVector(normalVec);
+		this.boundary.getDecisionPlane().setOffset(offset);
+		this.boundary.getDecisionPlane().setDotProduct(this.dotProduct);
 	}
 	
 	
@@ -123,11 +132,26 @@ public class NearestCentroidBoundary extends NearestCentroidClassifier implement
 	 */
 	public void setDotProduct(DotProduct dotProduct) {
 		this.dotProduct = dotProduct;
+		this.boundary.getDecisionPlane().setDotProduct(dotProduct);
 	}
 
+	@SuppressWarnings("static-method")
 	public String dotProductTipText() {
 		return "Set object to calculate the dot product";
 	}
+
+
+	/* (non-Javadoc)
+	 * @see weka.classifiers.AbstractClassifier#setDebug(boolean)
+	 */
+	@Override
+	public void setDebug(boolean debug) {
+		super.setDebug(debug);
+		DebugSetter.setDebug(this.boundary, debug);
+		DebugSetter.setDebug(this.defaultModel, debug);
+		DebugSetter.setDebug(this.dotProduct, debug);
+	}
+
 
 
 	/**

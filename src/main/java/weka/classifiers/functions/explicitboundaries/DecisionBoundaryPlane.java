@@ -1,15 +1,20 @@
 package weka.classifiers.functions.explicitboundaries;
 
 import weka.classifiers.functions.explicitboundaries.gemoetry.Plane;
+import weka.core.DebugSetter;
+import weka.core.Debuggable;
 import weka.core.Instance;
 import weka.core.Instances;
 
-public class DecisionBoundaryPlane extends DecisionBoundary {
+public class DecisionBoundaryPlane extends DecisionBoundary implements Debuggable {
 	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 3454683549175862055L;
+	
+	protected boolean debug;
+	
 	
 	protected Plane decisionPlane = null;
 
@@ -60,6 +65,20 @@ public class DecisionBoundaryPlane extends DecisionBoundary {
 		return this.getDecisionPlane().distanceToPlane(instance);
 	}
 	
-	
+	/**
+	 * @return the debug
+	 */
+	public boolean isDebug() {
+		return this.debug;
+	}
+
+	/**
+	 * @param debug the debug to set
+	 */
+	public void setDebug(boolean debug) {
+		this.debug = debug;
+		DebugSetter.setDebug(decisionPlane, debug);
+	}
+
 
 }

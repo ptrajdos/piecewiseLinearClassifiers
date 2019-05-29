@@ -11,17 +11,17 @@ import weka.classifiers.functions.explicitboundaries.gemoetry.Plane;
 import weka.classifiers.rules.ZeroR;
 import weka.core.Capabilities;
 import weka.core.Capabilities.Capability;
+import weka.core.DebugSetter;
 import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
 
 /**
- * @author pawel
- *
+ * @author pawel trajdos
+ * @since 0.1.0
+ * @version 2.1.0
  */
-//TODO There is an issue with incompatible instances produced by this classifiers.
-//It bothers the following datasets Faults, optdigits and glass
-//TODO fix it!!!
+
 public class FLDABoundary extends FLDA implements ClassifierWithBoundaries {
 
 	/**
@@ -35,6 +35,8 @@ public class FLDABoundary extends FLDA implements ClassifierWithBoundaries {
 	protected MajorityPlaneBoundaryModel defaultModel = null;
 	
 	protected ZeroR  alternativeModel = null;
+	
+	protected DecisionBoundaryPlane boundary;
 
 	/**
 	 * 
@@ -53,7 +55,10 @@ public class FLDABoundary extends FLDA implements ClassifierWithBoundaries {
 		if(this.defaultModel.isUseDefault()) {
 			return this.defaultModel.getPlaneModel();
 		}
-		
+		return this.boundary;
+	}
+	
+	protected void calculateBoundary()throws Exception {
 		double offset = -this.m_Threshold;
 		Instance normalVec = new DenseInstance(this.m_Data.numAttributes());
 		normalVec.setDataset(this.m_Data);
@@ -70,10 +75,8 @@ public class FLDABoundary extends FLDA implements ClassifierWithBoundaries {
 		tmpPlane.setNormalVector(normalVec);
 		tmpPlane.setOffset(offset);
 		
-		DecisionBoundaryPlane boundary = new DecisionBoundaryPlane(this.m_Data, 0, 1, tmpPlane); 
+		this.boundary = new DecisionBoundaryPlane(this.m_Data, 0, 1, tmpPlane); 
 		
-		
-		return boundary;
 	}
 	
 	/* (non-Javadoc)
@@ -95,11 +98,13 @@ public class FLDABoundary extends FLDA implements ClassifierWithBoundaries {
 	 */
 	@Override
 	public void buildClassifier(Instances insts) throws Exception {
-		this.getCapabilities().testWithFail(insts);
+		if(!this.getDoNotCheckCapabilities())
+			this.getCapabilities().testWithFail(insts);
 		super.buildClassifier(insts);
 		this.defaultModel.buildDefaultModelPlane(insts);
 		if(this.defaultModel.isUseDefault())
 			this.alternativeModel.buildClassifier(insts);
+		this.calculateBoundary();
 	}
 	
 	
@@ -117,6 +122,19 @@ public class FLDABoundary extends FLDA implements ClassifierWithBoundaries {
 		}
 		
 		return distribution;
+	}
+	
+	
+
+	/* (non-Javadoc)
+	 * @see weka.classifiers.AbstractClassifier#setDebug(boolean)
+	 */
+	@Override
+	public void setDebug(boolean debug) {
+		super.setDebug(debug);
+		DebugSetter.setDebug(this.boundary, debug);
+		DebugSetter.setDebug(this.defaultModel, debug);
+		this.alternativeModel.setDebug(debug);
 	}
 
 	/**

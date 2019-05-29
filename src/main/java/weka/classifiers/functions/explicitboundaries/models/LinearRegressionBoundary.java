@@ -32,8 +32,7 @@ public class LinearRegressionBoundary extends LinearRegression implements Classi
 	 */
 	@Override
 	public DecisionBoundary getBoundary() throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		throw new Exception("Not implemented yet");
 	}
 	/* (non-Javadoc)
 	 * @see weka.classifiers.functions.SMO#getCapabilities()

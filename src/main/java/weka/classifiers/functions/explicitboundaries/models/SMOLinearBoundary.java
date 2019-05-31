@@ -22,7 +22,7 @@ import weka.core.SelectedTag;
 /**
  * @author pawel trajdos
  * @since 0.1.0
- * @version 2.1.0
+ * @version 2.1.1
  *
  */
 public class SMOLinearBoundary extends SMO implements ClassifierWithBoundaries {
@@ -66,7 +66,7 @@ public class SMOLinearBoundary extends SMO implements ClassifierWithBoundaries {
 		return this.boundary;
 	}
 	
-	protected void calculateBoundary()throws Exception{
+	protected void calculateBoundary(Instances insts)throws Exception{
 		SMO.BinarySMO binaryModel = this.m_classifiers[0][1];
 		
 		@SuppressWarnings("rawtypes")
@@ -84,15 +84,24 @@ public class SMOLinearBoundary extends SMO implements ClassifierWithBoundaries {
 		int classIdx = this.m_classIndex;
 		int numAttrs =this.dataHeader.numAttributes();
 		
-		Instance normalVector = new DenseInstance(numAttrs);
-		normalVector.setDataset(this.dataHeader);
+		double[] attValues = new double[numAttrs];
 		
+		
+	
 		for(int a =0;a<sparseIndices.length;a++){
 			if(sparseIndices[a] == classIdx)
 				continue;
 			
-			normalVector.setValue(sparseIndices[a], -sparseWeights[a]);
+			attValues[sparseIndices[a]] = -sparseWeights[a];
+			//normalVector.setValue(sparseIndices[a], -sparseWeights[a]);
+	
 		}
+		attValues[classIdx]= Double.NaN;
+		
+		Instance normalVector = insts.get(0).copy(attValues);
+		normalVector.setDataset(this.dataHeader);
+		
+		
 		
 		Plane plane = new Plane(this.dataHeader);
 		plane.setNormalVector(normalVector);
@@ -119,7 +128,8 @@ public class SMOLinearBoundary extends SMO implements ClassifierWithBoundaries {
 		super.buildClassifier(insts);
 		this.dataHeader = new Instances(insts, 0);
 		this.defaultModel.buildDefaultModelPlane(insts);
-		this.calculateBoundary();
+		this.calculateBoundary(insts);
+		
 		
 	}
 

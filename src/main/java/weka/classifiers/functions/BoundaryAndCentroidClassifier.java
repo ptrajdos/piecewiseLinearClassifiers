@@ -25,7 +25,7 @@ import weka.tools.data.InstancesOperator;
 /**
  * @author pawel trajdos
  * @since 2.0.0
- * @version 2.0.0
+ * @version 2.1.1
  *
  */
 public class BoundaryAndCentroidClassifier extends SingleClassifierEnhancerBoundary {
@@ -145,7 +145,11 @@ public class BoundaryAndCentroidClassifier extends SingleClassifierEnhancerBound
 		for(int c=0;c<numClasses;c++) {
 			centDist = this.classProtos[c].distance(instance);
 			planeDirDist = proto2Bnd[c] - Math.signum(bnd.getValue(instance))*bnd.getDistance(instance);
-			planeDirDist/= stdDevs[c];
+			if(!Utils.eq(stdDevs[c], 0)) {
+				planeDirDist/= stdDevs[c];
+			}else {
+				planeDirDist = Double.POSITIVE_INFINITY;
+			}
 			
 			pot1 = this.potFunction.getPotentialValue(centDist);
 			pot2 = this.potFunction.getPotentialValue(planeDirDist);

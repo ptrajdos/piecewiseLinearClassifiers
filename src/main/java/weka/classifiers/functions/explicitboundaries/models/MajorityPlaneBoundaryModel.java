@@ -6,6 +6,8 @@ package weka.classifiers.functions.explicitboundaries.models;
 import java.io.Serializable;
 
 import weka.classifiers.functions.explicitboundaries.DecisionBoundaryPlane;
+import weka.core.DebugSetter;
+import weka.core.Debuggable;
 import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -15,7 +17,7 @@ import weka.tools.InstancesTools;
  * @author pawel
  *
  */
-public class MajorityPlaneBoundaryModel implements Serializable {
+public class MajorityPlaneBoundaryModel implements Serializable, Debuggable {
 
 	
 	/**
@@ -26,6 +28,8 @@ public class MajorityPlaneBoundaryModel implements Serializable {
 	protected DecisionBoundaryPlane planeModel = null;
 	
 	protected boolean useDefault = false;
+	
+	protected boolean debug;
 
 	/**
 	 * 
@@ -76,6 +80,21 @@ public class MajorityPlaneBoundaryModel implements Serializable {
 	 */
 	public boolean isUseDefault() {
 		return this.useDefault;
+	}
+
+	/**
+	 * @return the debug
+	 */
+	public boolean isDebug() {
+		return this.debug;
+	}
+
+	/**
+	 * @param debug the debug to set
+	 */
+	public void setDebug(boolean debug) {
+		this.debug = debug;
+		DebugSetter.setDebug(this.planeModel, debug);
 	}
 	
 	

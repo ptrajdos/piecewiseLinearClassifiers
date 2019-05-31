@@ -13,12 +13,13 @@ import weka.classifiers.functions.neural.NeuralConnection;
 import weka.classifiers.functions.neural.NeuralNode;
 import weka.core.Capabilities;
 import weka.core.Capabilities.Capability;
+import weka.core.DebugSetter;
 import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
 
 /**
- * @author pawel
+ * @author pawel trajdos
  *
  */
 public class MultilayerPerceptronBoundary extends MultilayerPerceptron implements ClassifierWithBoundaries {
@@ -49,7 +50,8 @@ public class MultilayerPerceptronBoundary extends MultilayerPerceptron implement
 	 */
 	@Override
 	public void buildClassifier(Instances i) throws Exception {
-		this.getCapabilities().testWithFail(i);
+		if(!this.getDoNotCheckCapabilities())
+			this.getCapabilities().testWithFail(i);
 		//Only linear models are allowed
 		this.setHiddenLayers("0");
 		this.setNormalizeNumericClass(false);
@@ -102,11 +104,11 @@ public class MultilayerPerceptronBoundary extends MultilayerPerceptron implement
 		 }
 		 normalVec = normalVec.copy(nVrep);
 		 
-		 DecisionBoundaryPlane boundary = new DecisionBoundaryPlane(normalVec.dataset(),0, 1);
-		 boundary.getDecisionPlane().setNormalVector(normalVec);
-		 boundary.getDecisionPlane().setOffset(offset);
+		 DecisionBoundaryPlane boundary1 = new DecisionBoundaryPlane(normalVec.dataset(),0, 1);
+		 boundary1.getDecisionPlane().setNormalVector(normalVec);
+		 boundary1.getDecisionPlane().setOffset(offset);
 		 
-		this.boundary = boundary;
+		this.boundary = boundary1;
 	}
 	
 	protected NeuralConnection[] getNeuralConnections()throws Exception {
@@ -133,15 +135,25 @@ public class MultilayerPerceptronBoundary extends MultilayerPerceptron implement
 		return base;
 	}
 	
-	public static void main(String[] args) {
-		runClassifier(new MultilayerPerceptronBoundary(), args);
+	@Override
+	public DecisionBoundary getBoundary() throws Exception {
+		return this.boundary;
+	}
+	
+	
+	/* (non-Javadoc)
+	 * @see weka.classifiers.AbstractClassifier#setDebug(boolean)
+	 */
+	@Override
+	public void setDebug(boolean debug) {
+		super.setDebug(debug);
+		DebugSetter.setDebug(this.boundary, debug);
 	}
 
 
 
-	@Override
-	public DecisionBoundary getBoundary() throws Exception {
-		return this.boundary;
+	public static void main(String[] args) {
+		runClassifier(new MultilayerPerceptronBoundary(), args);
 	}
 
 }

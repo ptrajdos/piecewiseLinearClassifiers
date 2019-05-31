@@ -12,6 +12,7 @@ import java.util.Vector;
 import weka.classifiers.Classifier;
 import weka.classifiers.functions.explicitboundaries.ClassifierWithBoundaries;
 import weka.classifiers.functions.explicitboundaries.DecisionBoundary;
+import weka.classifiers.functions.explicitboundaries.IDecisionBoundary;
 import weka.classifiers.functions.explicitboundaries.models.NearestCentroidBoundary;
 import weka.core.Attribute;
 import weka.core.Capabilities;
@@ -104,7 +105,7 @@ public class BoundaryBasedClassifier extends SingleClassifierEnhancerBoundary
 			//No crossvalidation -- use training set for validation
 			double[] vals = new double[2];
 			Instance tmpInstance = null;
-			DecisionBoundary boundary = this.getBoundary();
+			IDecisionBoundary boundary = this.getBoundary();
 			for(int i=0;i<numInstances;i++){
 				tmpInstance = data.get(i);
 				vals = new double[2];
@@ -123,7 +124,7 @@ public class BoundaryBasedClassifier extends SingleClassifierEnhancerBoundary
 			int numValInstances = 0;
 			Instance tmpInstance = null;
 			double[] vals  =new double[2];
-			DecisionBoundary boundary = null;
+			IDecisionBoundary boundary = null;
 			for(int f=0;f<this.numFolds;f++){
 				Instances train = tmpData.trainCV(this.numFolds, f);
 				Instances test = tmpData.testCV(this.numFolds, f);
@@ -157,7 +158,7 @@ public class BoundaryBasedClassifier extends SingleClassifierEnhancerBoundary
 		
 		if(this.useCalibrator & this.calibratorLearned){
 		
-		DecisionBoundary bound = ((ClassifierWithBoundaries) this.m_Classifier).getBoundary();
+		IDecisionBoundary bound = ((ClassifierWithBoundaries) this.m_Classifier).getBoundary();
 		double[] vals = new double[2];
 		vals[0] = bound.getValue(instance);
 		vals[1] = Utils.missingValue();

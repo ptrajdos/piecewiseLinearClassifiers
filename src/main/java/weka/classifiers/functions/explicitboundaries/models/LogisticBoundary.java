@@ -10,6 +10,7 @@ import weka.classifiers.functions.explicitboundaries.DecisionBoundaryPlane;
 import weka.classifiers.functions.explicitboundaries.gemoetry.Plane;
 import weka.core.Capabilities;
 import weka.core.Capabilities.Capability;
+import weka.core.DebugSetter;
 import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -17,7 +18,7 @@ import weka.core.Instances;
 /**
  * @author pawel trajdos
  * @since 1.3.0
- * @version 1.3.0
+ * @version 2.1.0
  *
  */
 public class LogisticBoundary extends Logistic implements ClassifierWithBoundaries {
@@ -34,6 +35,8 @@ public class LogisticBoundary extends Logistic implements ClassifierWithBoundari
 	 * Header of the dataset
 	 */
 	protected Instances dataHeader = null;
+	
+	protected DecisionBoundaryPlane boundary;
 
 	/**
 	 * 
@@ -49,10 +52,13 @@ public class LogisticBoundary extends Logistic implements ClassifierWithBoundari
 	 */
 	@Override
 	public void buildClassifier(Instances data) throws Exception {
-		this.getCapabilities().testWithFail(data);
+		if(!this.getDoNotCheckCapabilities())
+			this.getCapabilities().testWithFail(data);
 		super.buildClassifier(data);
 		this.defaultModel.buildDefaultModelPlane(data);
 		this.dataHeader = new Instances(data, 0);
+		
+		this.calculateBoundary();
 		
 	}
 
@@ -65,6 +71,10 @@ public class LogisticBoundary extends Logistic implements ClassifierWithBoundari
 			return this.defaultModel.planeModel;
 		}
 		
+		return this.boundary;
+	}
+	
+	protected void calculateBoundary()throws Exception{
 		double[][] params = this.coefficients();
 		//The model is assumed to be a binary classifier -- only one intercept/offset term is present
 		double offset = params[0][0];
@@ -86,9 +96,7 @@ public class LogisticBoundary extends Logistic implements ClassifierWithBoundari
 		tmpPlane.setNormalVector(normalVec);
 		tmpPlane.setOffset(offset);
 		
-		DecisionBoundaryPlane boundary = new DecisionBoundaryPlane(this.dataHeader, 0, 1, tmpPlane); 
-		
-		return boundary;
+		this.boundary = new DecisionBoundaryPlane(this.dataHeader, 0, 1, tmpPlane);
 	}
 	
 	/* (non-Javadoc)
@@ -102,6 +110,17 @@ public class LogisticBoundary extends Logistic implements ClassifierWithBoundari
 		base.enable(Capability.BINARY_CLASS);
 		return base;
 	}
+	
+	/* (non-Javadoc)
+	 * @see weka.classifiers.functions.Logistic#setDebug(boolean)
+	 */
+	@Override
+	public void setDebug(boolean debug) {
+		super.setDebug(debug);
+		DebugSetter.setDebug(this.boundary, debug);
+		DebugSetter.setDebug(this.defaultModel, debug);
+	}
+
 	/*
 	 * @param args
 	 */

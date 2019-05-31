@@ -6,14 +6,13 @@ package weka.classifiers.functions.explicitboundaries;
 import java.io.Serializable;
 
 import weka.core.Attribute;
-import weka.core.Instance;
 import weka.core.Instances;
 
 /**
  * @author pawel
  *
  */
-public abstract class DecisionBoundary implements Serializable {
+public abstract class DecisionBoundary implements Serializable, IDecisionBoundary {
 
 	/**
 	 * 
@@ -49,53 +48,27 @@ public abstract class DecisionBoundary implements Serializable {
 			throw new Exception("Incorrect class index");	
 	}
 	
-	/**
-	 * Give the class index for the instance
-	 * @param instance
-	 * @throws Exception 
-	 */
-	public abstract int getIndex(Instance instance) throws Exception;
 	
-	/**
-	 * Classify instance
-	 * @param instance
-	 * @return
-	 * @throws Exception
+	/* (non-Javadoc)
+	 * @see weka.classifiers.functions.explicitboundaries.IDecisionBoundary#getDatasetHeader()
 	 */
-	public abstract double classify(Instance instance) throws Exception;
-	
-	/**
-	 * Get value of the characteristic function of the decision boundary
-	 * @param instance
-	 * @return
-	 * @throws Exception
-	 */
-	public abstract double getValue(Instance instance)throws Exception;
-	
-	/**
-	 * Returns the smallest distance between the surface of the decision boundary and the instance
-	 * @param instance
-	 * @return
-	 * @throws Exception
-	 */
-	public abstract double getDistance(Instance instance)throws Exception;
-	/**
-	 * @return the datasetHeader
-	 */
+	@Override
 	public Instances getDatasetHeader() {
 		return this.datasetHeader;
 	}
 
-	/**
-	 * @return the class1Idx
+	/* (non-Javadoc)
+	 * @see weka.classifiers.functions.explicitboundaries.IDecisionBoundary#getClass1Idx()
 	 */
+	@Override
 	public int getClass1Idx() {
 		return this.class1Idx;
 	}
 
-	/**
-	 * @return the class2Idx
+	/* (non-Javadoc)
+	 * @see weka.classifiers.functions.explicitboundaries.IDecisionBoundary#getClass2Idx()
 	 */
+	@Override
 	public int getClass2Idx() {
 		return this.class2Idx;
 	}

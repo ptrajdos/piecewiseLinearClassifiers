@@ -8,7 +8,7 @@ import java.util.Enumeration;
 import java.util.Vector;
 
 import weka.classifiers.functions.explicitboundaries.ClassifierWithBoundaries;
-import weka.classifiers.functions.explicitboundaries.DecisionBoundary;
+import weka.classifiers.functions.explicitboundaries.IDecisionBoundary;
 import weka.classifiers.functions.explicitboundaries.combiners.PotentialFunction;
 import weka.classifiers.functions.explicitboundaries.combiners.PotentialFunctionExp4;
 import weka.classifiers.functions.explicitboundaries.models.NearestCentroidBoundary;
@@ -25,7 +25,7 @@ import weka.tools.data.InstancesOperator;
 /**
  * @author pawel trajdos
  * @since 2.0.0
- * @version 2.0.0
+ * @version 2.1.1
  *
  */
 public class BoundaryAndCentroidClassifier extends SingleClassifierEnhancerBoundary {
@@ -98,7 +98,7 @@ public class BoundaryAndCentroidClassifier extends SingleClassifierEnhancerBound
 		classProtos = new IClusterPrototype[numClasses];
 		protoPlaneSide = new double[numClasses];
 		stdDevs = new double[numClasses];
-		DecisionBoundary bnd = this.boundClassRef.getBoundary();
+		IDecisionBoundary bnd = this.boundClassRef.getBoundary();
 		proto2Bnd = new double[numClasses];
 		double[] inst2CentDist;
 		Instance tmpInst;
@@ -134,7 +134,7 @@ public class BoundaryAndCentroidClassifier extends SingleClassifierEnhancerBound
 		
 		int numClasses = this.stdDevs.length;
 		double[] potentials  = new double[numClasses];
-		DecisionBoundary bnd = this.boundClassRef.getBoundary();
+		IDecisionBoundary bnd = this.boundClassRef.getBoundary();
 		
 		double centDist=0;
 		double planeDirDist =0;
@@ -145,7 +145,11 @@ public class BoundaryAndCentroidClassifier extends SingleClassifierEnhancerBound
 		for(int c=0;c<numClasses;c++) {
 			centDist = this.classProtos[c].distance(instance);
 			planeDirDist = proto2Bnd[c] - Math.signum(bnd.getValue(instance))*bnd.getDistance(instance);
-			planeDirDist/= stdDevs[c];
+			if(!Utils.eq(stdDevs[c], 0)) {
+				planeDirDist/= stdDevs[c];
+			}else {
+				planeDirDist = Double.POSITIVE_INFINITY;
+			}
 			
 			pot1 = this.potFunction.getPotentialValue(centDist);
 			pot2 = this.potFunction.getPotentialValue(planeDirDist);

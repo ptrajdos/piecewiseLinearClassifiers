@@ -6,6 +6,7 @@ package weka.classifiers.functions.explicitboundaries.gemoetry;
 import java.io.Serializable;
 import java.util.Arrays;
 
+import weka.core.Debuggable;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.Utils;
@@ -14,30 +15,26 @@ import weka.tools.InstancesTools;
 /**
  * @author pawel trajdos
  * @since 0.1.0
- * @version 1.4.0
+ * @version 2.1.0
  *
  */
-public class DotProductEuclidean implements DotProduct, Serializable {
+public class DotProductEuclidean implements DotProduct, Serializable, Debuggable {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1477670834909210075L;
+	
+	boolean debug=true;
 
-	/**
-	 * 
-	 */
-	public DotProductEuclidean() {
-		// TODO Auto-generated constructor stub
-	}
 
 	/* (non-Javadoc)
 	 * @see weka.classifiers.functions.dotProducts.DotProductCalculator#dotProduct(weka.core.Instances, weka.core.Instance, weka.core.Instance)
 	 */
 	@Override
 	public double dotProduct(Instance inst1, Instance inst2) throws Exception {
-		
-		InstancesTools.checkCompatibility(inst1, inst2);
+		if(debug)
+			InstancesTools.checkCompatibility(inst1, inst2);
 		Instances dataSet = inst1.dataset();
 		
 		int numAttrs = dataSet.numAttributes();
@@ -93,5 +90,21 @@ public class DotProductEuclidean implements DotProduct, Serializable {
 		
 		return inst.copy(inst.toDoubleArray());
 	}
+
+	/**
+	 * @return the debug
+	 */
+	public boolean isDebug() {
+		return this.debug;
+	}
+
+	/**
+	 * @param debug the debug to set
+	 */
+	public void setDebug(boolean debug) {
+		this.debug = debug;
+	}
+	
+	
 
 }

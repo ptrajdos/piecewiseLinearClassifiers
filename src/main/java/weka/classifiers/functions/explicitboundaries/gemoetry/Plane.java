@@ -5,6 +5,8 @@ package weka.classifiers.functions.explicitboundaries.gemoetry;
 
 import java.io.Serializable;
 
+import weka.core.DebugSetter;
+import weka.core.Debuggable;
 import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -13,9 +15,9 @@ import weka.core.Utils;
 /**
  * @author pawel
  * @since 0.1.0
- * @version 0.1.0
+ * @version 2.1.0
  */
-public class Plane implements Serializable {
+public class Plane implements Serializable, Debuggable {
 
 	/**
 	 * 
@@ -51,6 +53,8 @@ public class Plane implements Serializable {
 	protected boolean normalizeDistance=false;
 	
 	protected GrammShmidtOrthonormal gsOrth;
+	
+	protected boolean debug=false;
 	
 	
 	
@@ -263,6 +267,7 @@ public class Plane implements Serializable {
 	 */
 	public void setDotProduct(DotProduct dotProduct) {
 		this.dotProduct = dotProduct;
+		this.gsOrth.setDotProd(dotProduct);
 	}
 
 	/**
@@ -296,10 +301,18 @@ public class Plane implements Serializable {
 	public void setNormalizeDistance(boolean normalizeDistance) {
 		this.normalizeDistance = normalizeDistance;
 	}
-	
-	
-	
-	
-	
+
+	@Override
+	public boolean isDebug() {
+		return this.debug;
+	}
+
+	@Override
+	public void setDebug(boolean debug) {
+		this.debug = debug;
+		DebugSetter.setDebug(dotProduct, debug);
+		DebugSetter.setDebug(gsOrth, debug);
+		
+	}
 
 }

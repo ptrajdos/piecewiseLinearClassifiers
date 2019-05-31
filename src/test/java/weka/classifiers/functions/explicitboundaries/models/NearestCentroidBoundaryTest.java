@@ -4,6 +4,7 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 import weka.classifiers.Classifier;
 import weka.classifiers.functions.NearestCentroidClassifierTest;
+import weka.tools.SerialCopier;
 
 public class NearestCentroidBoundaryTest extends NearestCentroidClassifierTest{
 
@@ -19,6 +20,8 @@ public class NearestCentroidBoundaryTest extends NearestCentroidClassifierTest{
 	 public static Test suite() {
 		    return new TestSuite(NearestCentroidBoundaryTest.class);
 		  }
+	 
+	 
 
 	public static void main(String[] args){
 		    junit.textui.TestRunner.run(suite());

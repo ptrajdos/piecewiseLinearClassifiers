@@ -67,6 +67,9 @@ public class SMOLinearBoundary extends SMO implements ClassifierWithBoundaries {
 	}
 	
 	protected void calculateBoundary(Instances insts)throws Exception{
+		this.defaultModel.buildDefaultModelPlane(insts);
+		if(this.defaultModel.useDefault)
+			return;
 		SMO.BinarySMO binaryModel = this.m_classifiers[0][1];
 		
 		@SuppressWarnings("rawtypes")
@@ -127,7 +130,7 @@ public class SMOLinearBoundary extends SMO implements ClassifierWithBoundaries {
 		this.setFilterType(new SelectedTag(SMO.FILTER_NONE, SMO.TAGS_FILTER));
 		super.buildClassifier(insts);
 		this.dataHeader = new Instances(insts, 0);
-		this.defaultModel.buildDefaultModelPlane(insts);
+		
 		this.calculateBoundary(insts);
 		
 		

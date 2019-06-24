@@ -75,6 +75,8 @@ public class LogisticBoundary extends Logistic implements ClassifierWithBoundari
 	}
 	
 	protected void calculateBoundary()throws Exception{
+		if(this.defaultModel.useDefault)
+			return;
 		double[][] params = this.coefficients();
 		//The model is assumed to be a binary classifier -- only one intercept/offset term is present
 		double offset = params[0][0];
@@ -88,7 +90,9 @@ public class LogisticBoundary extends Logistic implements ClassifierWithBoundari
 		int attIdx=1;
 		for(int a=0;a<numAttrs;a++) {
 			if(a != classIxd) {
-				normalVec.setValue(a, params[attIdx++][0]);
+				normalVec.setValue(a, params[attIdx++][0]);//TODO this is failing for leddigiths, dermatology, glass...
+				//For BoundPotClassifier
+				//Array Index out of Bound Exception, index 1!
 			}
 		}
 		

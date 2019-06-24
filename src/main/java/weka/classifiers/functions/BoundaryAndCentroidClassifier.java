@@ -14,6 +14,7 @@ import weka.classifiers.functions.explicitboundaries.combiners.PotentialFunction
 import weka.classifiers.functions.explicitboundaries.models.NearestCentroidBoundary;
 import weka.classifiers.functions.nearestCentroid.IClusterPrototype;
 import weka.classifiers.functions.nearestCentroid.prototypes.MahalanobisPrototype;
+import weka.classifiers.rules.ZeroR;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.Option;
@@ -25,7 +26,7 @@ import weka.tools.data.InstancesOperator;
 /**
  * @author pawel trajdos
  * @since 2.0.0
- * @version 2.1.1
+ * @version 2.1.2
  *
  */
 public class BoundaryAndCentroidClassifier extends SingleClassifierEnhancerBoundary {
@@ -58,6 +59,8 @@ public class BoundaryAndCentroidClassifier extends SingleClassifierEnhancerBound
 	
 	protected boolean normalize=true;
 	
+	protected ZeroR defaultModel;
+	
 	
 	
 	
@@ -82,7 +85,23 @@ public class BoundaryAndCentroidClassifier extends SingleClassifierEnhancerBound
 	 */
 	@Override
 	public void buildClassifier(Instances data) throws Exception {
-		this.getCapabilities().testWithFail(data);
+		if(!this.m_DoNotCheckCapabilities)
+			this.getCapabilities().testWithFail(data);
+		
+		int numIinsts = data.numInstances();
+		double[] classFreqs = InstancesOperator.classFreq(data);
+		for(int i =0;i<classFreqs.length;i++) {
+			classFreqs[i] = Math.ceil(classFreqs[i]*numIinsts);
+		}
+		
+		if(Utils.smOrEq(classFreqs[0], 1) | Utils.smOrEq(classFreqs[1], 1)) {
+			this.defaultModel = new ZeroR();
+			this.defaultModel.buildClassifier(data);
+			return;
+		}
+				
+		
+		
 		this.boundClassRef.buildClassifier(data);
 		
 		int numAttrs = data.numAttributes();
@@ -92,6 +111,8 @@ public class BoundaryAndCentroidClassifier extends SingleClassifierEnhancerBound
 			this.classesOnly=true;
 			return;
 		}
+		
+		
 		
 		int numClasses = data.numClasses();
 		Instances[] splittedData = InstancesOperator.classSpecSplit(data);
@@ -129,6 +150,10 @@ public class BoundaryAndCentroidClassifier extends SingleClassifierEnhancerBound
 	 */
 	@Override
 	public double[] distributionForInstance(Instance instance) throws Exception {
+		
+		if(this.defaultModel != null)
+			return this.defaultModel.distributionForInstance(instance);
+		
 		if (this.classesOnly)
 			return this.boundClassRef.distributionForInstance(instance);
 		

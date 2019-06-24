@@ -57,8 +57,7 @@ public class NearestCentroidBoundary extends NearestCentroidClassifier implement
 		if(!this.getDoNotCheckCapabilities())
 			this.getCapabilities().testWithFail(data);
 		super.buildClassifier(data);
-		this.defaultModel.buildDefaultModelPlane(data);
-		this.calculateBoundary();	
+		this.calculateBoundary(data);	
 	}
 
 
@@ -75,7 +74,10 @@ public class NearestCentroidBoundary extends NearestCentroidClassifier implement
 		
 	}
 	
-	protected void calculateBoundary()throws Exception {
+	protected void calculateBoundary(Instances data)throws Exception {
+		this.defaultModel.buildDefaultModelPlane(data);
+		if(this.defaultModel.useDefault)
+			return;
 		Instance normalVec = new DenseInstance(this.getCentroids()[0]);
 		normalVec.setDataset(this.getCentroids()[0].dataset());
 		Instance middleVec = new DenseInstance(this.getCentroids()[0]);

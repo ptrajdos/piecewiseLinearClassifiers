@@ -35,6 +35,8 @@ public class MultilayerPerceptronBoundary extends MultilayerPerceptron implement
 	protected Instances m_Data;
 	
 	protected DecisionBoundary boundary;
+	
+	protected MajorityPlaneBoundaryModel defaultModel = null;
 
 	/**
 	 * 
@@ -74,12 +76,14 @@ public class MultilayerPerceptronBoundary extends MultilayerPerceptron implement
 		int numAttrs = this.m_Data.numAttributes();
 		int classAttrNum = this.m_Data.classIndex();
 		
-		if(numAttrs ==1 & classAttrNum>=0) {
-			MajorityPlaneBoundaryModel majPlane = new MajorityPlaneBoundaryModel();
-			majPlane.buildDefaultModelPlane(this.m_Data);
-			this.boundary = majPlane.getPlaneModel();
+		this.defaultModel = new MajorityPlaneBoundaryModel();
+		this.defaultModel.buildDefaultModelPlane(this.m_Data);
+		if(this.defaultModel.useDefault) {
+			this.boundary = this.defaultModel.getPlaneModel();
 			return;
 		}
+			
+	
 		
 		
 		

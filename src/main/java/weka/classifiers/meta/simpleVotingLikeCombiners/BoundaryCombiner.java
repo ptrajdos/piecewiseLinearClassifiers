@@ -23,6 +23,7 @@ import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.RevisionUtils;
 import weka.core.Utils;
+import weka.core.UtilsPT;
 
 /**
  * @author pawel
@@ -132,23 +133,8 @@ public class BoundaryCombiner extends OutputCombinerBase {
 	 */
 	@Override
 	public void setOptions(String[] options) throws Exception {
-		String boundaryCombinerString = Utils.getOption("BC", options);
-	    if(boundaryCombinerString.length() != 0) {
-	      String combinerClassSpec[] = Utils.splitOptions(boundaryCombinerString);
-	      if(combinerClassSpec.length == 0) { 
-	        throw new Exception("Invalid Class combiner."); 
-	      }
-	      String className = combinerClassSpec[0];
-	      combinerClassSpec[0] = "";
-
-	      this.setBoundaryCombiner((DecisionBoundaryCombiner) 
-	                    Utils.forName( DecisionBoundaryCombiner.class, 
-	                                 className, 
-	                                 combinerClassSpec)
-	                                        );
-	    }
-	    else 
-	      this.setBoundaryCombiner(new PotentialFunctionCombiner()); 
+		
+		this.setBoundaryCombiner((DecisionBoundaryCombiner) UtilsPT.parseObjectOptions(options, "BC", new PotentialFunctionCombiner(), DecisionBoundaryCombiner.class));
 		
 	}
 
@@ -159,8 +145,7 @@ public class BoundaryCombiner extends OutputCombinerBase {
 	public String[] getOptions() {
 		Vector<String> options = new Vector<String>();
 	    options.add("-BC");
-	    String combinerOptions = (this.boundaryCombiner instanceof OptionHandler)? Utils.joinOptions(((OptionHandler)this.boundaryCombiner).getOptions()):"";
-	    options.add(this.boundaryCombiner.getClass().getName()+" "+combinerOptions); 
+	    options.add(UtilsPT.getClassAndOptions(this.getBoundaryCombiner()));
 	    
 	    return options.toArray(new String[0]);
 	}

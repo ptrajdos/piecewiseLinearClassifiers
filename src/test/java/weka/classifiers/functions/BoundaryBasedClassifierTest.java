@@ -6,6 +6,7 @@ import weka.classifiers.AbstractClassifier;
 import weka.classifiers.AbstractClassifierTest;
 import weka.classifiers.Classifier;
 import weka.classifiers.SingleClassifierEnhancer;
+import weka.tools.tests.WekaGOEChecker;
 
 public class BoundaryBasedClassifierTest extends AbstractClassifierTest {
 
@@ -35,6 +36,12 @@ public class BoundaryBasedClassifierTest extends AbstractClassifierTest {
 		}
 	 }
 	 
+	 public void testTipTexts() {
+		 WekaGOEChecker goe = new WekaGOEChecker();
+		 goe.setObject(this.getClassifier());
+		 goe.checkCallGlobalInfo();
+		 goe.checkToolTipsCall();
+	 }
 	
 
 	public static void main(String[] args){

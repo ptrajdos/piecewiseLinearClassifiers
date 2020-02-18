@@ -55,5 +55,15 @@ public class GrammShmidtOrthonormalTest {
 	      
 	      
 	}
+	
+	@Test
+	public void debugTest() {
+		GrammShmidtOrthonormal gs = new GrammShmidtOrthonormal();
+		gs.setDebug(true);
+		assertTrue("Get debug true", gs.isDebug());
+		
+		gs.setDebug(false);
+		assertFalse("Get debug false", gs.isDebug());
+	}
 
 }

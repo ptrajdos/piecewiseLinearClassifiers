@@ -19,7 +19,7 @@ public class MultilayerPerceptronBoundaryTest extends MultilayerPerceptronTest {
 	}
 	
 	 public static Test suite() {
-		    return new TestSuite(MultilayerPerceptronTest.class);
+		    return new TestSuite(MultilayerPerceptronBoundaryTest.class);
 		  }
 
 	public static void main(String[] args){

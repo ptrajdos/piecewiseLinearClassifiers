@@ -23,6 +23,7 @@ public class DotProductTester {
 		  ArrayList<Attribute> atts = new ArrayList<Attribute>(3);
 	      atts.add(new Attribute("X1"));
 	      atts.add(new Attribute("X2"));
+	      atts.add(new Attribute("X3"));
 	      LinkedList<String> valList = new LinkedList<String>();
 	      valList.add("1");
 	      valList.add("2");
@@ -30,13 +31,13 @@ public class DotProductTester {
 	      Instances dataset = new Instances("daataset",atts,1);
 	      dataset.setClassIndex(2);
 	      
-	      Instance test1  = new DenseInstance(1, new double[] {1,1,1});
+	      Instance test1  = new DenseInstance(1, new double[] {1,1,1,1});
 	      test1.setDataset(dataset);
 	      
-	      Instance test2  = new DenseInstance(1, new double[] {0.5,0.5,2});
+	      Instance test2  = new DenseInstance(1, new double[] {0.5,0.5,0.5,2});
 	      test2.setDataset(dataset);
 	      
-	      Instance test3  = new DenseInstance(1, new double[] {0.5,0.5,1});
+	      Instance test3  = new DenseInstance(1, new double[] {0.5,0.5,0.5,1});
 	      test3.setDataset(dataset);
 	      
 	      

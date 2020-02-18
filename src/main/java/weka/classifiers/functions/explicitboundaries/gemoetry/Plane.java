@@ -15,7 +15,7 @@ import weka.core.Utils;
 /**
  * @author pawel
  * @since 0.1.0
- * @version 2.1.0
+ * @version 2.1.3
  */
 public class Plane implements Serializable, Debuggable {
 
@@ -104,10 +104,7 @@ public class Plane implements Serializable, Debuggable {
 			result/= normalVecNorm;
 		}
 		 
-		if(this.normalizeDistance) {
-			double normalizer = vec.numAttributes();
-			result/= Math.sqrt(normalizer);
-		}
+		result = this.distanceNormalizer(result);
 		return result;
 	}
 	
@@ -125,22 +122,18 @@ public class Plane implements Serializable, Debuggable {
 		if(!Utils.eq(normalVecNorm, 0)) {
 			result/= normalVecNorm;
 		}
-		//TODO check it!!
-		if(this.normalizeDistance) {
-			double normFactor = vec.numAttributes();
-			result/= Math.sqrt(normFactor);
-		}
+		result = this.distanceNormalizer(result);
 		return result;
 	}
 
 	
 	private void createPlaneBase() throws Exception {
-		Instance[] base = createBase();
+		Instance[] base = createBase();//TODO error is here
 		this.planeBase = this.gsOrth.createOrthonormalBase(base);
 	}
 	
 	private Instance[] createBase() {
-		int numAttrs = this.dataHeader.numAttributes()  - (this.dataHeader.classIndex()>=0? 1:0);
+		int numAttrs = numericAttribsNumber();
 		if(numAttrs<=1) {
 			return new Instance[] {this.normalVector.copy(this.normalVector.toDoubleArray())};
 		}
@@ -156,10 +149,17 @@ public class Plane implements Serializable, Debuggable {
 		
 		double coef = nVecRep[coefIdx];
 		double[] instRep = null;
-		instRep = new double[nVecRep.length];
+		
 		int baseCount =0;
 		for(int a=0;a<nVecRep.length;a++) {
-			if(coefIdx == a || a== classIdx || (!this.dataHeader.attribute(a).isNumeric()) )continue;
+			instRep = new double[nVecRep.length];
+			if(coefIdx == a || a== classIdx)
+				continue;
+			
+			if(!this.dataHeader.attribute(a).isNumeric()) {
+				instRep[a] = nVecRep[a];
+				continue;
+			}
 			
 			instRep[a] =1.0;
 			instRep[coefIdx] = -(nVecRep[a] + this.offset)/coef;
@@ -230,7 +230,36 @@ public class Plane implements Serializable, Debuggable {
 	}
 
 
-
+	protected double distanceNormalizer(double distance) {
+		double result = distance;
+		if(!this.normalizeDistance)
+			return result;
+		
+			
+			
+			double normalizer = this.numericAttribsNumber();
+			result/= Math.sqrt(normalizer);
+		
+				
+		return result;
+	}
+	
+	protected int numericAttribsNumber() {
+		int numAttributes = 0;
+		int initialAttributesNum = this.normalVector.numAttributes();
+		Instances dataset = this.normalVector.dataset();
+		int classIdx  = dataset.classIndex();
+		for(int i =0;i<initialAttributesNum;i++) {
+			if(i==classIdx)
+				continue;
+			if(!dataset.attribute(i).isNumeric())
+				continue;
+			
+			numAttributes++;
+		}
+		return numAttributes;
+		
+	}
 
 	/**
 	 * @return the offset

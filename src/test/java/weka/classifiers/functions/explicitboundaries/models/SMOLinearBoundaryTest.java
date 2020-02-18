@@ -14,7 +14,7 @@ public class SMOLinearBoundaryTest extends SMOTest {
 	@Override
 	public Classifier getClassifier() {
 
-		return new FLDABoundary();
+		return new SMOLinearBoundary();
 	}
 	
 	 public static Test suite() {

@@ -16,11 +16,12 @@ import weka.classifiers.functions.explicitboundaries.combiners.potentialCombiner
 import weka.core.Instance;
 import weka.core.Option;
 import weka.core.OptionHandler;
-import weka.core.Utils;
+import weka.core.UtilsPT;
 
 /**
  * @author pawel trajdos
- * @version 1.1.1
+ * @since 1.1.1
+ * @version 2.1.3
  *
  */
 public class PotentialFunctionCombiner implements DecisionBoundaryCombiner, Serializable,OptionHandler {
@@ -57,10 +58,6 @@ public class PotentialFunctionCombiner implements DecisionBoundaryCombiner, Seri
 		//value >0 -> index1
 		if(this.boundaries == null)
 			throw new Exception("No boundaries have been set");
-		
-			
-		
-		
 		
 		int classIdx;
 		classIdx = this.potCombiner.getCombinedBoundaries(inst, this.boundaries, this.potential);
@@ -131,55 +128,22 @@ public class PotentialFunctionCombiner implements DecisionBoundaryCombiner, Seri
 	@Override
 	public void setOptions(String[] options) throws Exception {
 		
-		String potentialString = Utils.getOption("PF", options);
+		this.setPotential((PotentialFunction) UtilsPT.parseObjectOptions(options, "PF", new PotentialFunctionSign(), PotentialFunction.class));
 		
-	    if(potentialString.length() != 0) {
-	      String combinerClassSpec[] = Utils.splitOptions(potentialString);
-	      if(combinerClassSpec.length == 0) { 
-	        throw new Exception("Invalid Class combiner."); 
-	      }
-	      String className = combinerClassSpec[0];
-	      combinerClassSpec[0] = "";
-
-	      this.setPotential((PotentialFunction) 
-	                    Utils.forName( PotentialFunction.class, 
-	                                 className, 
-	                                 combinerClassSpec)
-	                                        );
-	    }
-	    else 
-	      this.setPotential(new PotentialFunctionSign());
-	    
-	    String potentialCombinerString = Utils.getOption("PC", options);
-	    if(potentialCombinerString.length()!=0) {
-	    	String combinerClassSpec[] = Utils.splitOptions(potentialString);
-		      if(combinerClassSpec.length == 0) { 
-		        throw new Exception("Invalid Class combiner."); 
-		      }
-		      String className = combinerClassSpec[0];
-		      combinerClassSpec[0] = "";
-	    	this.setPotCombiner((PotentialCombiner) 
-                    Utils.forName( PotentialCombiner.class, 
-                                 className, 
-                                 combinerClassSpec)
-                                        );
-	    }else
-	    	this.setPotCombiner(new PotentialCombinerSum());
+		this.setPotCombiner((PotentialCombiner) UtilsPT.parseObjectOptions(options, "PC", new PotentialCombinerSum(), PotentialCombiner.class));
 		
 	}
 
 	@Override
 	public String[] getOptions() {
 		Vector<String> options = new Vector<String>();
+		
 	    options.add("-PF");
-	    String combinerOptions = (this.potential instanceof OptionHandler)? Utils.joinOptions(((OptionHandler)this.potential).getOptions()):"";
-	    options.add(this.potential.getClass().getName()+" "+combinerOptions); 
-	    
+	    options.add(UtilsPT.getClassAndOptions(this.getPotential()));
 	    
 	    options.add("-PC");
-	    String potCombOptions = (this.potCombiner instanceof OptionHandler)? Utils.joinOptions( ((OptionHandler)this.potCombiner).getOptions() ):"";
-	    options.add(this.potCombiner.getClass().getName()  + " " + potCombOptions);
-	    
+	    options.add(UtilsPT.getClassAndOptions(this.getPotCombiner()));
+	   
 	    
 	    return options.toArray(new String[0]);
 	}

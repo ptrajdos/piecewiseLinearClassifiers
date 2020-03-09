@@ -14,7 +14,7 @@ public class LinearRegressionBoundaryTest extends LinearRegressionTest{
 	@Override
 	public Classifier getClassifier() {
 
-		return new FLDABoundary();
+		return new LinearRegressionBoundary();
 	}
 	
 	 public static Test suite() {

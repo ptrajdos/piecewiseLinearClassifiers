@@ -9,7 +9,9 @@ import weka.core.Attribute;
 import weka.core.Instances;
 
 /**
- * @author pawel
+ * @author pawel trajdos
+ * @since 2.1.0
+ * @version 2.1.3
  *
  */
 public abstract class DecisionBoundary implements Serializable, IDecisionBoundary {

@@ -1,6 +1,9 @@
 package weka.classifiers.functions.explicitboundaries.gemoetry;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -54,6 +57,16 @@ public class GrammShmidtOrthonormalTest {
 		}
 	      
 	      
+	}
+	
+	@Test
+	public void debugTest() {
+		GrammShmidtOrthonormal gs = new GrammShmidtOrthonormal();
+		gs.setDebug(true);
+		assertTrue("Get debug true", gs.isDebug());
+		
+		gs.setDebug(false);
+		assertFalse("Get debug false", gs.isDebug());
 	}
 
 }

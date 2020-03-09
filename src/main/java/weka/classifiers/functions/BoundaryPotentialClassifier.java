@@ -149,9 +149,9 @@ public class BoundaryPotentialClassifier extends SingleClassifierEnhancerBoundar
 		Vector<String> options = new Vector<String>();
 		
 		options.add("-P");
-		options.add(UtilsPT.getClassAndOptions(potential));
+		options.add(UtilsPT.getClassAndOptions(this.getPotential()));
 		
-		if(this.normalizeOutput)
+		if(this.isNormalizeOutput())
 			options.add("-N");
 		
 	

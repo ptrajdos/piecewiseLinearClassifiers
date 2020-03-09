@@ -1,33 +1,14 @@
 package weka.classifiers.functions.explicitboundaries.combiners;
 
-import static org.junit.Assert.*;
+public class PotentialFunctionExp2Test extends PotentialTester {
 
-import org.junit.Before;
-import org.junit.Test;
-
-public class PotentialFunctionExp2Test {
-
-	PotentialFunctionExp2 potFun = null;
-	@Before
-	public void setUp() throws Exception {
-		this.potFun = new PotentialFunctionExp2();
+	public PotentialFunctionExp2Test(String name, String classname) {
+		super(name, classname);
+	}
+	
+	public PotentialFunctionExp2Test(String name) {
+		super(name, PotentialFunctionExp2.class.getCanonicalName());
 	}
 
-	@Test
-	public void testGetPotentialValue() {
-		PotentialTester.testPotential(this.potFun);
-	}
-
-	@Test
-	public void testGetAlpha() {
-		assertEquals(1.0, this.potFun.getAlpha(),1E-6);
-	}
-
-	@Test
-	public void testSetAlpha() {
-		double val =5.5;
-		this.potFun.setAlpha(val);
-		assertEquals(val, this.potFun.getAlpha(),1E-6);
-	}
 
 }

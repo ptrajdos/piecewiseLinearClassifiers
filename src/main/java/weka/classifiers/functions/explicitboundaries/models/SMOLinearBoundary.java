@@ -14,7 +14,6 @@ import weka.classifiers.functions.supportVector.PolyKernel;
 import weka.core.Capabilities;
 import weka.core.Capabilities.Capability;
 import weka.core.DebugSetter;
-import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.SelectedTag;

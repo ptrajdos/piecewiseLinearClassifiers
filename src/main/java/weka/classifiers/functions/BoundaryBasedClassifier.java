@@ -15,20 +15,20 @@ import weka.classifiers.functions.explicitboundaries.DecisionBoundary;
 import weka.classifiers.functions.explicitboundaries.IDecisionBoundary;
 import weka.classifiers.functions.explicitboundaries.models.NearestCentroidBoundary;
 import weka.core.Attribute;
-import weka.core.Capabilities;
-import weka.core.Capabilities.Capability;
 import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.Option;
-import weka.core.OptionHandler;
 import weka.core.Randomizable;
 import weka.core.Utils;
+import weka.core.UtilsPT;
 import weka.tools.SerialCopier;
 
 /**
+ * Allows to use boundary classifier as general Classifier object
  * @author pawel trajdos
- * @version 2.0.0
+ * @since 2.0.0
+ * @version 2.1.3
  *
  */
 public class BoundaryBasedClassifier extends SingleClassifierEnhancerBoundary
@@ -189,6 +189,7 @@ public class BoundaryBasedClassifier extends SingleClassifierEnhancerBoundary
 	 */
 	public void setCalibrator(Classifier calibrator) {
 		this.calibrator = calibrator;
+		this.calibratorLearned=false;
 	}
 	
 	public String calibratorTipText() {
@@ -278,35 +279,15 @@ public class BoundaryBasedClassifier extends SingleClassifierEnhancerBoundary
 	 */
 	@Override
 	public void setOptions(String[] options) throws Exception {
+		
+		
 		this.setUseCalibrator(Utils.getFlag("CA", options));
 		
-		String cvNumStr = Utils.getOption("CV", options);
-		int cvNum =3;
-		try {
-		cvNum = Integer.parseInt(cvNumStr);
-		}catch(Exception e) {
-			cvNum =3;
-		}
+		this.setNumFolds(UtilsPT.parseIntegerOption(options, "CV", 3));
 		
-		String calibratorString = Utils.getOption("CAM", options);
-	    if(calibratorString.length() != 0) {
-	      String calibratorClassSpec[] = Utils.splitOptions(calibratorString);
-	      if(calibratorClassSpec.length == 0) { 
-	        throw new Exception("Invalid Calibrator " +
-	                            "specification string."); 
-	      }
-	      String className = calibratorClassSpec[0];
-	      calibratorClassSpec[0] = "";
-
-	      this.setCalibrator( (Classifier)
-	                  Utils.forName( Classifier.class, 
-	                                 className, 
-	                                 calibratorClassSpec)
-	                                        );
-	    }
-	    else 
-	      this.setCalibrator(new Logistic());
-
+		this.setCalibrator((Classifier) UtilsPT.parseObjectOptions(options, "CAM", new Logistic(), Classifier.class));
+		
+		
 		
 		super.setOptions(options);
 	}
@@ -324,12 +305,9 @@ public class BoundaryBasedClassifier extends SingleClassifierEnhancerBoundary
 		options.add(""+this.getNumFolds());
 		
 		options.add("-CAM");
-		String calibratorOptions = this.calibrator instanceof OptionHandler? " "+Utils.joinOptions( ((OptionHandler) this.calibrator).getOptions()): " ";
-	    options.add(this.calibrator.getClass().getName()+calibratorOptions);
-	    
+		options.add(UtilsPT.getClassAndOptions(this.getCalibrator()));
 		
-		
-		
+	   
 		Collections.addAll(options, super.getOptions());
 	    return options.toArray(new String[0]);
 	}

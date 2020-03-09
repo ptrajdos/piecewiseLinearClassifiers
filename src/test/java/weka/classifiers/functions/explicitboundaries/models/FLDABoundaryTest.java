@@ -28,6 +28,10 @@ public class FLDABoundaryTest extends FLDATest {
 	 public static Test suite() {
 		    return new TestSuite(FLDABoundaryTest.class);
 		  }
+	 
+	 public void testBoundary() {
+		 
+	 }
 
 	public static void main(String[] args){
 		    junit.textui.TestRunner.run(suite());

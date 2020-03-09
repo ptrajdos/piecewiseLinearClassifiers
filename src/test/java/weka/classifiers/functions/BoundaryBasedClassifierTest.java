@@ -5,7 +5,6 @@ import junit.framework.TestSuite;
 import weka.classifiers.AbstractClassifier;
 import weka.classifiers.AbstractClassifierTest;
 import weka.classifiers.Classifier;
-import weka.classifiers.SingleClassifierEnhancer;
 import weka.tools.tests.WekaGOEChecker;
 
 public class BoundaryBasedClassifierTest extends AbstractClassifierTest {

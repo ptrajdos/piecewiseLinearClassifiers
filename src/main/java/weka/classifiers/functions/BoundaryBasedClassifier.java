@@ -19,7 +19,6 @@ import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.Option;
-import weka.core.OptionHandler;
 import weka.core.Randomizable;
 import weka.core.Utils;
 import weka.core.UtilsPT;

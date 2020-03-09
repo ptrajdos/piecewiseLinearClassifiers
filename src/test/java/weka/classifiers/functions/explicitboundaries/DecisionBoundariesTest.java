@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.junit.Test;
-
 import junit.framework.TestCase;
 import weka.core.Attribute;
 import weka.core.DenseInstance;

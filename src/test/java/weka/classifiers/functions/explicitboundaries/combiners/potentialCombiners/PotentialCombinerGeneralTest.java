@@ -1,11 +1,7 @@
 package weka.classifiers.functions.explicitboundaries.combiners.potentialCombiners;
 
-import static org.junit.Assert.*;
-
 import java.util.ArrayList;
 import java.util.List;
-
-import org.junit.Test;
 
 import junit.framework.TestCase;
 import weka.classifiers.functions.explicitboundaries.DecisionBoundaries;

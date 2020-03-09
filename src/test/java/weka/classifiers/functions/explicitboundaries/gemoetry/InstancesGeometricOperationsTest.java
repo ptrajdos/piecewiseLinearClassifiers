@@ -13,7 +13,6 @@ import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.tools.InstancesTools;
-import weka.tools.data.InstancesOperator;
 
 public class InstancesGeometricOperationsTest {
 

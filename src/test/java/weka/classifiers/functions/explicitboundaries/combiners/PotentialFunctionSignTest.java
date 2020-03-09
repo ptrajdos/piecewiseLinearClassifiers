@@ -1,7 +1,5 @@
 package weka.classifiers.functions.explicitboundaries.combiners;
 
-import static org.junit.Assert.assertTrue;
-
 import org.junit.Test;
 
 /**

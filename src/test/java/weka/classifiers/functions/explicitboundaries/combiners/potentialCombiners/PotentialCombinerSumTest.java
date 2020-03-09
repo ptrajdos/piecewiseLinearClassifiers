@@ -3,10 +3,6 @@
  */
 package weka.classifiers.functions.explicitboundaries.combiners.potentialCombiners;
 
-import static org.junit.Assert.*;
-
-import org.junit.Test;
-
 /**
  * @author pawel
  *

@@ -27,9 +27,9 @@ public class DecisionBoundaryTest extends TestCase {
 			assertTrue("Non-zero lenght", toString.length()>0);
 		}catch(Exception e) {
 			fail("Serialization has failed");
-		}
-		
+		}	
 	}
+	
 	
 	
 

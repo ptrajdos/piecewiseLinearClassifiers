@@ -38,7 +38,7 @@ public abstract class SingleClassifierEnhancerBoundary extends SingleClassifierE
 		try {
 			this.boundClassRef = (ClassifierWithBoundaries) newClassifier;
 		}catch(Exception e) {
-			//e.printStackTrace();
+			e.printStackTrace();
 		}
 	}
 	

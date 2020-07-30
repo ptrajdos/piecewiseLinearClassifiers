@@ -57,5 +57,15 @@ public class MajorityPlaneBoundaryModelTest {
 			fail("Exception has been caught");
 		}
 	}
+	
+	@Test
+	public void testDebug() {
+		MajorityPlaneBoundaryModel mpbm = new MajorityPlaneBoundaryModel();
+		mpbm.setDebug(false);
+		assertTrue("debug false", mpbm.isDebug()==false);
+		
+		mpbm.setDebug(true);
+		assertTrue("debug false", mpbm.isDebug()==true);
+	}
 
 }

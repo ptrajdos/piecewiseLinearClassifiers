@@ -28,7 +28,7 @@ import weka.core.UtilsPT;
  * Only binary classifiers.
  * @author Pawel Trajdos
  * @since 0.1.0
- * @version 2.1.0
+ * @version 2.2.1
  *
  */
 public class NearestCentroidBoundary extends NearestCentroidClassifier implements ClassifierWithBoundaries {
@@ -124,7 +124,7 @@ public class NearestCentroidBoundary extends NearestCentroidClassifier implement
 		base.disableAll();
 		base.enable(Capability.NUMERIC_ATTRIBUTES);
 		base.enable(Capability.BINARY_CLASS);
-		base.setMinimumNumberInstances(2);
+		base.setMinimumNumberInstances(0);
 		return base;
 	}
 

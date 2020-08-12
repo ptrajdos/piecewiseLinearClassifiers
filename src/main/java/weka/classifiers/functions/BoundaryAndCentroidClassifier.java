@@ -94,6 +94,7 @@ public class BoundaryAndCentroidClassifier extends SingleClassifierEnhancerBound
 			classFreqs[i] = Math.ceil(classFreqs[i]*numIinsts);
 		}
 		
+		this.defaultModel = null;
 		if(Utils.smOrEq(classFreqs[0], 1) | Utils.smOrEq(classFreqs[1], 1)) {
 			this.defaultModel = new ZeroR();
 			this.defaultModel.buildClassifier(data);

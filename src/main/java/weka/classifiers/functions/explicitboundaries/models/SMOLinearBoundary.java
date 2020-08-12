@@ -11,6 +11,7 @@ import weka.classifiers.functions.explicitboundaries.DecisionBoundary;
 import weka.classifiers.functions.explicitboundaries.DecisionBoundaryPlane;
 import weka.classifiers.functions.explicitboundaries.gemoetry.Plane;
 import weka.classifiers.functions.supportVector.PolyKernel;
+import weka.classifiers.rules.ZeroR;
 import weka.core.Capabilities;
 import weka.core.Capabilities.Capability;
 import weka.core.DebugSetter;
@@ -21,7 +22,7 @@ import weka.core.SelectedTag;
 /**
  * @author pawel trajdos
  * @since 0.1.0
- * @version 2.1.1
+ * @version 2.2.1
  *
  */
 public class SMOLinearBoundary extends SMO implements ClassifierWithBoundaries {
@@ -39,6 +40,8 @@ public class SMOLinearBoundary extends SMO implements ClassifierWithBoundaries {
 	protected MajorityPlaneBoundaryModel defaultModel = null;
 	
 	protected DecisionBoundaryPlane boundary;
+	
+	protected ZeroR zeroModel;
 	
 
 	/**
@@ -127,13 +130,26 @@ public class SMOLinearBoundary extends SMO implements ClassifierWithBoundaries {
 		 * Set no data normalization 
 		 */
 		this.setFilterType(new SelectedTag(SMO.FILTER_NONE, SMO.TAGS_FILTER));
-		super.buildClassifier(insts);
+		this.zeroModel = null;
+		
+		this.defaultModel.buildDefaultModelPlane(insts);
+		
+		if(this.defaultModel.isUseDefault()) {
+			this.zeroModel = new ZeroR();
+			this.zeroModel.buildClassifier(insts);
+		}else
+			super.buildClassifier(insts);
+			
+		
+		
 		this.dataHeader = new Instances(insts, 0);
 		
 		this.calculateBoundary(insts);
 		
 		
 	}
+	
+	
 
 	/**
 	 * @param args
@@ -163,6 +179,14 @@ public class SMOLinearBoundary extends SMO implements ClassifierWithBoundaries {
 		super.setDebug(debug);
 		DebugSetter.setDebug(this.boundary, debug);
 		DebugSetter.setDebug(this.defaultModel, debug);
+	}
+
+	@Override
+	public double[] distributionForInstance(Instance inst) throws Exception {
+		if(this.defaultModel.isUseDefault())
+			return this.zeroModel.distributionForInstance(inst);
+		
+		return super.distributionForInstance(inst);
 	}
 	
 

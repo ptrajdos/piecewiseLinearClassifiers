@@ -22,7 +22,7 @@ import weka.tools.SerialCopier;
 /**
  * @author pawel trajdos
  * @since 2.2.0
- * @version 2.2.0 
+ * @version 2.2.1 
  *
  */
 public class BoundaryKernelClassifier extends SingleClassifierEnhancerBoundary implements weka.tools.GlobalInfoHandler {
@@ -36,6 +36,8 @@ public class BoundaryKernelClassifier extends SingleClassifierEnhancerBoundary i
 	
 	protected DensityEstimator estimProto = new SilvermanBandwidthSelectionKernel() ;
 	protected DensityEstimator[] estims;
+	
+	protected int[] numInsancesPerClass;
 	
 	
 	public BoundaryKernelClassifier(ClassifierWithBoundaries nearestCentroidBoundary) {
@@ -55,6 +57,7 @@ public class BoundaryKernelClassifier extends SingleClassifierEnhancerBoundary i
 	public void buildClassifier(Instances data) throws Exception {
 		if(!this.m_DoNotCheckCapabilities)
 			this.getCapabilities().testWithFail(data);
+		
 		this.boundClassRef.buildClassifier(data);
 		int numClasses = data.numClasses();
 		this.estims = new DensityEstimator[numClasses];
@@ -64,15 +67,36 @@ public class BoundaryKernelClassifier extends SingleClassifierEnhancerBoundary i
 		int numInstances = data.numInstances();
 		Instance tmpInstance = null;
 		IDecisionBoundary bnd = this.boundClassRef.getBoundary();
+		this.numInsancesPerClass = new int[numClasses];
 		double predVal=0;
+		int classIdx;
 		for(int i=0;i<numInstances;i++) {
 			tmpInstance = data.get(i);
 			predVal = bnd.getValue(tmpInstance);
-			this.estims[(int) tmpInstance.classValue()].addValue(predVal, 1.0);
+			classIdx = (int) tmpInstance.classValue();
+			this.estims[classIdx].addValue(predVal, 1.0);
+			this.numInsancesPerClass[classIdx]++;
 		}
-		
 
 	}
+	
+	@Override
+	public double[] distributionForInstance(Instance instance) throws Exception {
+		double[] distribution = new double[this.estims.length];
+		IDecisionBoundary bnd = this.boundClassRef.getBoundary();
+		double val = bnd.getValue(instance);
+		for(int i=0;i<distribution.length;i++)
+			if(this.numInsancesPerClass[i]>0)
+				distribution[i] = this.estims[i].getPDF(val);
+			else
+				distribution[i]=0;
+		
+		if(this.normalize)
+			distribution = UtilsPT.softMax(distribution);
+		
+		return distribution;
+	}
+
 	
 	
 	
@@ -141,20 +165,7 @@ public class BoundaryKernelClassifier extends SingleClassifierEnhancerBoundary i
 		return "Estimator prototype";
 	}
 
-	@Override
-	public double[] distributionForInstance(Instance instance) throws Exception {
-		double[] distribution = new double[this.estims.length];
-		IDecisionBoundary bnd = this.boundClassRef.getBoundary();
-		double val = bnd.getValue(instance);
-		for(int i=0;i<distribution.length;i++)
-			distribution[i] = this.estims[i].getPDF(val);
-		
-		if(this.normalize)
-			distribution = UtilsPT.softMax(distribution);
-		
-		return distribution;
-	}
-
+	
 	@Override
 	public String globalInfo() {
 		return "Kernel-based potential classifier" ;

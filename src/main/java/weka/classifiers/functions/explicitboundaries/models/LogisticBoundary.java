@@ -8,6 +8,7 @@ import weka.classifiers.functions.explicitboundaries.ClassifierWithBoundaries;
 import weka.classifiers.functions.explicitboundaries.DecisionBoundary;
 import weka.classifiers.functions.explicitboundaries.DecisionBoundaryPlane;
 import weka.classifiers.functions.explicitboundaries.gemoetry.Plane;
+import weka.classifiers.rules.ZeroR;
 import weka.core.Capabilities;
 import weka.core.Capabilities.Capability;
 import weka.core.DebugSetter;
@@ -18,7 +19,7 @@ import weka.core.Instances;
 /**
  * @author pawel trajdos
  * @since 1.3.0
- * @version 2.1.0
+ * @version 2.2.1
  *
  */
 public class LogisticBoundary extends Logistic implements ClassifierWithBoundaries {
@@ -29,7 +30,7 @@ public class LogisticBoundary extends Logistic implements ClassifierWithBoundari
 	private static final long serialVersionUID = -763786573937960677L;
 	
 	
-	protected MajorityPlaneBoundaryModel defaultModel = null;
+	protected MajorityPlaneBoundaryModel defaultPlaneModel = null;
 	
 	/**
 	 * Header of the dataset
@@ -37,6 +38,8 @@ public class LogisticBoundary extends Logistic implements ClassifierWithBoundari
 	protected Instances dataHeader = null;
 	
 	protected DecisionBoundaryPlane boundary;
+	
+	protected ZeroR defaultModel;
 
 	/**
 	 * 
@@ -44,7 +47,7 @@ public class LogisticBoundary extends Logistic implements ClassifierWithBoundari
 	public LogisticBoundary() {
 		super();
 		
-		this.defaultModel = new MajorityPlaneBoundaryModel();
+		this.defaultPlaneModel = new MajorityPlaneBoundaryModel();
 	}
 	
 	/* (non-Javadoc)
@@ -54,8 +57,17 @@ public class LogisticBoundary extends Logistic implements ClassifierWithBoundari
 	public void buildClassifier(Instances data) throws Exception {
 		if(!this.getDoNotCheckCapabilities())
 			this.getCapabilities().testWithFail(data);
-		super.buildClassifier(data);
-		this.defaultModel.buildDefaultModelPlane(data);
+		
+		this.defaultPlaneModel.buildDefaultModelPlane(data);
+		
+		if(this.defaultPlaneModel.isUseDefault()) {
+			this.defaultModel = new ZeroR();
+			this.defaultModel.buildClassifier(data);
+		}else
+			super.buildClassifier(data);
+		
+		
+		
 		this.dataHeader = new Instances(data, 0);
 		
 		this.calculateBoundary();
@@ -67,15 +79,15 @@ public class LogisticBoundary extends Logistic implements ClassifierWithBoundari
 	 */
 	@Override
 	public DecisionBoundary getBoundary() throws Exception {
-		if(this.defaultModel.isUseDefault()) {
-			return this.defaultModel.planeModel;
+		if(this.defaultPlaneModel.isUseDefault()) {
+			return this.defaultPlaneModel.planeModel;
 		}
 		
 		return this.boundary;
 	}
 	
 	protected void calculateBoundary()throws Exception{
-		if(this.defaultModel.useDefault)
+		if(this.defaultPlaneModel.useDefault)
 			return;
 		double[][] params = this.coefficients();
 		//The model is assumed to be a binary classifier -- only one intercept/offset term is present
@@ -122,7 +134,7 @@ public class LogisticBoundary extends Logistic implements ClassifierWithBoundari
 	public void setDebug(boolean debug) {
 		super.setDebug(debug);
 		DebugSetter.setDebug(this.boundary, debug);
-		DebugSetter.setDebug(this.defaultModel, debug);
+		DebugSetter.setDebug(this.defaultPlaneModel, debug);
 	}
 
 	/*
@@ -133,5 +145,15 @@ public class LogisticBoundary extends Logistic implements ClassifierWithBoundari
 
 	}
 
+	@Override
+	public double[] distributionForInstance(Instance instance) throws Exception {
+		if(this.defaultPlaneModel.isUseDefault())
+			return this.defaultModel.distributionForInstance(instance);
+		
+		return super.distributionForInstance(instance);
+	}
+
+	
+	
 
 }

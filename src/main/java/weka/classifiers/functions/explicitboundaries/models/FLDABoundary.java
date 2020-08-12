@@ -19,7 +19,7 @@ import weka.core.Instances;
 /**
  * @author pawel trajdos
  * @since 0.1.0
- * @version 2.1.0
+ * @version 2.2.1
  */
 
 public class FLDABoundary extends FLDA implements ClassifierWithBoundaries {

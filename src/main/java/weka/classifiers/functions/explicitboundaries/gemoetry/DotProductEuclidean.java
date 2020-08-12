@@ -33,7 +33,7 @@ public class DotProductEuclidean implements DotProduct, Serializable, Debuggable
 	 */
 	@Override
 	public double dotProduct(Instance inst1, Instance inst2) throws Exception {
-		if(debug)
+		if(this.debug)
 			InstancesTools.checkCompatibility(inst1, inst2);
 		Instances dataSet = inst1.dataset();
 		

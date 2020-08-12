@@ -11,6 +11,7 @@ import weka.classifiers.functions.explicitboundaries.DecisionBoundary;
 import weka.classifiers.functions.explicitboundaries.DecisionBoundaryPlane;
 import weka.classifiers.functions.neural.NeuralConnection;
 import weka.classifiers.functions.neural.NeuralNode;
+import weka.classifiers.rules.ZeroR;
 import weka.core.Capabilities;
 import weka.core.Capabilities.Capability;
 import weka.core.DebugSetter;
@@ -20,6 +21,8 @@ import weka.core.Instances;
 
 /**
  * @author pawel trajdos
+ * @since 0.1.0
+ * @version 2.2.1
  *
  */
 public class MultilayerPerceptronBoundary extends MultilayerPerceptron implements ClassifierWithBoundaries {
@@ -36,13 +39,18 @@ public class MultilayerPerceptronBoundary extends MultilayerPerceptron implement
 	
 	protected DecisionBoundary boundary;
 	
-	protected MajorityPlaneBoundaryModel defaultModel = null;
+	protected MajorityPlaneBoundaryModel defaultPlaneModel = null;
+	
+	protected ZeroR defaultModel;
+	
+	
 
 	/**
 	 * 
 	 */
 	public MultilayerPerceptronBoundary() {
 		super();
+		this.defaultPlaneModel = new MajorityPlaneBoundaryModel();
 	}
 	
 	
@@ -57,7 +65,17 @@ public class MultilayerPerceptronBoundary extends MultilayerPerceptron implement
 		//Only linear models are allowed
 		this.setHiddenLayers("0");
 		this.setNormalizeNumericClass(false);
-		super.buildClassifier(i);
+		
+		this.defaultPlaneModel.buildDefaultModelPlane(i);
+		if(this.defaultPlaneModel.isUseDefault()) {
+			this.defaultModel = new ZeroR();
+			this.defaultModel.buildClassifier(i);
+		}else 
+			super.buildClassifier(i);
+		
+		
+			
+		
 		
 		this.m_Data = i;
 		calcBoundary();
@@ -76,10 +94,10 @@ public class MultilayerPerceptronBoundary extends MultilayerPerceptron implement
 		int numAttrs = this.m_Data.numAttributes();
 		int classAttrNum = this.m_Data.classIndex();
 		
-		this.defaultModel = new MajorityPlaneBoundaryModel();
-		this.defaultModel.buildDefaultModelPlane(this.m_Data);
-		if(this.defaultModel.useDefault) {
-			this.boundary = this.defaultModel.getPlaneModel();
+		this.defaultPlaneModel = new MajorityPlaneBoundaryModel();
+		this.defaultPlaneModel.buildDefaultModelPlane(this.m_Data);
+		if(this.defaultPlaneModel.isUseDefault()) {
+			this.boundary = this.defaultPlaneModel.getPlaneModel();
 			return;
 		}
 			
@@ -159,5 +177,17 @@ public class MultilayerPerceptronBoundary extends MultilayerPerceptron implement
 	public static void main(String[] args) {
 		runClassifier(new MultilayerPerceptronBoundary(), args);
 	}
+
+
+
+	@Override
+	public double[] distributionForInstance(Instance instance) throws Exception {
+		if(this.defaultPlaneModel.isUseDefault() )
+			return this.defaultModel.distributionForInstance(instance);
+		
+		return super.distributionForInstance(instance);
+	}
+
+	
 
 }

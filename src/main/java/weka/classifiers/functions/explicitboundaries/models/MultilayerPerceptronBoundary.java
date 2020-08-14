@@ -153,7 +153,7 @@ public class MultilayerPerceptronBoundary extends MultilayerPerceptron implement
 		base.disableAll();
 		base.enable(Capability.NUMERIC_ATTRIBUTES);
 		base.enable(Capability.BINARY_CLASS);
-		base.setMinimumNumberInstances(2);
+		base.setMinimumNumberInstances(0);
 		return base;
 	}
 	

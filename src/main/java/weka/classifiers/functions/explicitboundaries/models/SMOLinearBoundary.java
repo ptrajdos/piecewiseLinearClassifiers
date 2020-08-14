@@ -168,6 +168,7 @@ public class SMOLinearBoundary extends SMO implements ClassifierWithBoundaries {
 		base.disableAll();
 		base.enable(Capability.NUMERIC_ATTRIBUTES);
 		base.enable(Capability.BINARY_CLASS);
+		base.setMinimumNumberInstances(0);
 		return base;
 	}
 

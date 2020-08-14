@@ -124,6 +124,7 @@ public class LogisticBoundary extends Logistic implements ClassifierWithBoundari
 		base.disableAll();
 		base.enable(Capability.NUMERIC_ATTRIBUTES);
 		base.enable(Capability.BINARY_CLASS);
+		base.setMinimumNumberInstances(0);
 		return base;
 	}
 	

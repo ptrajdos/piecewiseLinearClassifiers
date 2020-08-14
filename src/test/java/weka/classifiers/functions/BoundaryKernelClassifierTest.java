@@ -4,7 +4,11 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 import weka.classifiers.AbstractClassifierTest;
 import weka.classifiers.Classifier;
+import weka.core.Instance;
+import weka.core.Instances;
 import weka.tools.SerializationTester;
+import weka.tools.data.RandomDataGenerator;
+import weka.tools.tests.DistributionChecker;
 import weka.tools.tests.WekaGOEChecker;
 
 public class BoundaryKernelClassifierTest extends AbstractClassifierTest {
@@ -31,6 +35,31 @@ public class BoundaryKernelClassifierTest extends AbstractClassifierTest {
 		checker.setObject(this.getClassifier());
 		assertTrue("GlobalInfo call", checker.checkCallGlobalInfo());
 		assertTrue("TipTexts call", checker.checkToolTipsCall());
+	}
+	
+	public void testNoInstances() {
+		RandomDataGenerator gen = new RandomDataGenerator();
+		gen.setNumNominalAttributes(0);
+		gen.setNumObjects(0);
+		
+		Instances dataset = gen.generateData();
+		
+		Classifier cla = this.getClassifier();
+		
+		gen.setNumObjects(10);
+		Instances data2 = gen.generateData();
+		Instance testInstance = data2.get(0);
+		
+		try {
+			cla.buildClassifier(dataset);
+			
+			double[] distribution = cla.distributionForInstance(testInstance);
+			assertTrue("Intance test: ", DistributionChecker.checkDistribution(distribution));
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail("An Exception has been caught: " + e.getLocalizedMessage());
+		}
 	}
 	
 

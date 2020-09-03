@@ -62,5 +62,8 @@ public class BoundaryKernelClassifierTest extends AbstractClassifierTest {
 		}
 	}
 	
+	 public static void main(String[] args){
+		    junit.textui.TestRunner.run(suite());
+	}
 
 }

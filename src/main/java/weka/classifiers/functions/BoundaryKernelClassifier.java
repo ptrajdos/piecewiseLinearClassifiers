@@ -22,7 +22,7 @@ import weka.tools.SerialCopier;
 /**
  * @author pawel trajdos
  * @since 2.2.0
- * @version 2.2.1 
+ * @version 2.3.0 
  *
  */
 public class BoundaryKernelClassifier extends SingleClassifierEnhancerBoundary implements weka.tools.GlobalInfoHandler {
@@ -38,6 +38,10 @@ public class BoundaryKernelClassifier extends SingleClassifierEnhancerBoundary i
 	protected DensityEstimator[] estims;
 	
 	protected int[] numInsancesPerClass;
+	protected int numInstances=0;
+	protected int numClasses=0;
+	
+	protected boolean usePriorProbs=false;
 	
 	
 	public BoundaryKernelClassifier(ClassifierWithBoundaries nearestCentroidBoundary) {
@@ -59,18 +63,18 @@ public class BoundaryKernelClassifier extends SingleClassifierEnhancerBoundary i
 			this.getCapabilities().testWithFail(data);
 		
 		this.boundClassRef.buildClassifier(data);
-		int numClasses = data.numClasses();
-		this.estims = new DensityEstimator[numClasses];
-		for(int i=0;i<numClasses;i++)
+		this.numClasses = data.numClasses();
+		this.estims = new DensityEstimator[this.numClasses];
+		for(int i=0;i<this.numClasses;i++)
 			this.estims[i] = (DensityEstimator) SerialCopier.makeCopy(this.estimProto);
 		
-		int numInstances = data.numInstances();
+		this.numInstances = data.numInstances();
 		Instance tmpInstance = null;
 		IDecisionBoundary bnd = this.boundClassRef.getBoundary();
-		this.numInsancesPerClass = new int[numClasses];
+		this.numInsancesPerClass = new int[this.numClasses];
 		double predVal=0;
 		int classIdx;
-		for(int i=0;i<numInstances;i++) {
+		for(int i=0;i<this.numInstances;i++) {
 			tmpInstance = data.get(i);
 			predVal = bnd.getValue(tmpInstance);
 			classIdx = (int) tmpInstance.classValue();
@@ -86,8 +90,13 @@ public class BoundaryKernelClassifier extends SingleClassifierEnhancerBoundary i
 		IDecisionBoundary bnd = this.boundClassRef.getBoundary();
 		double val = bnd.getValue(instance);
 		for(int i=0;i<distribution.length;i++)
-			if(this.numInsancesPerClass[i]>0)
+			if(this.numInsancesPerClass[i]>0) {
 				distribution[i] = this.estims[i].getPDF(val);
+				if(this.usePriorProbs)
+					distribution[i]*= ((double)this.numInsancesPerClass[i])/((double)this.numInstances);
+				else
+					distribution[i]*=1.0/this.numClasses;
+			}
 			else
 				distribution[i]=0;
 		
@@ -114,8 +123,12 @@ public class BoundaryKernelClassifier extends SingleClassifierEnhancerBoundary i
 		newVector.addElement(new Option(
 			      "\tDetermines if the outpus is normalised "+
 		          "(default: true.\n",
-			      "NORM", 1, "-NORM"));
+			      "NORM", 0, "-NORM"));
 		
+		newVector.addElement(new Option(
+			      "\tDetermines if the prior probabilities are used when potential function is calculated "+
+		          "(default: false.\n",
+			      "PRIO", 0, "-PRIO"));
 	    
 		return newVector.elements();
 	}
@@ -125,6 +138,7 @@ public class BoundaryKernelClassifier extends SingleClassifierEnhancerBoundary i
 		
 		this.setEstimProto((DensityEstimator) UtilsPT.parseObjectOptions(options, "KP", new SilvermanBandwidthSelectionKernel(), DensityEstimator.class));
 		this.setNormalize(Utils.getFlag("NORM", options));
+		this.setUsePriorProbs(Utils.getFlag("PRIO", options));
 		
 		super.setOptions(options);
 		
@@ -140,6 +154,9 @@ public class BoundaryKernelClassifier extends SingleClassifierEnhancerBoundary i
 		
 		if(this.isNormalize())
 			options.add("-NORM");
+		
+		if(this.isUsePriorProbs())
+			options.add("-PRIO");
 		
 		Collections.addAll(options, super.getOptions());
 		
@@ -191,6 +208,28 @@ public class BoundaryKernelClassifier extends SingleClassifierEnhancerBoundary i
 	
 	public String normalizeTipText() {
 		return "Determines if the classifier output is normalised";
+	}
+
+
+
+	/**
+	 * @return the usePriorProbs
+	 */
+	public boolean isUsePriorProbs() {
+		return this.usePriorProbs;
+	}
+
+
+
+	/**
+	 * @param usePriorProbs the usePriorProbs to set
+	 */
+	public void setUsePriorProbs(boolean usePriorProbs) {
+		this.usePriorProbs = usePriorProbs;
+	}
+	
+	public String usePriorProbsTipText() {
+		return "Determines whether class prior probs are used";
 	}
 	
 

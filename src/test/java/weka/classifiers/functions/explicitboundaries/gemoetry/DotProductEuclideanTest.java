@@ -82,11 +82,11 @@ public class DotProductEuclideanTest {
 	      
 	      try {
 			Instance res1 =  dotP.projection(test5, test1);//Class taken from test1, but it should be taken from test5
-			assertTrue("Check projection 1", InstancesTools.checkEquall(res1, test6,false));
-			assertFalse("Check projection 1 -F ", InstancesTools.checkEquall(res1, test7,false));
+			assertTrue("Check projection 1", InstancesTools.checkEquall(res1, test6,true));
+			assertFalse("Check projection 1 -F ", InstancesTools.checkEquall(res1, test7,true));
 			res1 =  dotP.projection(test5, test3);
-			assertTrue("Check projection 2", InstancesTools.checkEquall(res1, test7,false));
-			assertFalse("Check projection 2 -F ", InstancesTools.checkEquall(res1, test6,false));
+			assertTrue("Check projection 2", InstancesTools.checkEquall(res1, test7,true));
+			assertFalse("Check projection 2 -F ", InstancesTools.checkEquall(res1, test6,true));
 			
 		} catch (Exception e) {
 			e.printStackTrace();

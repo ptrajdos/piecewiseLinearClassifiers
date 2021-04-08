@@ -77,8 +77,11 @@ public class DotProductEuclidean implements DotProduct, Serializable, Debuggable
 		
 		for(int a=0;a<attNum;a++) {
 			
-			if(a==classIdx)
+			if(a==classIdx) {
+				representation[a] = i1Rep[a];
 				continue;
+			}
+				
 			if(!dataSet.attribute(a).isNumeric()) {
 				representation[a] = i1Rep[a]; 
 				continue;

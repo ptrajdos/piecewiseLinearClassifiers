@@ -84,8 +84,13 @@ public class BoundaryKernelClassifier extends SingleClassifierEnhancerBoundary i
 
 	}
 	
-	@Override
-	public double[] distributionForInstance(Instance instance) throws Exception {
+	/**
+	 * Prepares preliminary distribution
+	 * @param instance
+	 * @return
+	 * @throws Exception 
+	 */
+	protected double[] preparePreDistribution(Instance instance) throws Exception {
 		double[] distribution = new double[this.estims.length];
 		IDecisionBoundary bnd = this.boundClassRef.getBoundary();
 		double val = bnd.getValue(instance);
@@ -99,6 +104,13 @@ public class BoundaryKernelClassifier extends SingleClassifierEnhancerBoundary i
 			}
 			else
 				distribution[i]=0;
+		
+		return distribution;
+	}
+	
+	@Override
+	public double[] distributionForInstance(Instance instance) throws Exception {
+		double[] distribution = this.preparePreDistribution(instance);
 		
 		if(this.normalize)
 			distribution = UtilsPT.softMax(distribution);

@@ -45,7 +45,7 @@ public class BoundaryKernelClassifierTest extends AbstractClassifierTest {
 		Instances dataset = gen.generateData();
 		
 		Classifier cla = this.getClassifier();
-		 
+		  
 		gen.setNumObjects(10);
 		Instances data2 = gen.generateData();
 		Instance testInstance = data2.get(0);

@@ -62,12 +62,16 @@ public class BoundaryKernelClassifierWithPlaneProjections extends BoundaryKernel
 		Plane plane = boundary.getDecisionPlane();
 		
 		Instance tmpInstance = plane.projectOnPlane(instance);
-		double projectionPDF = 0;
-		
+		double projectionLogPDF = 0;
+		//Changing into logs allow avoiding numeric problems (Getting INF)
 		for(int c=0;c<this.numClasses;c++) {
-			projectionPDF = this.planeProjectionsEstimators[c].density(tmpInstance);
-			distribution[c]*= projectionPDF;
+			if(this.numInsancesPerClass[c]!=0)
+				projectionLogPDF = this.planeProjectionsEstimators[c].logDensity(tmpInstance);
+			else
+				projectionLogPDF=0;
+			distribution[c]= Math.log(distribution[c]+Double.MIN_VALUE) +  projectionLogPDF;
 		}
+		distribution = UtilsPT.softMax(distribution);
 		
 		return distribution;
 	}

@@ -46,25 +46,22 @@ public class PotentialCombinerMaxMin implements PotentialCombiner, Serializable 
 		for(int i=0;i<boundNumber;i++) {
 			tmpVal = potFunction.getPotentialValue( boundariesList.get(i).getValue(inst));
 			
-			if(tmpVal >0 && tmpVal < minPositive) { 
+			if((tmpVal >0) & (tmpVal < minPositive)) { 
 				minPositive = tmpVal;
 				posCnt++;
 			}
 			
-			if(tmpVal<0 && tmpVal>maxNegative) { 
+			if((tmpVal<0) & (tmpVal>maxNegative)) { 
 				maxNegative = tmpVal;
 				negCnt++;
 			}
 			
-			if(negCnt == 0)
-				return idx1;
-			
-			if(posCnt == 0 )
-				return idx2;
-			
-			
-			
 		}
+		if(negCnt == 0)
+			return idx1;
+		
+		if(posCnt == 0 )
+			return idx2;
 		
 		return (minPositive + maxNegative)>0? idx1:idx2;
 	}

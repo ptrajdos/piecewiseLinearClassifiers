@@ -71,8 +71,8 @@ public class PotentialCombinerMaxMed implements PotentialCombiner, Serializable 
 			positiveArray[i] = positives.get(i);
 		}
 		
-		double negMedian  = UtilsPT.median(negativeArray);
-		double posMedian = UtilsPT.median(positiveArray);
+		double negMedian  = Math.abs(UtilsPT.median(negativeArray)) ;
+		double posMedian = Math.abs(UtilsPT.median(positiveArray)) ;
 	
 		return (posMedian - negMedian)>0? idx1:idx2;
 	}

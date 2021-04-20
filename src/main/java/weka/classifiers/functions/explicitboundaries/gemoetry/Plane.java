@@ -204,6 +204,15 @@ public class Plane implements Serializable, Debuggable {
 		
 		return projection;
 	}
+	
+	public Instances projectOnPlane(Instances instances) throws Exception {
+		Instances projectedInstances = new Instances(instances, 0);
+		for (Instance instance : instances) {
+			projectedInstances.add(this.projectOnPlane(instance));
+		}
+		
+		return projectedInstances;
+	}
 
 
 

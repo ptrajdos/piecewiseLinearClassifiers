@@ -203,6 +203,11 @@ public class PlaneTest {
 		tInstProj.setDataset(dataset);
 		
 		
+		Instances testInstances = new Instances(this.dataset,0);
+		testInstances.add(nV);
+		testInstances.add(base);
+		testInstances.add(tInst);
+		testInstances.add(tInstProj);
 		
 		Instance[] b1 = null;
 		Instance projT = null;
@@ -215,6 +220,8 @@ public class PlaneTest {
 			assertTrue("Check plane projection", InstancesTools.checkEquall(projT, tInstProj, false));
 			String toString = this.plane.toString();
 			assertTrue("String length", toString.length()>0);
+			
+			Instances projectedInstances = this.plane.projectOnPlane(testInstances);
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail("Exception has been caught" + e.toString());

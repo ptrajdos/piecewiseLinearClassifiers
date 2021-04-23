@@ -4,6 +4,7 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 import weka.classifiers.Classifier;
 import weka.classifiers.functions.NearestCentroidClassifierTest;
+import weka.classifiers.functions.explicitboundaries.ClassifierWithBoundaries;
 import weka.classifiers.functions.explicitboundaries.gemoetry.DotProduct;
 import weka.core.Instances;
 import weka.tools.data.RandomDataGenerator;
@@ -54,6 +55,17 @@ public class NearestCentroidBoundaryTest extends NearestCentroidClassifierTest{
 				fail("An exception has been caught: " + e.getLocalizedMessage());
 			}
 		}
+	 
+	 public void testBoundaryResponse() {
+		 RandomDataGenerator gen = new RandomDataGenerator();
+		 gen.setNumClasses(2);
+		 gen.setNumNominalAttributes(0);
+		 gen.setNumDateAttributes(0);
+		 gen.setNumStringAttributes(0);
+		 
+		 Instances dataset = gen.generateData();
+		 BoundaryChecker.checkBoundaries((ClassifierWithBoundaries) this.getClassifier(), dataset);
+	 }
 	 
 	
 

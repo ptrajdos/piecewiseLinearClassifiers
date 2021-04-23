@@ -5,8 +5,11 @@ import junit.framework.TestSuite;
 import weka.classifiers.AbstractClassifier;
 import weka.classifiers.AbstractClassifierTest;
 import weka.classifiers.Classifier;
+import weka.classifiers.functions.explicitboundaries.models.FLDABoundary;
+import weka.classifiers.meta.MultiClassClassifier;
 import weka.core.Instance;
 import weka.core.Instances;
+import weka.core.SelectedTag;
 import weka.tools.data.RandomDataGenerator;
 import weka.tools.data.RandomDoubleGenerator;
 import weka.tools.data.RandomDoubleGeneratorGaussian;
@@ -21,7 +24,7 @@ public class BoundaryBasedClassifierTest extends AbstractClassifierTest {
 
 	@Override
 	public Classifier getClassifier() {
-		return new BoundaryBasedClassifier();
+		return new BoundaryBasedClassifier(new FLDABoundary());
 	}
 
 	
@@ -69,6 +72,31 @@ public class BoundaryBasedClassifierTest extends AbstractClassifierTest {
 		} catch (Exception e) {
 			fail("An exception has been caught " + e.getMessage());
 		}
+	 }
+	 
+	 public void testMultiClassClassifier() {
+		 Classifier classifier = this.getClassifier();
+		 RandomDataGenerator gen = new RandomDataGenerator();
+		 gen.setNumNominalAttributes(0);
+		 gen.setNumStringAttributes(0);
+		 gen.setNumDateAttributes(0);
+		 gen.setNumClasses(5);
+		 RandomDoubleGenerator doubleGen = new RandomDoubleGeneratorGaussian();
+		 doubleGen.setDivisor(10000.0);
+		 gen.setDoubleGen(doubleGen );
+		 
+		 Instances dataset = gen.generateData();
+		 
+		 MultiClassClassifier mClassifier = new MultiClassClassifier();
+		 SelectedTag newMethod = new SelectedTag(MultiClassClassifier.METHOD_1_AGAINST_1, MultiClassClassifier.TAGS_METHOD);
+		 mClassifier.setMethod(newMethod );
+		 
+		 try {
+			mClassifier.buildClassifier(dataset);
+		} catch (Exception e) {
+			fail("An exception has been caught: " + e.getMessage());
+		}
+		 
 	 }
 	
 

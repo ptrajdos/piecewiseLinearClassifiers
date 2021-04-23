@@ -7,6 +7,7 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 import weka.classifiers.Classifier;
 import weka.classifiers.functions.FLDATest;
+import weka.classifiers.functions.explicitboundaries.ClassifierWithBoundaries;
 import weka.core.Instances;
 import weka.tools.data.RandomDataGenerator;
 import weka.tools.tests.NoInstancesChecker;
@@ -32,8 +33,15 @@ public class FLDABoundaryTest extends FLDATest {
 		    return new TestSuite(FLDABoundaryTest.class);
 		  }
 	 
-	 public void testBoundary() {
+	 public void testBoundaryResponse() {
+		 RandomDataGenerator gen = new RandomDataGenerator();
+		 gen.setNumClasses(2);
+		 gen.setNumNominalAttributes(0);
+		 gen.setNumDateAttributes(0);
+		 gen.setNumStringAttributes(0);
 		 
+		 Instances dataset = gen.generateData();
+		 BoundaryChecker.checkBoundaries((ClassifierWithBoundaries) this.getClassifier(), dataset);
 	 }
 	 
 	 public void testNoInstances() {

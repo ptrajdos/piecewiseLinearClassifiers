@@ -7,6 +7,7 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 import weka.classifiers.Classifier;
 import weka.classifiers.functions.LogisticTest;
+import weka.classifiers.functions.explicitboundaries.ClassifierWithBoundaries;
 import weka.core.Instances;
 import weka.tools.data.RandomDataGenerator;
 import weka.tools.tests.NoInstancesChecker;
@@ -27,6 +28,17 @@ public class LogisticBoundaryTest extends LogisticTest {
 
 		return new LogisticBoundary();
 	}
+	
+	public void testBoundaryResponse() {
+		 RandomDataGenerator gen = new RandomDataGenerator();
+		 gen.setNumClasses(2);
+		 gen.setNumNominalAttributes(0);
+		 gen.setNumDateAttributes(0);
+		 gen.setNumStringAttributes(0);
+		 
+		 Instances dataset = gen.generateData();
+		 BoundaryChecker.checkBoundaries((ClassifierWithBoundaries) this.getClassifier(), dataset);
+	 }
 	
 	public void testNoInstances() {
 		Classifier classifier = this.getClassifier();

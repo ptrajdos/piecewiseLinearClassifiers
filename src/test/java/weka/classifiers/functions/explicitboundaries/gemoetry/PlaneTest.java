@@ -18,6 +18,7 @@ import weka.core.Instance;
 import weka.core.Instances;
 import weka.tools.InstancesTools;
 import weka.tools.SerialCopier;
+import weka.tools.data.RandomDataGenerator;
 
 public class PlaneTest {
 
@@ -278,6 +279,30 @@ public class PlaneTest {
 		}
 	}
 	
+	@Test
+	public void testPlaneBased() {
+		RandomDataGenerator gen = new RandomDataGenerator();
+		gen.setNumNominalAttributes(0);
+		gen.setNumStringAttributes(0);
+		gen.setNumDateAttributes(0);
+		
+		Instances data = gen.generateData();
+		Instance testInstance = data.get(0);
+		
+		Plane plane = new Plane(data);
+		
+		try {
+			
+			Instances planeBasedInstances = plane.planeBasedInstances(data);
+			assertTrue("Not null planeBased instances", planeBasedInstances!=null);
+			assertTrue("Num Attribs", planeBasedInstances.numAttributes() == data.numAttributes()-1);
+			
+			Instance planeBasedInst = plane.planeBasedInstance(testInstance);
+			assertTrue("Not null planeBased instance", planeBasedInst!=null);
+		} catch (Exception e) {
+			fail("AnException has been caught: " + e.getMessage());
+		}
+	}
 	
 
 }

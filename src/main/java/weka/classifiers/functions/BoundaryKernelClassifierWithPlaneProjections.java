@@ -8,6 +8,7 @@ import weka.classifiers.functions.explicitboundaries.DecisionBoundaryPlane;
 import weka.classifiers.functions.explicitboundaries.gemoetry.Plane;
 import weka.core.Instance;
 import weka.core.Instances;
+import weka.core.Utils;
 import weka.core.UtilsPT;
 import weka.estimators.MultivariateEstimatorFromInstances;
 import weka.tools.SerialCopier;
@@ -54,7 +55,7 @@ public class BoundaryKernelClassifierWithPlaneProjections extends BoundaryKernel
 		DecisionBoundaryPlane boundary  = (DecisionBoundaryPlane) this.boundClassRef.getBoundary();
 		Plane plane = boundary.getDecisionPlane();
 		
-		Instance tmpInstance = plane.projectOnPlane(instance);
+		Instance tmpInstance = plane.planeBasedInstance(instance);
 		double projectionLogPDF = 0;
 		//Changing into logs allow avoiding numeric problems (Getting INF)
 		for(int c=0;c<this.numClasses;c++) {
@@ -64,7 +65,14 @@ public class BoundaryKernelClassifierWithPlaneProjections extends BoundaryKernel
 				projectionLogPDF=0;
 			distribution[c]= Math.log(distribution[c]+Double.MIN_VALUE) +  projectionLogPDF;
 		}
-		distribution = UtilsPT.softMax(distribution);
+		int maxIdx = Utils.maxIndex(distribution);
+		double max = distribution[maxIdx];
+		if(max>=700) {
+			for(int i=0;i<distribution.length;i++)
+				distribution[i]-=max;
+		}
+		for(int i=0;i<distribution.length;i++)
+			distribution[i] = Math.exp(distribution[i]);
 		
 		return distribution;
 	}

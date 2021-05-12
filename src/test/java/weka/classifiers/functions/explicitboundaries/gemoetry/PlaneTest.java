@@ -286,21 +286,28 @@ public class PlaneTest {
 		gen.setNumStringAttributes(0);
 		gen.setNumDateAttributes(0);
 		
-		Instances data = gen.generateData();
-		Instance testInstance = data.get(0);
-		
-		Plane plane = new Plane(data);
-		
-		try {
+		int[] numAttribs= {1,2,3,10};
+		for(int i =0;i<numAttribs.length;i++) {
+			gen.setNumNumericAttributes(numAttribs[i]);
+			Instances data = gen.generateData();
+			Instance testInstance = data.get(0);
 			
-			Instances planeBasedInstances = plane.planeBasedInstances(data);
-			assertTrue("Not null planeBased instances", planeBasedInstances!=null);
-			assertTrue("Num Attribs", planeBasedInstances.numAttributes() == data.numAttributes()-1);
+			Plane plane = new Plane(data);
 			
-			Instance planeBasedInst = plane.planeBasedInstance(testInstance);
-			assertTrue("Not null planeBased instance", planeBasedInst!=null);
-		} catch (Exception e) {
-			fail("AnException has been caught: " + e.getMessage());
+			try {
+				
+				Instances planeBasedInstances = plane.planeBasedInstances(data);
+				assertTrue("Not null planeBased instances", planeBasedInstances!=null);
+				if(numAttribs[i]>1)
+					assertTrue("Num Attribs", planeBasedInstances.numAttributes() == data.numAttributes()-1);
+				else
+					assertTrue("Num Attribs", planeBasedInstances.numAttributes() == data.numAttributes());
+				
+				Instance planeBasedInst = plane.planeBasedInstance(testInstance);
+				assertTrue("Not null planeBased instance", planeBasedInst!=null);
+			} catch (Exception e) {
+				fail("AnException has been caught: " + e.getMessage());
+			}
 		}
 	}
 	

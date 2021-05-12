@@ -58,7 +58,7 @@ public abstract class BoundaryKernelClassifierWithPlaneProjectionsAbstract exten
 	protected Instances getProjectedInstances(Instances data) throws Exception {
 		DecisionBoundaryPlane boundary  = (DecisionBoundaryPlane) this.boundClassRef.getBoundary();
 		Plane plane = boundary.getDecisionPlane();
-		Instances projectedInstances = plane.projectOnPlane(data);
+		Instances projectedInstances = plane.planeBasedInstances(data);
 		
 		return projectedInstances;
 	}

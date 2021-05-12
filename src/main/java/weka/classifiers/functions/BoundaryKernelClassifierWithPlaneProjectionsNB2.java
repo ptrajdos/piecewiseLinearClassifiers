@@ -16,7 +16,6 @@ import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.Option;
 import weka.core.Utils;
-import weka.core.UtilsPT;
 
 /**
  * @author pawel trajdos
@@ -106,13 +105,10 @@ public class BoundaryKernelClassifierWithPlaneProjectionsNB2 extends BoundaryKer
 	private boolean useKernel=false;
 	
 	protected Instances getProjectedInstances(Instances data) throws Exception {
-		Instances projectedInstances = new Instances(data, 0);
 		DecisionBoundaryPlane boundary  = (DecisionBoundaryPlane) this.boundClassRef.getBoundary();
 		Plane plane = boundary.getDecisionPlane();
+		Instances projectedInstances = plane.planeBasedInstances(data);
 		
-		for(int i=0;i<this.numInstances;i++) {
-			projectedInstances.add(plane.projectOnPlane(data.get(i)));
-		}
 		return projectedInstances;
 	}
 
@@ -131,7 +127,7 @@ public class BoundaryKernelClassifierWithPlaneProjectionsNB2 extends BoundaryKer
 		double[] distribution = super.preparePreDistribution(instance); 
 		DecisionBoundaryPlane boundary  = (DecisionBoundaryPlane) this.boundClassRef.getBoundary();
 		Plane plane = boundary.getDecisionPlane();
-		Instance tmpInstance = plane.projectOnPlane(instance);
+		Instance tmpInstance = plane.planeBasedInstance(instance);
 		
 		
 		
@@ -143,9 +139,9 @@ public class BoundaryKernelClassifierWithPlaneProjectionsNB2 extends BoundaryKer
 				distrSum+= distribution[c];
 			}
 		
-		if(Utils.gr(distrSum, 0))
+		/*if(Utils.gr(distrSum, 0))
 			Utils.normalize(distribution,distrSum);
-		
+		*/
 		return distribution;
 	}
 

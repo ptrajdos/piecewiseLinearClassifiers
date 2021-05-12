@@ -37,13 +37,10 @@ public class BoundaryKernelClassifierWithPlaneProjectionsNB extends BoundaryKern
 
 	
 	protected Instances getProjectedInstances(Instances data) throws Exception {
-		Instances projectedInstances = new Instances(data, 0);
 		DecisionBoundaryPlane boundary  = (DecisionBoundaryPlane) this.boundClassRef.getBoundary();
 		Plane plane = boundary.getDecisionPlane();
+		Instances projectedInstances = plane.planeBasedInstances(data);
 		
-		for(int i=0;i<this.numInstances;i++) {
-			projectedInstances.add(plane.projectOnPlane(data.get(i)));
-		}
 		return projectedInstances;
 	}
 
@@ -63,7 +60,7 @@ public class BoundaryKernelClassifierWithPlaneProjectionsNB extends BoundaryKern
 		
 		DecisionBoundaryPlane boundary  = (DecisionBoundaryPlane) this.boundClassRef.getBoundary();
 		Plane plane = boundary.getDecisionPlane();
-		Instance tmpInstance = plane.projectOnPlane(instance);
+		Instance tmpInstance = plane.planeBasedInstance(instance);
 		
 		
 		

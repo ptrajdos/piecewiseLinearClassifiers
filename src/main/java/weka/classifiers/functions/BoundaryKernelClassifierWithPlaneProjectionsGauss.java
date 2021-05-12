@@ -75,7 +75,7 @@ public class BoundaryKernelClassifierWithPlaneProjectionsGauss extends BoundaryK
 	protected Instances getProjectedInstances(Instances data) throws Exception {
 		DecisionBoundaryPlane boundary  = (DecisionBoundaryPlane) this.boundClassRef.getBoundary();
 		Plane plane = boundary.getDecisionPlane();
-		Instances projectedInstances = plane.projectOnPlane(data);
+		Instances projectedInstances = plane.planeBasedInstances(data);
 		
 		return projectedInstances;
 	}
@@ -95,7 +95,7 @@ public class BoundaryKernelClassifierWithPlaneProjectionsGauss extends BoundaryK
 		DecisionBoundaryPlane boundary  = (DecisionBoundaryPlane) this.boundClassRef.getBoundary();
 		Plane plane = boundary.getDecisionPlane();
 		
-		Instance tmpInstance = plane.projectOnPlane(instance);
+		Instance tmpInstance = plane.planeBasedInstance(instance);
 		
 		double logInstanceGlobalPdf = this.mestimator.logDensity(tmpInstance);
 		

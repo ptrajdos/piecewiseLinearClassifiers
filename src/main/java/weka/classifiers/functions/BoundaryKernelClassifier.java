@@ -3,6 +3,7 @@
  */
 package weka.classifiers.functions;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Vector;
@@ -33,6 +34,8 @@ public class BoundaryKernelClassifier extends SingleClassifierEnhancerBoundary i
 	private static final long serialVersionUID = 8651181854725711338L;
 	
 	protected boolean normalize= true;
+	
+	protected boolean preNormalize=false;
 	
 	protected DensityEstimator estimProto = new SilvermanBandwidthSelectionKernel() ;
 	protected DensityEstimator[] estims;
@@ -112,10 +115,22 @@ public class BoundaryKernelClassifier extends SingleClassifierEnhancerBoundary i
 	public double[] distributionForInstance(Instance instance) throws Exception {
 		double[] distribution = this.preparePreDistribution(instance);
 		
+		if(this.preNormalize)
+			distribution = this.prenormalize(distribution);
+		
 		if(this.normalize)
 			distribution = UtilsPT.softMax(distribution);
 		
 		return distribution;
+	}
+	
+	private double[] prenormalize(double[] distribution) {
+		double[] nDistr = Arrays.copyOf(distribution, distribution.length);
+		double sum = Utils.sum(nDistr);
+		if(Utils.gr(sum, 0))
+			Utils.normalize(nDistr, sum);
+		
+		return nDistr;
 	}
 
 	
@@ -138,6 +153,11 @@ public class BoundaryKernelClassifier extends SingleClassifierEnhancerBoundary i
 			      "NORM", 0, "-NORM"));
 		
 		newVector.addElement(new Option(
+			      "\tDetermines if the outpus is pre normalised (linear)"+
+		          "(default: true.\n",
+			      "NORM", 0, "-NORM"));
+		
+		newVector.addElement(new Option(
 			      "\tDetermines if the prior probabilities are used when potential function is calculated "+
 		          "(default: false.\n",
 			      "PRIO", 0, "-PRIO"));
@@ -151,6 +171,7 @@ public class BoundaryKernelClassifier extends SingleClassifierEnhancerBoundary i
 		this.setEstimProto((DensityEstimator) UtilsPT.parseObjectOptions(options, "KP", new SilvermanBandwidthSelectionKernel(), DensityEstimator.class));
 		this.setNormalize(Utils.getFlag("NORM", options));
 		this.setUsePriorProbs(Utils.getFlag("PRIO", options));
+		this.setPreNormalize(Utils.getFlag("PNORM", options));
 		
 		super.setOptions(options);
 		
@@ -166,6 +187,9 @@ public class BoundaryKernelClassifier extends SingleClassifierEnhancerBoundary i
 		
 		if(this.isNormalize())
 			options.add("-NORM");
+		
+		if(this.isPreNormalize())
+			options.add("-PNORM");
 		
 		if(this.isUsePriorProbs())
 			options.add("-PRIO");
@@ -243,6 +267,27 @@ public class BoundaryKernelClassifier extends SingleClassifierEnhancerBoundary i
 	public String usePriorProbsTipText() {
 		return "Determines whether class prior probs are used";
 	}
+
+
+
+	/**
+	 * @return the preNormalize
+	 */
+	public boolean isPreNormalize() {
+		return this.preNormalize;
+	}
+
+
+
+	/**
+	 * @param preNormalize the preNormalize to set
+	 */
+	public void setPreNormalize(boolean preNormalize) {
+		this.preNormalize = preNormalize;
+	}
 	
+	public String preNormalizeTipText() {
+		return "Determines whether pre normalization (linear) is applied";
+	}
 
 }

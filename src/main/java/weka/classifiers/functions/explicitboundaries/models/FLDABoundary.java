@@ -75,9 +75,9 @@ public class FLDABoundary extends FLDA implements ClassifierWithBoundaries {
 		tmpPlane.setNormalVector(normalVec);
 		tmpPlane.setOffset(offset);
 		
-		this.boundary = new DecisionBoundaryPlane(this.m_Data, 0, 1, tmpPlane); 
-		
+		this.boundary = new DecisionBoundaryPlane(this.m_Data, 0, 1, tmpPlane); 	
 	}
+	
 	
 	/* (non-Javadoc)
 	 * @see weka.classifiers.functions.SMO#getCapabilities()
@@ -118,7 +118,10 @@ public class FLDABoundary extends FLDA implements ClassifierWithBoundaries {
 		if(this.defaultModel.isUseDefault()) {
 			distribution = this.alternativeModel.distributionForInstance(inst);
 		}else {
-			distribution = super.distributionForInstance(inst); 
+			
+			distribution  = new double[2];
+			distribution[0] = 0.5*(this.boundary.getValue(inst) + 1.0);
+			distribution[1] = 1 - distribution[0];
 		}
 		
 		return distribution;

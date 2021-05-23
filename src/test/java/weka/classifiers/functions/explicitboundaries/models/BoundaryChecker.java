@@ -24,10 +24,22 @@ public class BoundaryChecker {
 			for (Instance instance : data) {
 				double val = classifier.getBoundary().classify(instance);
 				double classVal = classifier.classifyInstance(instance);
+				double[] distribution = classifier.distributionForInstance(instance);
+				
+				double funVal = classifier.getBoundary().getValue(instance);
+				double phantomClassVal = classVal*2.0 -1;
+				
+				int maxIdx = Utils.maxIndex(distribution);
 				if(val >=0 && val <=numClasses)
 					return false;
 				
 				if(!Utils.eq(val, classVal))
+					return false;
+				
+				if(!Utils.eq(val, maxIdx))
+					return false;
+				
+				if(funVal*phantomClassVal<0)
 					return false;
 				
 			}

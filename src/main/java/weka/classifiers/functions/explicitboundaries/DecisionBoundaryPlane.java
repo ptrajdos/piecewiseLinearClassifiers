@@ -5,6 +5,7 @@ import weka.core.DebugSetter;
 import weka.core.Debuggable;
 import weka.core.Instance;
 import weka.core.Instances;
+import weka.core.Utils;
 
 public class DecisionBoundaryPlane extends DecisionBoundary implements Debuggable {
 	
@@ -15,21 +16,46 @@ public class DecisionBoundaryPlane extends DecisionBoundary implements Debuggabl
 	
 	protected boolean debug;
 	
+	protected double normFactor=1;
+	
 	
 	protected Plane decisionPlane = null;
 
 	public DecisionBoundaryPlane(Instances data, int class1Idx, int class2Idx, Plane plane) throws Exception {
 		super(data, class1Idx, class2Idx);
 		this.decisionPlane = plane;
+		this.getNormalizingFactor(data);
 	}
 	
 	public DecisionBoundaryPlane(Instances data, int class1Idx, int class2Idx)throws Exception{
 		this(data, class1Idx, class2Idx, new Plane(data));
+		this.getNormalizingFactor(data);
 	}
 
 	@Override
 	public int getIndex(Instance instance) throws Exception {
 		return this.decisionPlane.sideOfThePlane(instance)>0? this.class1Idx:this.class2Idx;
+	}
+	
+	private void getNormalizingFactor(Instances data) throws Exception {
+		int numInstances = data.numInstances();
+		double max=0;
+		double val=0;
+		for(int i=0;i<numInstances;i++) {
+			Instance tmpInstance = data.get(i);
+			val = this.decisionPlane.sideOfThePlane(tmpInstance);
+			val = val>=0? val:-val;
+			
+			if(val>max) {
+				max=val;
+			}
+		}
+		if(Utils.eq(max, 0))
+			this.normFactor=1.0;
+		else
+			this.normFactor = max;
+			
+		
 	}
 
 	/**
@@ -57,7 +83,16 @@ public class DecisionBoundaryPlane extends DecisionBoundary implements Debuggabl
 
 	@Override
 	public double getValue(Instance instance) throws Exception {
-		return this.decisionPlane.sideOfThePlane(instance);
+		double value = this.decisionPlane.sideOfThePlane(instance);
+		value/=this.normFactor;
+		
+		if(value<-1)
+			value=-1;
+		
+		if(value>1)
+			value=1;
+		
+		return value;
 	}
 
 	@Override
@@ -77,7 +112,7 @@ public class DecisionBoundaryPlane extends DecisionBoundary implements Debuggabl
 	 */
 	public void setDebug(boolean debug) {
 		this.debug = debug;
-		DebugSetter.setDebug(decisionPlane, debug);
+		DebugSetter.setDebug(this.decisionPlane, debug);
 	}
 
 

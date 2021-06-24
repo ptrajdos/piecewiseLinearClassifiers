@@ -314,8 +314,8 @@ public class Plane implements Serializable, Debuggable {
 	
 	public Instance planeBasedInstance(Instance instance) throws Exception {
 		this.planeBaseFilter.input(instance);
-		this.planeBaseFilter.batchFinished();
 		Instance tmpInstance = this.planeBaseFilter.output();
+		this.planeBaseFilter.batchFinished();
 		return tmpInstance;
 	}
 

@@ -127,7 +127,7 @@ public class BoundaryKernelClassifier extends SingleClassifierEnhancerBoundary i
 	private double[] prenormalize(double[] distribution) {
 		double[] nDistr = Arrays.copyOf(distribution, distribution.length);
 		double sum = Utils.sum(nDistr);
-		if(Utils.gr(sum, 0))
+		if(sum>1e-280)
 			Utils.normalize(nDistr, sum);
 		
 		return nDistr;

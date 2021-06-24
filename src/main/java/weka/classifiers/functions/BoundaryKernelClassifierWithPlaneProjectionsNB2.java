@@ -91,7 +91,7 @@ public class BoundaryKernelClassifierWithPlaneProjectionsNB2 extends BoundaryKer
 			      attIndex++;
 			    }
 
-			    //No normalization -- normalization is performed after probability calculation
+			    Utils.normalize(probs);
 			    return probs;
 		}
 		

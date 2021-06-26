@@ -3,6 +3,8 @@
  */
 package weka.classifiers.functions.explicitboundaries.models;
 
+import java.lang.reflect.Field;
+
 import weka.classifiers.functions.Logistic;
 import weka.classifiers.functions.explicitboundaries.ClassifierWithBoundaries;
 import weka.classifiers.functions.explicitboundaries.DecisionBoundary;
@@ -15,11 +17,15 @@ import weka.core.DebugSetter;
 import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
+import weka.filters.Filter;
+import weka.filters.unsupervised.attribute.NominalToBinary;
+import weka.filters.unsupervised.attribute.RemoveUseless;
+import weka.filters.unsupervised.attribute.ReplaceMissingValues;
 
 /**
  * @author pawel trajdos
  * @since 1.3.0
- * @version 2.2.1
+ * @version 2.3.1
  *
  */
 public class LogisticBoundary extends Logistic implements ClassifierWithBoundaries {
@@ -40,6 +46,19 @@ public class LogisticBoundary extends Logistic implements ClassifierWithBoundari
 	protected DecisionBoundaryPlane boundary;
 	
 	protected ZeroR defaultModel;
+	
+	/**
+	 * Accessible fields from the parent class
+	 */
+	
+	 /** An attribute filter */
+	  protected RemoveUseless m_AttFilter;
+
+	  /** The filter used to make attributes numeric. */
+	 protected NominalToBinary m_NominalToBinary;
+
+	  /** The filter used to get rid of missing values. */
+	  protected ReplaceMissingValues m_ReplaceMissingValues;
 
 	/**
 	 * 
@@ -63,16 +82,33 @@ public class LogisticBoundary extends Logistic implements ClassifierWithBoundari
 		if(this.defaultPlaneModel.isUseDefault()) {
 			this.defaultModel = new ZeroR();
 			this.defaultModel.buildClassifier(data);
-		}else
+		}else {
 			super.buildClassifier(data);
-		
-		
-		
-		this.dataHeader = new Instances(data, 0);
-		
-		this.calculateBoundary();
+			this.getParentFields();
+			this.dataHeader = new Instances(this.filterInstances(data), 0);
+			this.calculateBoundary();
+		}
 		
 	}
+	
+	protected void getParentFields() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+		
+		Field repMissingVals = this.getClass().getSuperclass().getDeclaredField("m_ReplaceMissingValues");
+		repMissingVals.setAccessible(true);
+		this.m_ReplaceMissingValues = (ReplaceMissingValues) repMissingVals.get(this);
+		
+		Field mNom2Bin = this.getClass().getSuperclass().getDeclaredField("m_NominalToBinary");
+		mNom2Bin.setAccessible(true);
+		this.m_NominalToBinary = (NominalToBinary) mNom2Bin.get(this);
+		
+		
+		Field mAttFilter = this.getClass().getSuperclass().getDeclaredField("m_AttFilter");
+		mAttFilter.setAccessible(true);
+		this.m_AttFilter = (RemoveUseless) mAttFilter.get(this);
+		
+	}
+	
+	
 
 	/* (non-Javadoc)
 	 * @see weka.classifiers.functions.explicitboundaries.ClassifierWithBoundaries#getBoundary()
@@ -108,7 +144,7 @@ public class LogisticBoundary extends Logistic implements ClassifierWithBoundari
 			}
 		}
 		
-		Plane tmpPlane = new Plane(this.dataHeader);
+		Plane tmpPlane = new LogisticBoundaryPlane(this.dataHeader);
 		tmpPlane.setNormalVector(normalVec);
 		tmpPlane.setOffset(offset);
 		
@@ -160,7 +196,68 @@ public class LogisticBoundary extends Logistic implements ClassifierWithBoundari
 		return distribution;
 	}
 
+	protected Instance filterInstance(Instance instance) {
+		    m_ReplaceMissingValues.input(instance);
+		    instance = m_ReplaceMissingValues.output();
+		    m_AttFilter.input(instance);
+		    instance = m_AttFilter.output();
+		    m_NominalToBinary.input(instance);
+		    instance = m_NominalToBinary.output();
+		return instance;
+	}
 	
+	protected Instances filterInstances(Instances instances) throws Exception {
+		Instances result = Filter.useFilter(instances, m_ReplaceMissingValues);
+		result = Filter.useFilter(instances, m_AttFilter);
+		result = Filter.useFilter(result, m_NominalToBinary);
+		return result;
+		
+	}
+	
+	protected class LogisticBoundaryPlane extends Plane{
+
+		public LogisticBoundaryPlane(Instances dataSpace) {
+			super(dataSpace);
+		}
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -1970067357108885170L;
+
+		@Override
+		public double distanceToPlane(Instance vec) throws Exception {
+			return super.distanceToPlane(filterInstance(vec));
+		}
+
+		@Override
+		public double sideOfThePlane(Instance vec) throws Exception {
+			return super.sideOfThePlane(filterInstance(vec));
+		}
+
+		@Override
+		public Instance projectOnPlane(Instance inst) throws Exception {
+			return super.projectOnPlane(filterInstance(inst));
+		}
+
+		@Override
+		public Instances projectOnPlane(Instances instances) throws Exception {
+			return super.projectOnPlane(filterInstances(instances));
+		}
+
+		@Override
+		public Instances planeBasedInstances(Instances instances) throws Exception {
+			return super.planeBasedInstances(filterInstances(instances));
+		}
+
+		@Override
+		public Instance planeBasedInstance(Instance instance) throws Exception {
+			return super.planeBasedInstance(filterInstance(instance));
+		}
+		
+		
+		
+	}
 	
 
 }

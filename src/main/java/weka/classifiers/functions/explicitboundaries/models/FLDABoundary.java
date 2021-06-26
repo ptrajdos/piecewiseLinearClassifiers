@@ -158,7 +158,7 @@ public class FLDABoundary extends FLDA implements ClassifierWithBoundaries {
 		
 	}
 	
-	private class FLDAPlane extends Plane {
+	protected class FLDAPlane extends Plane {
 
 		public FLDAPlane(Instances dataSpace) {
 			super(dataSpace);

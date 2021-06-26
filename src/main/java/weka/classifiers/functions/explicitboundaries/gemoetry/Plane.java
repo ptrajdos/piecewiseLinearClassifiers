@@ -140,7 +140,7 @@ public class Plane implements Serializable, Debuggable {
 		this.dotProduct = new DotProductEuclidean();
 		this.dataHeader = new Instances(dataSpace, 0);
 		this.normalVector = new DenseInstance(dataSpace.numAttributes());
-		this.normalVector.setDataset(dataSpace);
+		this.normalVector.setDataset(this.dataHeader);
 		
 		int classIdx = dataSpace.classIndex();
 		int numAttrs = dataSpace.numAttributes();

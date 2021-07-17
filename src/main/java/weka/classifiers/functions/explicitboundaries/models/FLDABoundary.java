@@ -15,11 +15,12 @@ import weka.core.DebugSetter;
 import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
+import weka.filters.Filter;
 
 /**
  * @author pawel trajdos
  * @since 0.1.0
- * @version 2.2.1
+ * @version 2.3.1
  */
 
 public class FLDABoundary extends FLDA implements ClassifierWithBoundaries {
@@ -71,13 +72,13 @@ public class FLDABoundary extends FLDA implements ClassifierWithBoundaries {
 			}
 		}
 		
-		Plane tmpPlane = new Plane(this.m_Data);
+		Plane tmpPlane = new FLDAPlane(this.m_Data);
 		tmpPlane.setNormalVector(normalVec);
 		tmpPlane.setOffset(offset);
 		
-		this.boundary = new DecisionBoundaryPlane(this.m_Data, 0, 1, tmpPlane); 
-		
+		this.boundary = new DecisionBoundaryPlane(this.m_Data, 0, 1, tmpPlane); 	
 	}
+	
 	
 	/* (non-Javadoc)
 	 * @see weka.classifiers.functions.SMO#getCapabilities()
@@ -100,6 +101,7 @@ public class FLDABoundary extends FLDA implements ClassifierWithBoundaries {
 	public void buildClassifier(Instances insts) throws Exception {
 		if(!this.getDoNotCheckCapabilities())
 			this.getCapabilities().testWithFail(insts);
+		//TODO this method changes the input set
 		super.buildClassifier(insts);
 		this.defaultModel.buildDefaultModelPlane(insts);
 		if(this.defaultModel.isUseDefault())
@@ -118,7 +120,10 @@ public class FLDABoundary extends FLDA implements ClassifierWithBoundaries {
 		if(this.defaultModel.isUseDefault()) {
 			distribution = this.alternativeModel.distributionForInstance(inst);
 		}else {
-			distribution = super.distributionForInstance(inst); 
+			
+			distribution  = new double[2];
+			distribution[0] = 0.5*(this.boundary.getValue(inst) + 1.0);
+			distribution[1] = 1 - distribution[0];
 		}
 		
 		return distribution;
@@ -143,6 +148,57 @@ public class FLDABoundary extends FLDA implements ClassifierWithBoundaries {
 	public static void main(String[] args) {
 		runClassifier(new FLDABoundary(), args);
 
+	}
+	
+	protected Instance filterInstance(Instance inst) {
+		Instance tmpInst;
+		m_RemoveUseless.input(inst);
+	    tmpInst = m_RemoveUseless.output();
+		return tmpInst;
+		
+	}
+	
+	protected class FLDAPlane extends Plane {
+
+		public FLDAPlane(Instances dataSpace) {
+			super(dataSpace);
+		}
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -4232940652337367592L;
+
+		@Override
+		public double distanceToPlane(Instance vec) throws Exception {
+			return super.distanceToPlane(filterInstance(vec));
+		}
+
+		@Override
+		public double sideOfThePlane(Instance vec) throws Exception {
+			return super.sideOfThePlane(filterInstance(vec));
+		}
+
+		@Override
+		public Instance projectOnPlane(Instance inst) throws Exception {
+			return super.projectOnPlane(filterInstance(inst));
+		}
+
+		@Override
+		public Instances projectOnPlane(Instances instances) throws Exception {
+			return super.projectOnPlane(Filter.useFilter(instances, m_RemoveUseless));
+		}
+
+		@Override
+		public Instances planeBasedInstances(Instances instances) throws Exception {
+			return super.planeBasedInstances(Filter.useFilter(instances, m_RemoveUseless));
+		}
+
+		@Override
+		public Instance planeBasedInstance(Instance instance) throws Exception {
+			return super.planeBasedInstance(filterInstance(instance));
+		}
+		
 	}
 
 }

@@ -168,6 +168,7 @@ public class SMOLinearBoundary extends SMO implements ClassifierWithBoundaries {
 		base.disableAll();
 		base.enable(Capability.NUMERIC_ATTRIBUTES);
 		base.enable(Capability.BINARY_CLASS);
+		base.setMinimumNumberInstances(0);
 		return base;
 	}
 
@@ -186,7 +187,13 @@ public class SMOLinearBoundary extends SMO implements ClassifierWithBoundaries {
 		if(this.defaultModel.isUseDefault())
 			return this.zeroModel.distributionForInstance(inst);
 		
-		return super.distributionForInstance(inst);
+		double[] distribution;
+		distribution  = new double[2];
+		distribution[0] = 0.5*(this.boundary.getValue(inst) + 1.0);
+		distribution[1] = 1 - distribution[0];
+		
+		
+		return distribution;
 	}
 	
 

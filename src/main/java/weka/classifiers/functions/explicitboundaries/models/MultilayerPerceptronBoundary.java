@@ -153,7 +153,7 @@ public class MultilayerPerceptronBoundary extends MultilayerPerceptron implement
 		base.disableAll();
 		base.enable(Capability.NUMERIC_ATTRIBUTES);
 		base.enable(Capability.BINARY_CLASS);
-		base.setMinimumNumberInstances(2);
+		base.setMinimumNumberInstances(0);
 		return base;
 	}
 	
@@ -185,7 +185,13 @@ public class MultilayerPerceptronBoundary extends MultilayerPerceptron implement
 		if(this.defaultPlaneModel.isUseDefault() )
 			return this.defaultModel.distributionForInstance(instance);
 		
-		return super.distributionForInstance(instance);
+		double[] distribution;
+		distribution  = new double[2];
+		distribution[0] = 0.5*(this.boundary.getValue(instance) + 1.0);
+		distribution[1] = 1 - distribution[0];
+		
+		
+		return distribution;
 	}
 
 	

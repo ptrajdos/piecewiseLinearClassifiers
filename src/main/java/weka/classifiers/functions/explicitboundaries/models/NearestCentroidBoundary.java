@@ -14,6 +14,7 @@ import weka.classifiers.functions.explicitboundaries.DecisionBoundary;
 import weka.classifiers.functions.explicitboundaries.DecisionBoundaryPlane;
 import weka.classifiers.functions.explicitboundaries.gemoetry.DotProduct;
 import weka.classifiers.functions.explicitboundaries.gemoetry.DotProductEuclidean;
+import weka.classifiers.rules.ZeroR;
 import weka.core.Capabilities;
 import weka.core.Capabilities.Capability;
 import weka.core.DebugSetter;
@@ -43,6 +44,8 @@ public class NearestCentroidBoundary extends NearestCentroidClassifier implement
 	protected MajorityPlaneBoundaryModel defaultModel = null;
 	
 	protected DecisionBoundaryPlane boundary;
+	
+	protected ZeroR alternativeModel=new ZeroR();
 
 	/**
 	 * 
@@ -82,8 +85,11 @@ public class NearestCentroidBoundary extends NearestCentroidClassifier implement
 	
 	protected void calculateBoundary(Instances data)throws Exception {
 		this.defaultModel.buildDefaultModelPlane(data);
-		if(this.defaultModel.useDefault)
+		if(this.defaultModel.useDefault) {
+			this.alternativeModel.buildClassifier(data);
 			return;
+		}
+			
 		Instance normalVec = new DenseInstance(this.getCentroids()[0]);
 		normalVec.setDataset(this.getCentroids()[0].dataset());
 		Instance middleVec = new DenseInstance(this.getCentroids()[0]);
@@ -113,7 +119,19 @@ public class NearestCentroidBoundary extends NearestCentroidClassifier implement
 		this.boundary.getDecisionPlane().setDotProduct(this.dotProduct);
 	}
 	
-	
+	@Override
+	public double[] distributionForInstance(Instance instance) throws Exception {
+		if(this.defaultModel.useDefault) 
+			return this.alternativeModel.distributionForInstance(instance);
+		
+		double[] distribution;
+		distribution  = new double[2];
+		distribution[0] = 0.5*(this.boundary.getValue(instance) + 1.0);
+		distribution[1] = 1 - distribution[0];
+		
+		
+		return distribution;
+	}
 
 	/* (non-Javadoc)
 	 * @see weka.classifiers.functions.NearestCentroidClassifier#getCapabilities()

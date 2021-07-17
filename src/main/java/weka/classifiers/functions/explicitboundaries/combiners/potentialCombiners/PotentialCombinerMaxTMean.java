@@ -71,8 +71,8 @@ public class PotentialCombinerMaxTMean implements PotentialCombiner, Serializabl
 			positiveArray[i] = positives.get(i);
 		}
 		
-		double negTMean  = UtilsPT.truncatedMean(negativeArray);
-		double posTMean = UtilsPT.truncatedMean(positiveArray);
+		double negTMean  = Math.abs(UtilsPT.truncatedMean(negativeArray));
+		double posTMean = Math.abs(UtilsPT.truncatedMean(positiveArray)) ;
 		
 	
 	

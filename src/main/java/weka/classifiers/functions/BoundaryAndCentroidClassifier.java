@@ -26,7 +26,7 @@ import weka.tools.data.InstancesOperator;
 /**
  * @author pawel trajdos
  * @since 2.0.0
- * @version 2.1.2
+ * @version 2.4.0
  *
  */
 public class BoundaryAndCentroidClassifier extends SingleClassifierEnhancerBoundary {
@@ -61,6 +61,10 @@ public class BoundaryAndCentroidClassifier extends SingleClassifierEnhancerBound
 	
 	protected ZeroR defaultModel;
 	
+	double[] classFreqs; 
+	
+	boolean usePriors=false;
+	
 	
 	
 	
@@ -89,7 +93,7 @@ public class BoundaryAndCentroidClassifier extends SingleClassifierEnhancerBound
 			this.getCapabilities().testWithFail(data);
 		
 		int numIinsts = data.numInstances();
-		double[] classFreqs = InstancesOperator.classFreq(data);
+		this.classFreqs = InstancesOperator.classFreq(data);
 		for(int i =0;i<classFreqs.length;i++) {
 			classFreqs[i] = Math.ceil(classFreqs[i]*numIinsts);
 		}
@@ -181,6 +185,8 @@ public class BoundaryAndCentroidClassifier extends SingleClassifierEnhancerBound
 			pot2 = this.potFunction.getPotentialValue(planeDirDist);
 			
 			potentials[c] = this.proportion*pot1 + (1-this.proportion)*pot2 + this.eps;
+			if(this.usePriors)
+				potentials[c]*=this.classFreqs[c];
 			sum+=potentials[c];
 			
 		}
@@ -327,6 +333,11 @@ public class BoundaryAndCentroidClassifier extends SingleClassifierEnhancerBound
 			      "\tNormalization flag"+
 		          "(default: TRUE).\n",
 			      "N", 0, "-N"));
+		
+		newVector.addElement(new Option(
+			      "\tDetermines whether the prior class probabilities are used"+
+		          "(default: FALSE).\n",
+			      "UP", 0, "-UP"));
 		 
 		
 		
@@ -354,6 +365,8 @@ public class BoundaryAndCentroidClassifier extends SingleClassifierEnhancerBound
 		
 		this.setNormalize(Utils.getFlag("N", options));
 		
+		this.setUsePriors(Utils.getFlag("UP", options));
+		
 		
 		super.setOptions(options);
 	}
@@ -377,15 +390,36 @@ public class BoundaryAndCentroidClassifier extends SingleClassifierEnhancerBound
 		options.add("-EPS");
 		options.add(""+this.getEps());
 		
-		if(this.normalize)
+		if(this.isNormalize())
 			options.add("-N");
+		
+		if(this.isUsePriors())
+			options.add("-UP");
 		
 		
 		Collections.addAll(options, super.getOptions());
 	    
 	    return options.toArray(new String[0]);
 	}
+
+	/**
+	 * @return the usePriors
+	 */
+	public boolean isUsePriors() {
+		return this.usePriors;
+	}
+
+	/**
+	 * @param usePriors the usePriors to set
+	 */
+	public void setUsePriors(boolean usePriors) {
+		this.usePriors = usePriors;
+	}
 	
+	
+	public String usePriorsTipText() {
+		return "Determines whether prior class probabilities are used.";
+	}
 	
 	
 

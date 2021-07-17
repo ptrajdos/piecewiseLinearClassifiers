@@ -2,43 +2,28 @@ package weka.classifiers.functions;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
-import weka.classifiers.AbstractClassifierTest;
 import weka.classifiers.Classifier;
-import weka.core.Instances;
 import weka.core.Instance;
-import weka.tools.SerialCopier;
-import weka.tools.data.IRandomDoubleGenerator;
+import weka.core.Instances;
 import weka.tools.data.RandomDataGenerator;
 import weka.tools.data.RandomDoubleGenerator;
 import weka.tools.data.RandomDoubleGeneratorGaussian;
 import weka.tools.tests.DistributionChecker;
 
-public class BoundaryAndCentroidClassifierTest extends AbstractClassifierTest{
+public class BoundaryKernelClassifier2Test extends BoundaryKernelClassifierTest {
 
-	public BoundaryAndCentroidClassifierTest(String name) {
+	public BoundaryKernelClassifier2Test(String name) {
 		super(name);
 	}
 
 	@Override
 	public Classifier getClassifier() {
-		return new BoundaryAndCentroidClassifier();
+		BoundaryKernelClassifier kernClass =new BoundaryKernelClassifier();
+		kernClass.setUsePriorProbs(true);
+		return kernClass;
 	}
 	
-	 public static Test suite() {
-		    return new TestSuite(BoundaryAndCentroidClassifierTest.class);
-		  }
-	 
-	 public void testSerialCopy() {
-		  Classifier cla = this.getClassifier();
-		  try {
-			Classifier copy = (Classifier) SerialCopier.makeCopy(cla);
-		} catch (Exception e) {
-			e.printStackTrace();
-			fail("Copy by serialization has failed.");
-		}
-	  }
-	 
-	 public void testOnCondensedData() {
+	public void testOnCondensedData() {
 		 Classifier classifier = this.getClassifier();
 		 RandomDataGenerator gen = new RandomDataGenerator();
 		 gen.setNumNominalAttributes(0);
@@ -60,12 +45,13 @@ public class BoundaryAndCentroidClassifierTest extends AbstractClassifierTest{
 			fail("An exception has been caught " + e.getMessage());
 		}
 	 }
-	 
+
+	public static Test suite() {
+	    return new TestSuite(BoundaryKernelClassifier2Test.class);
+	  }
+
 	 public static void main(String[] args){
 		    junit.textui.TestRunner.run(suite());
 	}
-	
-
-	
 
 }

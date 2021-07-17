@@ -4,18 +4,21 @@
 package weka.classifiers.functions.explicitboundaries.gemoetry;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
+import weka.core.Attribute;
 import weka.core.DebugSetter;
 import weka.core.Debuggable;
 import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.Utils;
+import weka.filters.Filter;
 
 /**
  * @author pawel
  * @since 0.1.0
- * @version 2.1.3
+ * @version 2.3.0
  */
 public class Plane implements Serializable, Debuggable {
 
@@ -56,6 +59,80 @@ public class Plane implements Serializable, Debuggable {
 	
 	protected boolean debug=false;
 	
+	protected Filter planeBaseFilter;
+	
+	private class PlaneProjectionFilter extends Filter{
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 6260845303462464014L;
+		
+		private String numAttProto="N";
+
+		@Override
+		public boolean setInputFormat(Instances instanceInfo) throws Exception {
+			super.setInputFormat(instanceInfo);
+			super.setOutputFormat(this.generateOutputFormat(instanceInfo));
+			return true;
+		}
+		
+		private Instances generateOutputFormat(Instances data) {
+			
+			ArrayList<Attribute> attributes = new ArrayList<Attribute>(); 
+			int planeBaseSize = planeBase.length;
+			for(int i=0;i<planeBaseSize;i++)
+				attributes.add(new Attribute(this.numAttProto+i));
+			
+			boolean isClassSet = false;
+			if(data.classIndex()>=0) {
+				attributes.add(data.classAttribute().copy(data.classAttribute().name()));
+				isClassSet=true;
+			}
+			
+			Instances projectedInstances = new Instances("proj", attributes, 0);
+			if(isClassSet)
+				projectedInstances.setClassIndex(planeBaseSize);
+			
+				
+			return projectedInstances;
+		}
+
+		@Override
+		public boolean input(Instance instance) throws Exception {
+			super.input(instance);
+			
+			
+			double projCoeff;
+			int numAtts = this.getOutputFormat().numAttributes();
+			int classAttrib = this.getOutputFormat().classIndex();
+			double classVal = instance.classValue();
+			int baseVecNum=0;
+			
+			double[] rep = new double[numAtts];
+			for(int a=0;a<rep.length;a++) {
+				if(a==classAttrib)
+					rep[a] = classVal;
+				else {
+					projCoeff = dotProduct.dotProduct(planeBase[baseVecNum++], instance);
+					rep[a] = projCoeff;
+				}
+			}
+			
+			Instance tmpInstance = new DenseInstance(instance.weight(), rep);
+			tmpInstance.setDataset(getOutputFormat());
+			
+			
+			
+			
+			push(tmpInstance);
+			return true;
+		}
+		
+		
+		
+	} 
+	
 	
 	
 	
@@ -63,7 +140,7 @@ public class Plane implements Serializable, Debuggable {
 		this.dotProduct = new DotProductEuclidean();
 		this.dataHeader = new Instances(dataSpace, 0);
 		this.normalVector = new DenseInstance(dataSpace.numAttributes());
-		this.normalVector.setDataset(dataSpace);
+		this.normalVector.setDataset(this.dataHeader);
 		
 		int classIdx = dataSpace.classIndex();
 		int numAttrs = dataSpace.numAttributes();
@@ -88,7 +165,24 @@ public class Plane implements Serializable, Debuggable {
 			e.printStackTrace();
 		}
 		
+		this.createFilter(this.dataHeader);
+		
+		
 	}
+	
+	
+	private void createFilter(Instances data) {
+		this.planeBaseFilter = new PlaneProjectionFilter();
+		try {
+			this.planeBaseFilter.setInputFormat(data);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	
+	
 	
 	/**
 	 * Calculate the distance of the vector to the plane
@@ -128,7 +222,7 @@ public class Plane implements Serializable, Debuggable {
 
 	
 	private void createPlaneBase() throws Exception {
-		Instance[] base = createBase();//TODO error is here
+		Instance[] base = createBase();
 		this.planeBase = this.gsOrth.createOrthonormalBase(base);
 	}
 	
@@ -204,6 +298,26 @@ public class Plane implements Serializable, Debuggable {
 		
 		return projection;
 	}
+	
+	public Instances projectOnPlane(Instances instances) throws Exception {
+		Instances projectedInstances = new Instances(instances, 0);
+		for (Instance instance : instances) {
+			projectedInstances.add(this.projectOnPlane(instance));
+		}
+		
+		return projectedInstances;
+	}
+	
+	public Instances planeBasedInstances(Instances instances) throws Exception {
+		return Filter.useFilter(instances, this.planeBaseFilter);
+	}
+	
+	public Instance planeBasedInstance(Instance instance) throws Exception {
+		this.planeBaseFilter.input(instance);
+		Instance tmpInstance = this.planeBaseFilter.output();
+		this.planeBaseFilter.batchFinished();
+		return tmpInstance;
+	}
 
 
 
@@ -227,6 +341,7 @@ public class Plane implements Serializable, Debuggable {
 		this.normalVector = normalVector;
 		
 		this.createPlaneBase();
+		this.createFilter(this.dataHeader);
 	}
 
 

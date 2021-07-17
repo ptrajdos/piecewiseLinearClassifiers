@@ -18,6 +18,7 @@ import weka.core.Instance;
 import weka.core.Instances;
 import weka.tools.InstancesTools;
 import weka.tools.SerialCopier;
+import weka.tools.data.RandomDataGenerator;
 
 public class PlaneTest {
 
@@ -203,6 +204,11 @@ public class PlaneTest {
 		tInstProj.setDataset(dataset);
 		
 		
+		Instances testInstances = new Instances(this.dataset,0);
+		testInstances.add(nV);
+		testInstances.add(base);
+		testInstances.add(tInst);
+		testInstances.add(tInstProj);
 		
 		Instance[] b1 = null;
 		Instance projT = null;
@@ -215,6 +221,8 @@ public class PlaneTest {
 			assertTrue("Check plane projection", InstancesTools.checkEquall(projT, tInstProj, false));
 			String toString = this.plane.toString();
 			assertTrue("String length", toString.length()>0);
+			
+			Instances projectedInstances = this.plane.projectOnPlane(testInstances);
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail("Exception has been caught" + e.toString());
@@ -271,6 +279,37 @@ public class PlaneTest {
 		}
 	}
 	
+	@Test
+	public void testPlaneBased() {
+		RandomDataGenerator gen = new RandomDataGenerator();
+		gen.setNumNominalAttributes(0);
+		gen.setNumStringAttributes(0);
+		gen.setNumDateAttributes(0);
+		
+		int[] numAttribs= {1,2,3,10};
+		for(int i =0;i<numAttribs.length;i++) {
+			gen.setNumNumericAttributes(numAttribs[i]);
+			Instances data = gen.generateData();
+			Instance testInstance = data.get(0);
+			
+			Plane plane = new Plane(data);
+			
+			try {
+				
+				Instances planeBasedInstances = plane.planeBasedInstances(data);
+				assertTrue("Not null planeBased instances", planeBasedInstances!=null);
+				if(numAttribs[i]>1)
+					assertTrue("Num Attribs", planeBasedInstances.numAttributes() == data.numAttributes()-1);
+				else
+					assertTrue("Num Attribs", planeBasedInstances.numAttributes() == data.numAttributes());
+				
+				Instance planeBasedInst = plane.planeBasedInstance(testInstance);
+				assertTrue("Not null planeBased instance", planeBasedInst!=null);
+			} catch (Exception e) {
+				fail("AnException has been caught: " + e.getMessage());
+			}
+		}
+	}
 	
 
 }

@@ -15,7 +15,7 @@ import weka.estimators.MultivariateGaussianEstimator;
 /**
  * @author pawel trajdos
  * @since 2.3.0
- * @version 2.3.0
+ * @version 2.3.2
  *
  */
 public class BoundaryKernelClassifierWithPlaneProjectionsGauss extends BoundaryKernelClassifier {

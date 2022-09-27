@@ -70,9 +70,12 @@ public class BoundaryBasedClassifier extends SingleClassifierEnhancerBoundary
 		}
 		this.calibrator = new Logistic();
 	}
+	
 	public BoundaryBasedClassifier() {
 		this(new NearestCentroidBoundary());
 	}
+	
+	
 
 	/* (non-Javadoc)
 	 * @see weka.classifiers.Classifier#buildClassifier(weka.core.Instances)
@@ -324,6 +327,12 @@ public class BoundaryBasedClassifier extends SingleClassifierEnhancerBoundary
 	}
 	public static void main(String[] args) {
 		runClassifier(new BoundaryBasedClassifier(), args);
+	}
+
+	@Override
+	protected String defaultClassifierString() {
+		
+		return NearestCentroidBoundary.class.getCanonicalName();
 	}
 
 }

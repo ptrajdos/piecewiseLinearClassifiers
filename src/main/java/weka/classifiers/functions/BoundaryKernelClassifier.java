@@ -183,7 +183,7 @@ public class BoundaryKernelClassifier extends SingleClassifierEnhancerBoundary i
 		
 		
 		options.add("-KP");
-		options.add(UtilsPT.getClassAndOptions(this.getEstimProto()));
+		options.add( UtilsPT.getClassAndOptions(this.getEstimProto()) );
 		
 		if(this.isNormalize())
 			options.add("-NORM");

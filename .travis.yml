@@ -1,10 +1,10 @@
-dist: trusty
+dist: focal
 language: java
-jdk: oraclejdk8
+jdk: openjdk11
 sudo: enabled 
 
 branches:
-  ony:
+  only:
     - master
 
 install: mvn install  -Dgpg.skip

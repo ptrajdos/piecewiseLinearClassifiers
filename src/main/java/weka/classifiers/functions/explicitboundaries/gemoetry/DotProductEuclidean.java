@@ -62,9 +62,8 @@ public class DotProductEuclidean implements DotProduct, Serializable, Debuggable
 	}
 
 	@Override
-	public Instance projection(Instance inst1, Instance inst2) throws Exception {
-		double[] tmp = inst2.toDoubleArray();
-		double[] representation =  Arrays.copyOf(tmp, tmp.length) ;
+	public Instance projection(Instance inst1, Instance inst2) throws Exception { 
+		double[] representation =  inst2.toDoubleArray();
 		Instances dataSet = inst1.dataset();
 		double weight=0;
 		double i2Norm = this.norm(inst2);

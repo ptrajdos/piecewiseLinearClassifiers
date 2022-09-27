@@ -405,6 +405,7 @@
         <configuration>
           <show>public</show>
           <outputDirectory>${project.basedir}/doc</outputDirectory>          
+          <source>8</source>
         </configuration>
         <executions>
           <execution>

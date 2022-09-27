@@ -41,7 +41,6 @@ public class MajorityPlaneBoundaryModel implements Serializable, Debuggable {
 	/**
 	 * Builds a default decision boundary if there are instances belonging to only one class.
 	 * @param dataset
-	 * @return
 	 * @throws Exception 
 	 */
 	public  void buildDefaultModelPlane(Instances dataset) throws Exception {

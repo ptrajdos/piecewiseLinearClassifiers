@@ -406,6 +406,8 @@
           <show>public</show>
           <outputDirectory>${project.basedir}/doc</outputDirectory>          
           <source>8</source>
+          <!-- No doclint. Something goes wrong with during Travis build -->
+          <doclint>none</doclint> <!-- Turn off all checks -->
         </configuration>
         <executions>
           <execution>

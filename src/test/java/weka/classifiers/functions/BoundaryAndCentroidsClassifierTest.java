@@ -12,6 +12,7 @@ import weka.tools.data.RandomDataGenerator;
 import weka.tools.data.RandomDoubleGenerator;
 import weka.tools.data.RandomDoubleGeneratorGaussian;
 import weka.tools.tests.DistributionChecker;
+import weka.tools.tests.WekaGOEChecker;
 
 public class BoundaryAndCentroidsClassifierTest extends AbstractClassifierTest{
 
@@ -60,6 +61,13 @@ public class BoundaryAndCentroidsClassifierTest extends AbstractClassifierTest{
 			fail("An exception has been caught " + e.getMessage());
 		}
 	 }
+	 
+	 public void testGlobalInfoAndTips() {
+			WekaGOEChecker checker = new WekaGOEChecker();
+			checker.setObject(this.getClassifier());
+			assertTrue("GlobalInfo call", checker.checkCallGlobalInfo());
+			assertTrue("TipTexts call", checker.checkToolTipsCall());
+		}
 	 
 	 public static void main(String[] args){
 		    junit.textui.TestRunner.run(suite());

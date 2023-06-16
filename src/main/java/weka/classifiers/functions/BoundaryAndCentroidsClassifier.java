@@ -25,6 +25,8 @@ import weka.core.Utils;
 import weka.core.UtilsPT;
 import weka.tools.SerialCopier;
 import weka.tools.data.InstancesOperator;
+import weka.tools.data.splitters.DataSplitter;
+import weka.tools.data.splitters.CopySplitter;
 
 /**
  * @author pawel trajdos
@@ -47,7 +49,7 @@ public class BoundaryAndCentroidsClassifier extends SingleClassifierEnhancerBoun
 	protected PotentialFunction potFunction;
 	
 	/**
-	 * Proportion between Centroid potential and plane potential
+	 * Proportion between plane potential and cluster potential
 	 */
 	protected double proportion=0.5;
 	
@@ -59,11 +61,13 @@ public class BoundaryAndCentroidsClassifier extends SingleClassifierEnhancerBoun
 	
 	protected ZeroR defaultModel;
 	
-	double[] classFreqs; 
+	protected double[] classFreqs; 
 	
-	boolean usePriors=false;
+	protected boolean usePriors=false;
 
 	protected ClassSpecificClusterer classSpecClusterer;
+	
+	protected DataSplitter dataSplitter;
 	
 	
 	/**
@@ -75,6 +79,8 @@ public class BoundaryAndCentroidsClassifier extends SingleClassifierEnhancerBoun
 		this.prototypeProto = new CustomizablePrototype();
 		this.potFunction = new PotentialFunctionTanh();
 		this.classSpecClusterer = new ClassSpecificClusterer();
+		this.dataSplitter = new CopySplitter();
+		
 	}
 	
 	public BoundaryAndCentroidsClassifier() {
@@ -92,20 +98,35 @@ public class BoundaryAndCentroidsClassifier extends SingleClassifierEnhancerBoun
 		
 		int numIinsts = data.numInstances();
 		this.classFreqs = InstancesOperator.classFreq(data);
+		double[] classCounts = new double[this.classFreqs.length];
+		
 		for(int i =0;i<classFreqs.length;i++) {
-			classFreqs[i] = Math.ceil(classFreqs[i]*numIinsts);
+			classCounts[i] = Math.ceil(classFreqs[i]*numIinsts);
 		}
 		
 		this.defaultModel = null;
-		if(Utils.smOrEq(classFreqs[0], 1) | Utils.smOrEq(classFreqs[1], 1)) {
+		if(Utils.smOrEq(classCounts[0], 1) | Utils.smOrEq(classCounts[1], 1)) {
 			this.defaultModel = new ZeroR();
 			this.defaultModel.buildClassifier(data);
 			return;
 		}
-
+		this.dataSplitter.train(data);
+		Instances[] splitted = this.dataSplitter.split(data);
+		
+		this.boundClassRef.buildClassifier(splitted[0]);
+		this.buildClusters(splitted[1]);
+		
+		
+	}
+	
+	/**
+	 * Builds class-specific clusters and creates cluster prototypes
+	 * @param data
+	 * @throws Exception
+	 */
+	protected void buildClusters(Instances data) throws Exception {
 		this.classSpecClusterer.buildClusterer(data);
 		
-		this.boundClassRef.buildClassifier(data);
 		
 		int numAttrs = data.numAttributes();
 		int classIdx = data.classIndex();
@@ -133,7 +154,7 @@ public class BoundaryAndCentroidsClassifier extends SingleClassifierEnhancerBoun
 			
 			for (int i =0; i<nClusters; i++) {
 				classClusterSplittedData[c][i] = new Instances(classSplittedData[c],0);
-				this.classProtos[c][c] = (IClusterPrototype) SerialCopier.makeCopy(this.prototypeProto);
+				this.classProtos[c][i] = (IClusterPrototype) SerialCopier.makeCopy(this.prototypeProto);
 			}
 		}
 		
@@ -163,6 +184,51 @@ public class BoundaryAndCentroidsClassifier extends SingleClassifierEnhancerBoun
 		}
 		
 	}
+	
+	
+	protected double[] getresponse(Instance instance) throws Exception {
+		
+		double[] distribution = new double[this.classFreqs.length];
+		
+		for(int c =0 ;c<this.classFreqs.length; c++) {
+			int nProtos = this.classProtos[c].length;
+			
+			for(int p =0; p< nProtos; p++) {
+				distribution[c] += 1 - this.potFunction.getPotentialValue(this.classProtos[c][p].distance(instance));
+			}
+			distribution[c]/=nProtos;
+					
+		}
+		
+		IDecisionBoundary bound = this.boundClassRef.getBoundary();
+		double sign = Math.signum(bound.getValue(instance));
+		double dist = bound.getDistance(instance);
+		double potVal = this.potFunction.getPotentialValue(dist);
+		
+		if(sign > 0) {
+			distribution[0] =  this.proportion * Math.abs(potVal) + (1.0-this.proportion) * distribution[0];
+			distribution[1] = (1-this.proportion) * distribution[1];
+		}else {
+			distribution[1] = this.proportion * Math.abs(potVal) + (1.0 - this.proportion) * distribution[1];
+			distribution[0] = (1-this.proportion) * distribution[0];
+		}
+		
+		
+		if( this.usePriors) {
+			for(int c =0; c< this.classFreqs.length; c++)
+				distribution[c] *= classFreqs[c];
+			
+		}
+		
+		if(! this.normalize) {
+		distribution = UtilsPT.softMax(distribution);
+		}else{
+			Utils.normalize(distribution);
+		}
+		
+		
+		return distribution;
+	}
 
 	/* (non-Javadoc)
 	 * @see weka.classifiers.AbstractClassifier#distributionForInstance(weka.core.Instance)
@@ -176,7 +242,8 @@ public class BoundaryAndCentroidsClassifier extends SingleClassifierEnhancerBoun
 		if (this.classesOnly)
 			return this.boundClassRef.distributionForInstance(instance);
 		
-		return this.boundClassRef.distributionForInstance(instance);
+		
+		return this.getresponse(instance);
 	}
 	
 	public String globalInfo() {
@@ -242,7 +309,7 @@ public class BoundaryAndCentroidsClassifier extends SingleClassifierEnhancerBoun
 	}
 	
 	public String proportionTipText() {
-		return "Proportion between Centroid and Plane potentials";
+		return "Proportion between Plane and cluster potentials";
 	}
 	
 	
@@ -326,6 +393,11 @@ public class BoundaryAndCentroidsClassifier extends SingleClassifierEnhancerBoun
 			      "\tDetermines whether the prior class probabilities are used"+
 		          "(default: FALSE).\n",
 			      "UP", 0, "-UP"));
+		
+		newVector.addElement(new Option(
+			      "\tThe DataSplitter to use "+
+		          "(default:" +  CopySplitter.class.getCanonicalName()+ ".\n",
+			      "DS", 1, "-DS"));
 		 
 		
 		
@@ -350,6 +422,9 @@ public class BoundaryAndCentroidsClassifier extends SingleClassifierEnhancerBoun
 							UtilsPT.parseObjectOptions(options, "CSP", new ClassSpecificClusterer(), ClassSpecificClusterer.class)
 		);
 		
+		this.setDataSplitter((DataSplitter)
+						UtilsPT.parseObjectOptions(options, "DS", new CopySplitter(), DataSplitter.class) );
+		
 		this.setPotFunction((PotentialFunction)
 				 UtilsPT.parseObjectOptions(options, "PO", new PotentialFunctionExp4(), PotentialFunction.class));
 		
@@ -371,16 +446,19 @@ public class BoundaryAndCentroidsClassifier extends SingleClassifierEnhancerBoun
 		Vector<String> options = new Vector<String>();
 		
 		options.add("-P");
-		options.add(UtilsPT.getClassAndOptions(prototypeProto));
+		options.add(UtilsPT.getClassAndOptions(this.getPrototypeProto()));
 
 		options.add("-CSP");
 		options.add(UtilsPT.getClassAndOptions(this.getClassSpecificClusterer()));
 		
 		options.add("-PR");
-		options.add(""+this.proportion);
+		options.add(""+this.getProportion());
+		
+		options.add("-DS");
+		options.add(UtilsPT.getClassAndOptions(this.getDataSplitter()));
 		
 		options.add("-PO");
-		options.add(UtilsPT.getClassAndOptions(potFunction));
+		options.add(UtilsPT.getClassAndOptions(this.getPotFunction()));
 		
 		options.add("-EPS");
 		options.add(""+this.getEps());
@@ -426,6 +504,18 @@ public class BoundaryAndCentroidsClassifier extends SingleClassifierEnhancerBoun
 
 	public String classSpecificClustererTipText(){
 		return "Class-specific clusterer to use";
+	}
+
+	public DataSplitter getDataSplitter() {
+		return dataSplitter;
+	}
+
+	public void setDataSplitter(DataSplitter dataSplitter) {
+		this.dataSplitter = dataSplitter;
+	}
+	
+	public String dataSplitterTipText() {
+		return "Data splitter to use";
 	}
 	
 	

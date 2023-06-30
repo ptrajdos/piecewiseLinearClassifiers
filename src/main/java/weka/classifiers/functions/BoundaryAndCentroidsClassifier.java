@@ -5,7 +5,12 @@ package weka.classifiers.functions;
 
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Vector;
+
+import org.apache.commons.math3.analysis.UnivariateFunction;
+import org.apache.commons.math3.analysis.solvers.BisectionSolver;
 
 import weka.classifiers.functions.explicitboundaries.ClassifierWithBoundaries;
 import weka.classifiers.functions.explicitboundaries.IDecisionBoundary;
@@ -45,6 +50,9 @@ public class BoundaryAndCentroidsClassifier extends SingleClassifierEnhancerBoun
 	
 	protected IClusterPrototype[][] classProtos; // classes x number of class-specific clusters
 	
+	protected double[][] clusterPotentialArgumentMultipliers; // classes x number of class-specific clusters
+	protected double[] boundaryPotentialArgumentMultipliers; // 2 
+	
 	
 	protected PotentialFunction potFunction;
 	
@@ -68,6 +76,12 @@ public class BoundaryAndCentroidsClassifier extends SingleClassifierEnhancerBoun
 	protected ClassSpecificClusterer classSpecClusterer;
 	
 	protected DataSplitter dataSplitter;
+	
+	protected double quantile=0.9;
+	protected double quantilePotentialVal = 0.1;
+	protected double minSearch = 1E-6;
+	protected double maxSearch = 5.0;
+	protected int nBisectIterations = 1000;
 	
 	
 	/**
@@ -113,7 +127,7 @@ public class BoundaryAndCentroidsClassifier extends SingleClassifierEnhancerBoun
 		this.dataSplitter.train(data);
 		Instances[] splitted = this.dataSplitter.split(data);
 		
-		this.boundClassRef.buildClassifier(splitted[0]);
+		this.buildBoundaryClassifier(splitted[0]);
 		this.buildClusters(splitted[1]);
 		
 		
@@ -183,6 +197,108 @@ public class BoundaryAndCentroidsClassifier extends SingleClassifierEnhancerBoun
 			
 		}
 		
+		//Multipliers
+		this.clusterPotentialArgumentMultipliers = new double[numClasses][];
+		for(int c =0; c< numClasses; c++) {
+			int nClusters = classSpecClusterNumber[c];
+			this.clusterPotentialArgumentMultipliers[c] = new double[nClusters];
+			
+			for(int i =0; i<nClusters;i++) {
+				
+				
+				double[] distances = new double[classClusterSplittedData[c][i].numInstances()];
+				
+				for(int d=0; d<distances.length;d++) {
+					distances[d] = this.classProtos[c][i].distance(classClusterSplittedData[c][i].get(d));
+				}
+				
+				double qVal = UtilsPT.quantile(distances, this.quantile);
+				
+				BisectionSolver solver = new BisectionSolver();
+				double multiplier =  solver.solve(this.nBisectIterations, new UnivariateFunction() {
+					
+					@Override
+					public double value(double x) {
+						
+						try {
+							return 1.0 - potFunction.getPotentialValue(qVal * x) - quantilePotentialVal;
+						} catch (Exception e) {
+							return 0;
+						}
+					}
+				}, this.minSearch, this.maxSearch);
+				this.clusterPotentialArgumentMultipliers[c][i] = multiplier;
+			}
+		}
+		
+		
+	}
+	
+	protected void buildBoundaryClassifier(Instances instances) throws Exception {
+		
+		this.boundClassRef.buildClassifier(instances);
+		
+		int numAttrs = instances.numAttributes();
+		int classIdx = instances.classIndex();
+
+		this.classesOnly = false;
+		if(numAttrs==1 & classIdx>=0) {
+			this.classesOnly = true;
+			return;
+		}
+		
+		
+		IDecisionBoundary bound = this.boundClassRef.getBoundary();
+		
+		List<Double> zeroDists = new LinkedList<>();
+		List<Double> oneDists = new LinkedList<>();
+		
+		int nInstances = instances.numInstances();
+		int nClasses = instances.numClasses();
+		
+		this.boundaryPotentialArgumentMultipliers = new double[nClasses];
+		
+		for(int i=0; i<nInstances;i++) {
+			
+			Instance tmpInstance = instances.get(i);
+			
+			double sign = Math.signum(bound.getValue(tmpInstance));
+			double dist = bound.getDistance(tmpInstance);
+			
+			if(sign>0) {
+				zeroDists.add(dist);
+			}else {
+				oneDists.add(dist);
+			}
+		}
+		
+		double[][] distances = new double[instances.numClasses()][];
+		
+		distances[0] = zeroDists.stream().mapToDouble(Double::doubleValue).toArray();
+		distances[1] = oneDists.stream().mapToDouble(Double::doubleValue).toArray();
+		
+		for(int c =0; c<nClasses; c++ ) {
+			
+			double quant = UtilsPT.quantile(distances[c], this.quantile);
+			
+			BisectionSolver solver = new BisectionSolver();
+			
+			double multiplier  = solver.solve(this.nBisectIterations, new UnivariateFunction() {
+				
+				@Override
+				public double value(double x) {
+					
+					try {
+						return potFunction.getPotentialValue( quant * x) - (1.0 - quantilePotentialVal);
+					} catch (Exception e) {
+						return 0;
+					}
+				}
+			}, this.minSearch, this.maxSearch);
+			this.boundaryPotentialArgumentMultipliers[c] = multiplier;
+		}
+		
+		
 	}
 	
 	
@@ -194,7 +310,7 @@ public class BoundaryAndCentroidsClassifier extends SingleClassifierEnhancerBoun
 			int nProtos = this.classProtos[c].length;
 			
 			for(int p =0; p< nProtos; p++) {
-				distribution[c] += 1 - this.potFunction.getPotentialValue(this.classProtos[c][p].distance(instance));
+				distribution[c] += 1 - this.potFunction.getPotentialValue(this.clusterPotentialArgumentMultipliers[c][p] * this.classProtos[c][p].distance(instance));
 			}
 			distribution[c]/=nProtos;
 					
@@ -203,12 +319,15 @@ public class BoundaryAndCentroidsClassifier extends SingleClassifierEnhancerBoun
 		IDecisionBoundary bound = this.boundClassRef.getBoundary();
 		double sign = Math.signum(bound.getValue(instance));
 		double dist = bound.getDistance(instance);
-		double potVal = this.potFunction.getPotentialValue(dist);
+//		double potVal = this.potFunction.getPotentialValue(dist);
 		
+		double potVal = 1.0;
 		if(sign > 0) {
+			potVal = this.potFunction.getPotentialValue(dist * this.boundaryPotentialArgumentMultipliers[0]); 
 			distribution[0] =  this.proportion * Math.abs(potVal) + (1.0-this.proportion) * distribution[0];
 			distribution[1] = (1-this.proportion) * distribution[1];
 		}else {
+			potVal = this.potFunction.getPotentialValue(dist * this.boundaryPotentialArgumentMultipliers[1]);
 			distribution[1] = this.proportion * Math.abs(potVal) + (1.0 - this.proportion) * distribution[1];
 			distribution[0] = (1-this.proportion) * distribution[0];
 		}
@@ -398,7 +517,33 @@ public class BoundaryAndCentroidsClassifier extends SingleClassifierEnhancerBoun
 			      "\tThe DataSplitter to use "+
 		          "(default:" +  CopySplitter.class.getCanonicalName()+ ".\n",
 			      "DS", 1, "-DS"));
-		 
+		
+		newVector.addElement(new Option(
+			      "\tQuantile of points to use"+
+		          "(default: 0.9).\n",
+			      "QA", 1, "-QA"));
+		
+		newVector.addElement(new Option(
+			      "\tPotential Value for given quantile"+
+		          "(default: 0.1).\n",
+			      "PQA", 1, "-PQA"));
+		
+		
+		newVector.addElement(new Option(
+			      "\tMin Multiplier Value"+
+		          "(default: 1E-3).\n",
+			      "MiPV", 1, "-MiPV"));
+		
+		newVector.addElement(new Option(
+			      "\tMax Multiplier Value"+
+		          "(default: 5.0).\n",
+			      "MaPV", 1, "-MaPV"));
+		
+		newVector.addElement(new Option(
+			      "\tBisection Iterations"+
+		          "(default: 1000).\n",
+			      "BI", 1, "-BI"));
+		
 		
 		
 		newVector.addAll(Collections.list(super.listOptions()));
@@ -434,6 +579,16 @@ public class BoundaryAndCentroidsClassifier extends SingleClassifierEnhancerBoun
 		
 		this.setUsePriors(Utils.getFlag("UP", options));
 		
+		this.setQuantile(UtilsPT.parseDoubleOption(options, "QA", 0.9));
+		
+		this.setQuantilePotentialVal(UtilsPT.parseDoubleOption(options, "PQA", 0.1));
+		
+		this.setMinSearch(UtilsPT.parseDoubleOption(options, "MiPV", 1E-3));
+		
+		this.setMaxSearch(UtilsPT.parseDoubleOption(options, "MaPV", 5.0));
+		
+		this.setnBisectIterations(UtilsPT.parseIntegerOption(options, "BI", 1000));
+		
 		
 		super.setOptions(options);
 	}
@@ -468,6 +623,21 @@ public class BoundaryAndCentroidsClassifier extends SingleClassifierEnhancerBoun
 		
 		if(this.isUsePriors())
 			options.add("-UP");
+		
+		options.add("-QA");
+		options.add(""+this.getQuantile());
+		
+		options.add("-PQA");
+		options.add(""+this.getQuantilePotentialVal());
+		
+		options.add("-MiPV");
+		options.add(""+this.getMinSearch());
+		
+		options.add("-MaPV");
+		options.add(""+this.getMaxSearch());
+		
+		options.add("-BI");
+		options.add(""+this.getnBisectIterations());
 		
 		
 		Collections.addAll(options, super.getOptions());
@@ -517,6 +687,68 @@ public class BoundaryAndCentroidsClassifier extends SingleClassifierEnhancerBoun
 	public String dataSplitterTipText() {
 		return "Data splitter to use";
 	}
+	
+	public String quantileTipText() {
+		return "Distance quantile to use";
+	}
+
+	public double getQuantile() {
+		return quantile;
+	}
+
+	public void setQuantile(double quantile) {
+		this.quantile = quantile;
+	}
+
+	public String quantilePotentialValTipText() {
+		return "Potential function value for given quantile";
+	}
+	
+	public double getQuantilePotentialVal() {
+		return quantilePotentialVal;
+	}
+
+	public void setQuantilePotentialVal(double quantilePotentialVal) {
+		this.quantilePotentialVal = quantilePotentialVal;
+	}
+
+	public String minSearchTipText() {
+		return "Min Multiplier value to use";
+	}
+	
+	public double getMinSearch() {
+		return minSearch;
+	}
+
+	public void setMinSearch(double minSearch) {
+		this.minSearch = minSearch;
+	}
+	
+	public String maxSearchTipText() {
+		return "Max Multiplier value to use";
+	}
+
+	public double getMaxSearch() {
+		return maxSearch;
+	}
+
+	public void setMaxSearch(double maxSearch) {
+		this.maxSearch = maxSearch;
+	}
+	
+	public String nBisectIterationsTipText() {
+		return "Max number of bisection operations to perform";
+	}
+
+	public int getnBisectIterations() {
+		return nBisectIterations;
+	}
+
+	public void setnBisectIterations(int nBisectIterations) {
+		this.nBisectIterations = nBisectIterations;
+	}
+	
+	
 	
 	
 

@@ -29,6 +29,8 @@ import weka.core.Option;
 import weka.core.Utils;
 import weka.core.UtilsPT;
 import weka.tools.SerialCopier;
+import weka.tools.arrayFunctions.MeanFunction;
+import weka.tools.arrayFunctions.MultivariateFunction;
 import weka.tools.data.InstancesOperator;
 import weka.tools.data.splitters.DataSplitter;
 import weka.tools.data.splitters.CopySplitter;
@@ -83,6 +85,9 @@ public class BoundaryAndCentroidsClassifier extends SingleClassifierEnhancerBoun
 	protected double maxSearch = 5.0;
 	protected int nBisectIterations = 1000;
 	
+	// TODO Options
+	protected MultivariateFunction clusterCombiner;
+	
 	
 	/**
 	 * 
@@ -94,6 +99,7 @@ public class BoundaryAndCentroidsClassifier extends SingleClassifierEnhancerBoun
 		this.potFunction = new PotentialFunctionTanh();
 		this.classSpecClusterer = new ClassSpecificClusterer();
 		this.dataSplitter = new CopySplitter();
+		this.clusterCombiner = new MeanFunction();
 		
 	}
 	
@@ -306,15 +312,19 @@ public class BoundaryAndCentroidsClassifier extends SingleClassifierEnhancerBoun
 		
 		double[] distribution = new double[this.classFreqs.length];
 		
+		
 		for(int c =0 ;c<this.classFreqs.length; c++) {
 			int nProtos = this.classProtos[c].length;
+			double[] clusterDistribution = new double[nProtos];
 			
 			for(int p =0; p< nProtos; p++) {
-				distribution[c] += 1 - this.potFunction.getPotentialValue(this.clusterPotentialArgumentMultipliers[c][p] * this.classProtos[c][p].distance(instance));
+				clusterDistribution[p] += 1 - this.potFunction.getPotentialValue(this.clusterPotentialArgumentMultipliers[c][p] * this.classProtos[c][p].distance(instance));
 			}
-			distribution[c]/=nProtos;
+			distribution[c] = this.clusterCombiner.value(clusterDistribution);
 					
 		}
+		
+		
 		
 		IDecisionBoundary bound = this.boundClassRef.getBoundary();
 		double sign = Math.signum(bound.getValue(instance));
@@ -544,6 +554,11 @@ public class BoundaryAndCentroidsClassifier extends SingleClassifierEnhancerBoun
 		          "(default: 1000).\n",
 			      "BI", 1, "-BI"));
 		
+		newVector.addElement(new Option(
+			      "\tThe Cluster Combiner to use "+
+		          "(default:" +  MeanFunction.class.getCanonicalName()+ ".\n",
+			      "CC", 1, "-CC"));
+		
 		
 		
 		newVector.addAll(Collections.list(super.listOptions()));
@@ -588,6 +603,8 @@ public class BoundaryAndCentroidsClassifier extends SingleClassifierEnhancerBoun
 		this.setMaxSearch(UtilsPT.parseDoubleOption(options, "MaPV", 5.0));
 		
 		this.setnBisectIterations(UtilsPT.parseIntegerOption(options, "BI", 1000));
+		
+		this.setClusterCombiner((MultivariateFunction) UtilsPT.parseObjectOptions(options, "CC", new MeanFunction(), MultivariateFunction.class ));
 		
 		
 		super.setOptions(options);
@@ -638,6 +655,9 @@ public class BoundaryAndCentroidsClassifier extends SingleClassifierEnhancerBoun
 		
 		options.add("-BI");
 		options.add(""+this.getnBisectIterations());
+		
+		options.add("-CC");
+		options.add(UtilsPT.getClassAndOptions(this.getClusterCombiner()));
 		
 		
 		Collections.addAll(options, super.getOptions());
@@ -747,9 +767,19 @@ public class BoundaryAndCentroidsClassifier extends SingleClassifierEnhancerBoun
 	public void setnBisectIterations(int nBisectIterations) {
 		this.nBisectIterations = nBisectIterations;
 	}
+
+	public MultivariateFunction getClusterCombiner() {
+		return clusterCombiner;
+	}
+
+	public void setClusterCombiner(MultivariateFunction clusterCombiner) {
+		this.clusterCombiner = clusterCombiner;
+	}
 	
 	
-	
+	public String clusterCombinerTipText() {
+		return "Method of combining cluster responses";
+	}
 	
 
 }

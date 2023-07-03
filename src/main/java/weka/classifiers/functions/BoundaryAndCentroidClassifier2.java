@@ -7,6 +7,10 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Vector;
 
+import org.apache.commons.math3.analysis.UnivariateFunction;
+import org.apache.commons.math3.analysis.solvers.BisectionSolver;
+import org.apache.mahout.math.Arrays;
+
 import weka.classifiers.functions.explicitboundaries.ClassifierWithBoundaries;
 import weka.classifiers.functions.explicitboundaries.IDecisionBoundary;
 import weka.classifiers.functions.explicitboundaries.combiners.PotentialFunction;
@@ -25,11 +29,11 @@ import weka.tools.data.InstancesOperator;
 
 /**
  * @author pawel trajdos
- * @since 2.0.0
- * @version 2.4.0
+ * @since 2.4.1
+ * @version 2.4.1
  *
  */
-public class BoundaryAndCentroidClassifier extends SingleClassifierEnhancerBoundary {
+public class BoundaryAndCentroidClassifier2 extends SingleClassifierEnhancerBoundary {
 
 	/**
 	 * 
@@ -65,6 +69,16 @@ public class BoundaryAndCentroidClassifier extends SingleClassifierEnhancerBound
 	
 	boolean usePriors=false;
 	
+	protected double quant  = 0.9;
+	protected double quantPotentialValue = 0.1;
+	protected double minSearch = 1E-3;
+	protected double maxSearch = 5.0;
+	protected int numIterations = 1000;
+	
+	protected double[] classCentroidsMultipliers;
+	
+	protected double[] boundaryMultipliers;
+	
 	
 	
 	
@@ -72,14 +86,14 @@ public class BoundaryAndCentroidClassifier extends SingleClassifierEnhancerBound
 	/**
 	 * 
 	 */
-	public BoundaryAndCentroidClassifier(ClassifierWithBoundaries boundClassifier) {
+	public BoundaryAndCentroidClassifier2(ClassifierWithBoundaries boundClassifier) {
 		super();
 		this.setClassifier(boundClassifier);
 		this.prototypeProto = new MahalanobisPrototype();
 		this.potFunction = new PotentialFunctionExp4();
 	}
 	
-	public BoundaryAndCentroidClassifier() {
+	public BoundaryAndCentroidClassifier2() {
 		this(new NearestCentroidBoundary());
 	}
 	
@@ -130,6 +144,9 @@ public class BoundaryAndCentroidClassifier extends SingleClassifierEnhancerBound
 		Instance tmpInst;
 		double tmpDist;
 		
+		this.boundaryMultipliers = new double[numClasses];
+		this.classCentroidsMultipliers = new double[numClasses];
+		
 		for(int c =0 ;c<numClasses;c++) {
 			this.classProtos[c] = (IClusterPrototype) SerialCopier.makeCopy(this.prototypeProto);
 			this.classProtos[c].build(splittedData[c]);
@@ -138,15 +155,56 @@ public class BoundaryAndCentroidClassifier extends SingleClassifierEnhancerBound
 			proto2Bnd[c] = Math.signum(bnd.getValue(this.classProtos[c].getCenterPoint()))*bnd.getDistance(this.classProtos[c].getCenterPoint());
 			
 			inst2CentDist = new double[splittedData[c].numInstances()];
+			double[] centroidDists = new double[splittedData[c].numInstances()];
 			
 			for(int i=0;i< inst2CentDist.length;i++) {
 				tmpInst = splittedData[c].get(i);
 				tmpDist = Math.signum(bnd.getValue(tmpInst))*bnd.getDistance(tmpInst);
 				//Distance from class centroid to instance. Along normal vector of the plane
-				inst2CentDist[i] = proto2Bnd[c] - tmpDist; 
+				inst2CentDist[i] = proto2Bnd[c] - tmpDist;
+				
+				centroidDists[i] = this.classProtos[c].distance(tmpInst);
 				
 			}
-			this.stdDevs[c] = UtilsPT.stdDev(inst2CentDist);	
+			this.stdDevs[c] = UtilsPT.stdDev(inst2CentDist);
+			double[] inst2CentDistNormalized = Arrays.copyOf(inst2CentDist, inst2CentDist.length);
+			//TODO what if std is zero?
+			Utils.normalize(inst2CentDistNormalized, this.stdDevs[c]);
+			
+			double centroidDistQuantileNorm = UtilsPT.quantile(inst2CentDist, this.quant);
+			double centroidDistQuantile = UtilsPT.quantile(centroidDists, this.quant);
+			
+			BisectionSolver distNormSolver = new BisectionSolver();
+			
+			this.boundaryMultipliers[c] = distNormSolver.solve(this.numIterations, new UnivariateFunction() {
+				
+				@Override
+				public double value(double x) {
+					try {
+						return potFunction.getPotentialValue(x * centroidDistQuantileNorm) - quantPotentialValue;
+					} catch (Exception e) {
+						return 0;
+					}
+				}
+			},
+					this.minSearch, this.maxSearch);
+			
+			BisectionSolver distSolver = new BisectionSolver();
+			
+			this.classCentroidsMultipliers[c] = distSolver.solve(this.numIterations, new UnivariateFunction() {
+				
+				@Override
+				public double value(double x) {
+					
+					try {
+						return potFunction.getPotentialValue(x * centroidDistQuantile) - quantPotentialValue;
+					} catch (Exception e) {
+						return 0;
+					}
+				}
+			}, this.minSearch, this.maxSearch);
+			
+			
 		}
 		
 
@@ -183,8 +241,8 @@ public class BoundaryAndCentroidClassifier extends SingleClassifierEnhancerBound
 				planeDirDist = Double.POSITIVE_INFINITY;
 			}
 			
-			pot1 = this.potFunction.getPotentialValue(centDist);
-			pot2 = this.potFunction.getPotentialValue(planeDirDist);
+			pot1 = this.potFunction.getPotentialValue(centDist * this.classCentroidsMultipliers[c]);
+			pot2 = this.potFunction.getPotentialValue(planeDirDist * this.boundaryMultipliers[c]);
 			
 			potentials[c] = this.proportion*pot1 + (1-this.proportion)*pot2 + this.eps;
 			if(this.usePriors)
@@ -340,7 +398,31 @@ public class BoundaryAndCentroidClassifier extends SingleClassifierEnhancerBound
 			      "\tDetermines whether the prior class probabilities are used"+
 		          "(default: FALSE).\n",
 			      "UP", 0, "-UP"));
-		 
+		
+		newVector.addElement(new Option(
+			      "\tQuantile to use"+
+		          "(default: 0.9).\n",
+			      "QA", 1, "-QA"));
+		
+		newVector.addElement(new Option(
+			      "\tQuantile potential to use"+
+		          "(default: 0.1).\n",
+			      "QAP", 1, "-QAP"));
+		
+		newVector.addElement(new Option(
+			      "\tMin multiplier value to use"+
+		          "(default: 1E-3).\n",
+			      "MiM", 1, "-MiM"));
+		
+		newVector.addElement(new Option(
+			      "\tMax multiplier value to use"+
+		          "(default: 5.0).\n",
+			      "MaM", 1, "-MaM"));
+		
+		newVector.addElement(new Option(
+			      "\tNumber of bisection iterations to use"+
+		          "(default: 1000).\n",
+			      "BI", 1, "-BI"));
 		
 		
 		newVector.addAll(Collections.list(super.listOptions()));
@@ -368,6 +450,17 @@ public class BoundaryAndCentroidClassifier extends SingleClassifierEnhancerBound
 		this.setNormalize(Utils.getFlag("N", options));
 		
 		this.setUsePriors(Utils.getFlag("UP", options));
+		
+		this.setQuant(UtilsPT.parseDoubleOption(options, "QA", 0.9));
+		
+		this.setQuantPotentialValue(UtilsPT.parseDoubleOption(options, "QAP", 0.1));
+		
+		this.setMinSearch(UtilsPT.parseDoubleOption(options, "MiM", 1E-3));
+		
+		this.setMaxSearch(UtilsPT.parseDoubleOption(options, "MaM", 5.0));
+		
+		this.setNumIterations(UtilsPT.parseIntegerOption(options, "BI", 1000));
+		
 		
 		
 		super.setOptions(options);
@@ -398,6 +491,22 @@ public class BoundaryAndCentroidClassifier extends SingleClassifierEnhancerBound
 		if(this.isUsePriors())
 			options.add("-UP");
 		
+		options.add("-QA");
+		options.add(""+this.getQuant());
+		
+		options.add("-QAP");
+		options.add(""+this.getQuantPotentialValue());
+		
+		
+		options.add("-MiM");
+		options.add(""+this.getMinSearch());
+		
+		options.add("-MaM");
+		options.add(""+this.getMaxSearch());
+		
+		options.add("-BI");
+		options.add(""+this.getNumIterations());
+		
 		
 		Collections.addAll(options, super.getOptions());
 	    
@@ -422,6 +531,68 @@ public class BoundaryAndCentroidClassifier extends SingleClassifierEnhancerBound
 	public String usePriorsTipText() {
 		return "Determines whether prior class probabilities are used.";
 	}
+	
+	public String quantTipText() {
+		return "Quantile to use";
+	}
+
+	public double getQuant() {
+		return quant;
+	}
+
+	public void setQuant(double quant) {
+		this.quant = quant;
+	}
+	
+	public String quantPotentialValueTipText() {
+		return "Potential value for the distance quantile";
+	}
+
+	public double getQuantPotentialValue() {
+		return quantPotentialValue;
+	}
+
+	public void setQuantPotentialValue(double quantPotentialValue) {
+		this.quantPotentialValue = quantPotentialValue;
+	}
+	
+	public String minSearchTipText() {
+		return "Min multiplier search";
+	}
+
+	public double getMinSearch() {
+		return minSearch;
+	}
+
+	public void setMinSearch(double minSearch) {
+		this.minSearch = minSearch;
+	}
+	
+	public String maxSearchTipText() {
+		return "Max multiplier search";
+	}
+
+	public double getMaxSearch() {
+		return maxSearch;
+	}
+
+	public void setMaxSearch(double maxSearch) {
+		this.maxSearch = maxSearch;
+	}
+	
+	public String numIterationsTipText() {
+		return "Number of bisection iterations ";
+	}
+
+	public int getNumIterations() {
+		return numIterations;
+	}
+
+	public void setNumIterations(int numIterations) {
+		this.numIterations = numIterations;
+	}
+	
+	
 	
 	
 

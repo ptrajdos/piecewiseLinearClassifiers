@@ -8,6 +8,7 @@ import weka.core.Instances;
 import weka.core.Instance;
 import weka.tools.SerialCopier;
 import weka.tools.data.IRandomDoubleGenerator;
+import weka.tools.data.InstancesOperator;
 import weka.tools.data.RandomDataGenerator;
 import weka.tools.data.RandomDoubleGenerator;
 import weka.tools.data.RandomDoubleGeneratorGaussian;
@@ -60,6 +61,32 @@ public class BoundaryAndCentroidsClassifierTest extends AbstractClassifierTest{
 		} catch (Exception e) {
 			fail("An exception has been caught " + e.getMessage());
 		}
+	 }
+	 
+	 public void testOnSingleClass() {
+		 
+		 Classifier classifier = this.getClassifier();
+		 RandomDataGenerator gen = new RandomDataGenerator();
+		 gen.setNumNominalAttributes(0);
+		 gen.setNumStringAttributes(0);
+		 gen.setNumDateAttributes(0);
+		 gen.setNumClasses(2);
+		 
+		 Instances dataset = gen.generateData();
+		 
+		 try {
+			 Instances[] splittedData = InstancesOperator.classSpecSplit(dataset);
+			classifier.buildClassifier(splittedData[0]);
+			for (Instance instance : dataset) {
+				double[] distribution = classifier.distributionForInstance(instance);
+				assertTrue("Check distribution", DistributionChecker.checkDistribution(distribution));
+			}
+			
+		} catch (Exception e) {
+			fail("An exception has been caught " + e.getMessage());
+		}
+		 
+		 
 	 }
 	 
 	 public void testGlobalInfoAndTips() {

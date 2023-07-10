@@ -67,7 +67,6 @@ public class BoundaryAndCentroidsClassifier extends SingleClassifierEnhancerBoun
 	
 	protected double eps=Double.MIN_VALUE;
 	
-	protected boolean normalize=true;
 	
 	protected ZeroR defaultModel;
 	
@@ -132,6 +131,20 @@ public class BoundaryAndCentroidsClassifier extends SingleClassifierEnhancerBoun
 		}
 		this.dataSplitter.train(data);
 		Instances[] splitted = this.dataSplitter.split(data);
+		
+		//Checking if the default model should be used. 
+		for(int i=0;i<splitted.length;i++) {
+			Instances tmpInstances = splitted[i];
+			int[] classCounts2 = InstancesOperator.objPerClass(tmpInstances);
+			for (int cnt : classCounts2) {
+				if( cnt <=1 ) {
+					this.defaultModel = new ZeroR();
+					this.defaultModel.buildClassifier(data);
+					return;
+				}
+					
+			}
+		}
 		
 		this.buildBoundaryClassifier(splitted[0]);
 		this.buildClusters(splitted[1]);
@@ -349,13 +362,10 @@ public class BoundaryAndCentroidsClassifier extends SingleClassifierEnhancerBoun
 			
 		}
 		
-		if(! this.normalize) {
+		
 		distribution = UtilsPT.softMax(distribution);
-		}else{
-			Utils.normalize(distribution);
-		}
 		
-		
+	
 		return distribution;
 	}
 
@@ -461,25 +471,7 @@ public class BoundaryAndCentroidsClassifier extends SingleClassifierEnhancerBoun
 		return "Epsilon factor for the algorithm";
 	}
 	
-	
 
-	/**
-	 * @return the normalize
-	 */
-	public boolean isNormalize() {
-		return this.normalize;
-	}
-
-	/**
-	 * @param normalize the normalize to set
-	 */
-	public void setNormalize(boolean normalize) {
-		this.normalize = normalize;
-	}
-	
-	public String normalizeTipText() {
-		return "Determines whether potential values should be normalized";
-	}
 
 	/* (non-Javadoc)
 	 * @see weka.classifiers.SingleClassifierEnhancer#listOptions()
@@ -513,10 +505,6 @@ public class BoundaryAndCentroidsClassifier extends SingleClassifierEnhancerBoun
 		          "(default: Double.MIN_VALUE).\n",
 			      "EPS", 1, "-EPS"));
 		
-		newVector.addElement(new Option(
-			      "\tNormalization flag"+
-		          "(default: TRUE).\n",
-			      "N", 0, "-N"));
 		
 		newVector.addElement(new Option(
 			      "\tDetermines whether the prior class probabilities are used"+
@@ -590,7 +578,6 @@ public class BoundaryAndCentroidsClassifier extends SingleClassifierEnhancerBoun
 		
 		this.setEps(UtilsPT.parseDoubleOption(options, "EPS", Double.MIN_VALUE));
 		
-		this.setNormalize(Utils.getFlag("N", options));
 		
 		this.setUsePriors(Utils.getFlag("UP", options));
 		
@@ -635,8 +622,6 @@ public class BoundaryAndCentroidsClassifier extends SingleClassifierEnhancerBoun
 		options.add("-EPS");
 		options.add(""+this.getEps());
 		
-		if(this.isNormalize())
-			options.add("-N");
 		
 		if(this.isUsePriors())
 			options.add("-UP");

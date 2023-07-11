@@ -298,6 +298,12 @@ public class BoundaryAndCentroidsClassifier extends SingleClassifierEnhancerBoun
 		
 		for(int c =0; c<nClasses; c++ ) {
 			
+			// No instances on the side of the plane. The potential should be steep.
+			if(distances[c].length < 1) {
+				this.boundaryPotentialArgumentMultipliers[c] = 20.0;
+				continue;
+			}
+			
 			double quant = UtilsPT.quantile(distances[c], this.quantile);
 			
 			BisectionSolver solver = new BisectionSolver();

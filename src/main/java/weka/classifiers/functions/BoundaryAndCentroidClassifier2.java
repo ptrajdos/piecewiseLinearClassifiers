@@ -250,8 +250,11 @@ public class BoundaryAndCentroidClassifier2 extends SingleClassifierEnhancerBoun
 			sum+=potentials[c];
 			
 		}
-		if(this.normalize)
+		if(this.normalize) {
+			//TODO sum is NaN for some cases!
+			//PotentialExp4 cannot return NaN for nonNan arguments!
 			Utils.normalize(potentials, sum);
+		}
 		
 		return potentials;
 	}

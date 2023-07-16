@@ -3,17 +3,29 @@ package weka.classifiers.functions.explicitboundaries.combiners;
 import org.junit.Before;
 import org.junit.Test;
 
-public class PotentialFunctionLinearTest {
+/**
+ * 
+ * @author pawel trajdos
+ * @since 2.1.3
+ * @version 2.4.1
+ *
+ */
 
-	PotentialFunctionLinear potFun = null;
-	@Before
-	public void setUp() throws Exception {
-		this.potFun = new PotentialFunctionLinear();
+public class PotentialFunctionLinearTest extends PotentialTester {
+
+	@Override
+	public PotentialFunction getPotentialFunction() {
+		
+		return new PotentialFunctionLinear();
 	}
 
-	@Test
-	public void testPotentialFunctionLinear() {
-		PotentialTester.testPotential(potFun);
+	@Override
+	public void testInfs() {
+		//No test infs for linear function. 
+		
 	}
+
+
+	
 
 }

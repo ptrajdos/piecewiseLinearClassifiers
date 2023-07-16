@@ -112,6 +112,14 @@
         <version>[2.1.0,)</version>
     </dependency>
     
+     <dependency>
+        <groupId>com.github.ptrajdos</groupId>
+        <artifactId>WekaTools</artifactId>
+        <version>[2.1.0,)</version>
+        <type>test-jar</type>
+        <scope>test</scope>
+    </dependency>
+    
     <dependency>
         <groupId>nz.ac.waikato.cms.weka</groupId>
         <artifactId>discriminantAnalysis</artifactId>

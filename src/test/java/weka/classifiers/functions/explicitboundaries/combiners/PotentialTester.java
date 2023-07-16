@@ -3,25 +3,42 @@
  */
 package weka.classifiers.functions.explicitboundaries.combiners;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.fail;
+
 import java.util.LinkedList;
 
-import weka.core.OptionHandlersTest.OptionHandlerTest;
+import org.junit.Test;
+
+import weka.core.OptionHandler;
+import weka.tools.tests.OptionHandlerChecker;
+
+
 
 /**
  * @author pawel trajdos
  * @since 1.0.0
- * @version 2.1.3
+ * @version 2.4.1
  *
  */
-public class PotentialTester extends OptionHandlerTest {
+public abstract class PotentialTester {
 
-	public PotentialTester(String name, String classname) {
-		super(name, classname);
+	public abstract PotentialFunction getPotentialFunction();
+	
+	@Test
+	public void testPotential() {
+		PotentialFunction potential = getPotentialFunction();
+		PotentialTester.testPotential(potential);
 	}
 	
-	public void testPotential() {
-		PotentialFunction potential = (PotentialFunction) this.getOptionHandler();
-		PotentialTester.testPotential(potential);
+	@Test
+	public void testOptions() {
+		
+		PotentialFunction potential  = getPotentialFunction();
+		if (potential instanceof OptionHandler) {
+
+			OptionHandlerChecker.checkOptions((OptionHandler) potential);
+		}
 	}
 
 	public static void testPotential(PotentialFunction fun) {
@@ -36,8 +53,8 @@ public class PotentialTester extends OptionHandlerTest {
 			values.add(val);
 			val+=increment;	
 		}
-		//values.add(Double.MAX_VALUE);
-		//values.add(-Double.MAX_VALUE);
+		values.add(Double.MAX_VALUE);
+		values.add(-Double.MAX_VALUE);
 		values.add(Double.MIN_NORMAL);
 		values.add(-Double.MIN_NORMAL);
 		values.add(Double.MIN_VALUE);
@@ -53,6 +70,27 @@ public class PotentialTester extends OptionHandlerTest {
 			}
 		}
 		
+		
+	}
+	
+	@Test
+	public void testInfs() {
+		PotentialFunction potential = this.getPotentialFunction();
+		
+		LinkedList<Double> values = new LinkedList<Double>();
+		values.add(Double.POSITIVE_INFINITY);
+		values.add(Double.NEGATIVE_INFINITY);
+		
+		for (Double value : values) {
+			try {
+				double response = potential.getPotentialValue(value);
+				assertFalse("Infinite response for: "+value +" ",Double.isInfinite(response));
+				assertFalse("NaN response for: "+value+" ",Double.isNaN(response));
+			} catch (Exception e) {
+				e.printStackTrace();
+				fail("An Exception has ben caught: " + e.toString());
+			}
+		}
 		
 	}
 

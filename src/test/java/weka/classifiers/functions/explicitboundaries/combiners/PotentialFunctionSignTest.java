@@ -1,21 +1,20 @@
 package weka.classifiers.functions.explicitboundaries.combiners;
 
-import org.junit.Test;
-
 /**
  * 
  * @author pawel trajdos
  * @since 2.1.3
- * @version 2.1.3
+ * @version 2.4.1
  *
  */
-public class PotentialFunctionSignTest  {
+public class PotentialFunctionSignTest  extends PotentialTester {
 
-	@Test
-	public void testPotential() {
-		PotentialTester.testPotential(new PotentialFunctionSign());
-		
+	@Override
+	public PotentialFunction getPotentialFunction() {
+		return new PotentialFunctionSign();
 	}
+
 	
+
 
 }

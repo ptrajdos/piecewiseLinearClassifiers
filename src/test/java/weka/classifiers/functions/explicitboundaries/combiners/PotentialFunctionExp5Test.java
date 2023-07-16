@@ -1,14 +1,21 @@
 package weka.classifiers.functions.explicitboundaries.combiners;
 
+/**
+ * 
+ * @author pawel trajdos
+ * @since 2.1.3
+ * @version 2.4.1
+ *
+ */
+
 public class PotentialFunctionExp5Test extends PotentialTester {
 
-	public PotentialFunctionExp5Test(String name, String classname) {
-		super(name, classname);
+	@Override
+	public PotentialFunction getPotentialFunction() {
+		
+		return new PotentialFunctionExp5();
 	}
-	
-	public PotentialFunctionExp5Test(String name) {
-		super(name, PotentialFunctionExp5.class.getCanonicalName());
-	}
+
 
 
 

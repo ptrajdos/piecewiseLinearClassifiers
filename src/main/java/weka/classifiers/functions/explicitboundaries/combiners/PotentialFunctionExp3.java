@@ -23,7 +23,14 @@ public class PotentialFunctionExp3 extends APotentialFunctionSingleParam {
 	 */
 	@Override
 	public double getPotentialValue(double x) throws Exception {
-		double val = x*x*x*Math.exp(-this.alpha*x*x + 1.5)*Math.pow(3.0/(2.0*this.alpha), -1.5) ;
+		if(Double.isInfinite(x))
+			return 0;
+		
+		double powX = x*x*x;
+		if(Double.isInfinite(powX))
+			return 0.0;
+		
+		double val = powX*Math.exp(-this.alpha*x*x + 1.5)*Math.pow(3.0/(2.0*this.alpha), -1.5) ;
 		return val;
 	}	
 

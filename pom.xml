@@ -62,6 +62,13 @@
    <dependencies>
 
     <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+      <version>2.10.1</version>
+    </dependency>
+
+
+    <dependency>
     <groupId>com.github.ptrajdos</groupId>
     <artifactId>WekaNearestCentroid</artifactId>
     <version>[4.0.0,)</version>

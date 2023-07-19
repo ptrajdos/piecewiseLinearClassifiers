@@ -7,10 +7,18 @@ import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
+import weka.classifiers.Classifier;
 import weka.core.Attribute;
 import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
+import weka.core.Utils;
+import weka.filters.Filter;
+import weka.filters.unsupervised.attribute.NominalToBinary;
+import weka.tools.data.RandomDataGenerator;
+import weka.tools.data.RandomDoubleGenerator;
+import weka.tools.data.RandomDoubleGeneratorGaussian;
+import weka.tools.tests.DistributionChecker;
 
 /**
  * @author pawel trajdos
@@ -153,6 +161,126 @@ public class DecisionBoundaryPlaneTest extends DecisionBoundaryTest {
 			fail("Preparation has failed");
 		}
 	}
+	
+	public void checkPlane(Instances dataset) throws Exception {
+		
+		DecisionBoundaryPlane decB = new DecisionBoundaryPlane(dataset, 0, 1);
+		
+		for(Instance instance : dataset) {
+			
+			double classResult =  decB.classify(instance);
+			
+			assertTrue("Class value", classResult>=0 & classResult<=1);
+			
+			int index = decB.getIndex(instance);
+			assertTrue("Index: ", index==0 | index ==1);
+			
+			double distance = decB.getDistance(instance);
+			assertFalse("Distance NaN", Double.isNaN(distance));
+			assertTrue("Distance Finite", Double.isFinite(distance));
+			assertTrue("Distance greater than zero", Utils.grOrEq(distance, 0.0));
+			
+			double disFun = decB.getValue(instance);
+			assertFalse("Discriminant value NaN", Double.isNaN(disFun));
+			assertTrue("Discriminant value", Double.isFinite(disFun));
+			
+			if(index == 0 ) {
+				assertTrue("Index 0 dis", disFun>0);
+			}else {
+				assertTrue("Index 1 dis", disFun<=0);
+			}
+			
+		}
+		
+	}
+	
+	 public void testOnCondensedData() {
+		 
+		 
+		 RandomDataGenerator gen = new RandomDataGenerator();
+		 gen.setNumNominalAttributes(0);
+		 gen.setNumStringAttributes(0);
+		 gen.setNumDateAttributes(0);
+		 RandomDoubleGenerator doubleGen = new RandomDoubleGeneratorGaussian();
+		 doubleGen.setDivisor(10000.0);
+		 gen.setDoubleGen(doubleGen );
+		 
+		 Instances dataset = gen.generateData();
+		 
+		 
+		 
+		 try {
+			 
+			this.checkPlane(dataset);
+			
+			
+		} catch (Exception e) {
+			fail("An exception has been caught " + e.getMessage());
+		}
+	 }
+	 
+	 
+	 public void testOnNominalConvertedData() {
+		 
+		 
+		 RandomDataGenerator gen = new RandomDataGenerator();
+		 gen.setNumNominalAttributes(10);
+		 gen.setNumStringAttributes(0);
+		 gen.setNumDateAttributes(0);
+		 gen.setNumNumericAttributes(0);
+		 gen.setNumClasses(2);
+		 gen.setMaxNumNominalValues(10);
+		 gen.setNumObjects(100);
+		 		 
+		 Instances dataset = gen.generateData();
+		 
+		 NominalToBinary nom2Bin = new NominalToBinary();
+		 
+		 
+		 
+		 try {
+			 
+			 nom2Bin.setInputFormat(dataset);
+			 dataset = Filter.useFilter(dataset, nom2Bin);
+			 
+			this.checkPlane(dataset);
+			
+			
+		} catch (Exception e) {
+			fail("An exception has been caught " + e.getMessage());
+		}
+	 }
+	 
+	 public void testOnNominalUnaryData() {
+		 
+		 
+		 RandomDataGenerator gen = new RandomDataGenerator();
+		 gen.setNumNominalAttributes(10);
+		 gen.setNumStringAttributes(0);
+		 gen.setNumDateAttributes(0);
+		 gen.setNumNumericAttributes(0);
+		 gen.setNumClasses(2);
+		 gen.setMaxNumNominalValues(1);
+		 gen.setNumObjects(100);
+		 gen.setAllowUnary(true);
+		 		 
+		 Instances dataset = gen.generateData();
+		 
+		 NominalToBinary nom2Bin = new NominalToBinary();
+		 
+		 
+		 try {
+			 
+			 nom2Bin.setInputFormat(dataset);
+			 dataset = Filter.useFilter(dataset, nom2Bin);
+			 
+			this.checkPlane(dataset);
+			
+			
+		} catch (Exception e) {
+			fail("An exception has been caught " + e.getMessage());
+		}
+	 }
 
 	
 

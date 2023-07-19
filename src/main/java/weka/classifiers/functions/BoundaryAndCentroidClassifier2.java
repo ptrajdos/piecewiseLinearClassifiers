@@ -11,6 +11,8 @@ import org.apache.commons.math3.analysis.UnivariateFunction;
 import org.apache.commons.math3.analysis.solvers.BisectionSolver;
 import org.apache.mahout.math.Arrays;
 
+import com.google.gson.Gson;
+
 import weka.classifiers.functions.explicitboundaries.ClassifierWithBoundaries;
 import weka.classifiers.functions.explicitboundaries.IDecisionBoundary;
 import weka.classifiers.functions.explicitboundaries.combiners.PotentialFunction;
@@ -26,6 +28,7 @@ import weka.core.Utils;
 import weka.core.UtilsPT;
 import weka.tools.SerialCopier;
 import weka.tools.data.InstancesOperator;
+
 
 /**
  * @author pawel trajdos
@@ -71,8 +74,8 @@ public class BoundaryAndCentroidClassifier2 extends SingleClassifierEnhancerBoun
 	
 	protected double quant  = 0.9;
 	protected double quantPotentialValue = 0.1;
-	protected double minSearch = 1E-3;
-	protected double maxSearch = 5.0;
+	protected double minSearch = 1E-4;
+	protected double maxSearch = 7.0;
 	protected int numIterations = 1000;
 	
 	protected double[] classCentroidsMultipliers;
@@ -160,17 +163,19 @@ public class BoundaryAndCentroidClassifier2 extends SingleClassifierEnhancerBoun
 				tmpInst = splittedData[c].get(i);
 				tmpDist = Math.signum(bnd.getValue(tmpInst))*bnd.getDistance(tmpInst);
 				//Distance from class centroid to instance. Along normal vector of the plane
-				inst2CentDist[i] = proto2Bnd[c] - tmpDist;
+				inst2CentDist[i] = proto2Bnd[c] - tmpDist; //Can this be negative?
 				
 				centroidDists[i] = this.classProtos[c].distance(tmpInst);
 				
 			}
 			this.stdDevs[c] = UtilsPT.stdDev(inst2CentDist);
-			double[] inst2CentDistNormalized = Arrays.copyOf(inst2CentDist, inst2CentDist.length);
-			//TODO what if std is zero?
-			Utils.normalize(inst2CentDistNormalized, this.stdDevs[c]);
 			
-			double centroidDistQuantileNorm = UtilsPT.quantile(inst2CentDist, this.quant);
+			double[] inst2CentDistAbs = new double[inst2CentDist.length];
+			for(int j=0;j<inst2CentDist.length;j++) {
+				inst2CentDistAbs[j] = Math.abs(inst2CentDist[j]);
+			}
+			
+			double centroidDistQuantileNorm = UtilsPT.quantile(inst2CentDistAbs, this.quant);
 			double centroidDistQuantile = UtilsPT.quantile(centroidDists, this.quant);
 			
 			BisectionSolver distNormSolver = new BisectionSolver();
@@ -243,6 +248,18 @@ public class BoundaryAndCentroidClassifier2 extends SingleClassifierEnhancerBoun
 			pot1 = this.potFunction.getPotentialValue(centDist * this.classCentroidsMultipliers[c]);
 			pot2 = this.potFunction.getPotentialValue(planeDirDist * this.boundaryMultipliers[c]);
 			
+			if(this.getDebug() & Double.isNaN(pot1) ) {
+				Gson gson = new Gson();
+				String repr = gson.toJson(this);
+				System.err.println("Potential 1 is NAN: \n"+ repr);
+			}
+			
+			if(this.getDebug() & Double.isNaN(pot2) ) {
+				Gson gson = new Gson();
+				String repr = gson.toJson(this);
+				System.err.println("Potential 2 is NAN: \n"+ repr);
+			}
+			
 			potentials[c] = this.proportion*pot1 + (1-this.proportion)*pot2 + this.eps;
 			if(this.usePriors)
 				potentials[c]*=this.classFreqs[c];
@@ -252,7 +269,14 @@ public class BoundaryAndCentroidClassifier2 extends SingleClassifierEnhancerBoun
 		if(this.normalize) {
 			//TODO sum is NaN for some cases!
 			//PotentialExp4 cannot return NaN for nonNan arguments!
+			try {
 			Utils.normalize(potentials, sum);
+			}catch( Exception e) {
+				Gson gson = new Gson();
+				String repr = gson.toJson(this);
+				System.err.println("SUM is NAN: \n"+ repr);
+				throw e;
+			}
 		}
 		
 		return potentials;

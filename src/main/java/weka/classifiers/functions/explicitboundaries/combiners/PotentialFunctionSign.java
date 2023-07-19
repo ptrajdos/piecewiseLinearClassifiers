@@ -24,6 +24,8 @@ public class PotentialFunctionSign implements PotentialFunction, Serializable {
 	 */
 	@Override
 	public double getPotentialValue(double x) throws Exception {
+		if(Double.isNaN(x))
+			return Double.NaN;
 		return x>0? 1:-1;
 	}
 

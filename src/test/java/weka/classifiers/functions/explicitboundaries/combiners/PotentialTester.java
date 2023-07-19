@@ -4,6 +4,7 @@
 package weka.classifiers.functions.explicitboundaries.combiners;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.LinkedList;
@@ -93,5 +94,26 @@ public abstract class PotentialTester {
 		}
 		
 	}
+	
+	@Test
+	public void testNans() {
+		PotentialFunction potential = this.getPotentialFunction();
+		
+		LinkedList<Double> values = new LinkedList<Double>();
+		values.add(Double.NaN);
+		
+		for (Double value : values) {
+			try {
+				double response = potential.getPotentialValue(value);
+				assertTrue("Not NaN response for: "+value+" ",Double.isNaN(response));
+			} catch (Exception e) {
+				e.printStackTrace();
+				fail("An Exception has ben caught: " + e.toString());
+			}
+		}
+		
+	}
+	
+	
 
 }

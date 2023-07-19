@@ -5,6 +5,8 @@ import junit.framework.TestSuite;
 import weka.classifiers.AbstractClassifierTest;
 import weka.classifiers.Classifier;
 import weka.core.Instances;
+import weka.filters.Filter;
+import weka.filters.unsupervised.attribute.NominalToBinary;
 import weka.core.Instance;
 import weka.tools.SerialCopier;
 import weka.tools.data.IRandomDoubleGenerator;
@@ -59,6 +61,69 @@ public class BoundaryAndCentroidClassifierTest extends AbstractClassifierTest{
 		} catch (Exception e) {
 			fail("An exception has been caught " + e.getMessage());
 		}
+	 }
+	 
+	 public void testOnNominalConvertedData() {
+		 Classifier classifier = this.getClassifier();
+		 
+		 RandomDataGenerator gen = new RandomDataGenerator();
+		 gen.setNumNominalAttributes(10);
+		 gen.setNumStringAttributes(0);
+		 gen.setNumDateAttributes(0);
+		 gen.setNumNumericAttributes(0);
+		 gen.setNumClasses(2);
+		 gen.setMaxNumNominalValues(10);
+		 gen.setNumObjects(100);
+		 		 
+		 Instances dataset = gen.generateData();
+		 
+		 NominalToBinary nom2Bin = new NominalToBinary();
+		 
+		 try {
+			 nom2Bin.setInputFormat(dataset);
+			 dataset = Filter.useFilter(dataset, nom2Bin);
+			classifier.buildClassifier(dataset);
+			for (Instance instance : dataset) {
+				double[] distribution = classifier.distributionForInstance(instance);
+				assertTrue("Check distribution", DistributionChecker.checkDistribution(distribution));
+			}
+			
+		} catch (Exception e) {
+			fail("An exception has been caught " + e.getMessage());
+		}
+		 
+	 }
+	 
+	 public void testOnNominalUnaryConvertedData() {
+		 Classifier classifier = this.getClassifier();
+		 
+		 RandomDataGenerator gen = new RandomDataGenerator();
+		 gen.setNumNominalAttributes(10);
+		 gen.setNumStringAttributes(0);
+		 gen.setNumDateAttributes(0);
+		 gen.setNumNumericAttributes(0);
+		 gen.setNumClasses(2);
+		 gen.setMaxNumNominalValues(1);
+		 gen.setNumObjects(100);
+		 gen.setAllowUnary(true);
+		 		 
+		 Instances dataset = gen.generateData();
+		 
+		 NominalToBinary nom2Bin = new NominalToBinary();
+		 
+		 try {
+			 nom2Bin.setInputFormat(dataset);
+			 dataset = Filter.useFilter(dataset, nom2Bin);
+			classifier.buildClassifier(dataset);
+			for (Instance instance : dataset) {
+				double[] distribution = classifier.distributionForInstance(instance);
+				assertTrue("Check distribution", DistributionChecker.checkDistribution(distribution));
+			}
+			
+		} catch (Exception e) {
+			fail("An exception has been caught " + e.getMessage());
+		}
+		 
 	 }
 	 
 	 public static void main(String[] args){

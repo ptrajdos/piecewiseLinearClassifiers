@@ -25,7 +25,7 @@ public class DotProductEuclidean implements DotProduct, Serializable, Debuggable
 	 */
 	private static final long serialVersionUID = 1477670834909210075L;
 	
-	boolean debug=true;
+	boolean debug=false;
 
 
 	/* (non-Javadoc)

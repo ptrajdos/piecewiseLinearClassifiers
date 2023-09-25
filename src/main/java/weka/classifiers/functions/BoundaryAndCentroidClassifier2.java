@@ -32,8 +32,8 @@ import weka.tools.data.InstancesOperator;
 
 /**
  * @author pawel trajdos
- * @since 2.4.1
- * @version 2.4.1
+ * @since 2.5.0
+ * @version 2.5.0
  *
  */
 public class BoundaryAndCentroidClassifier2 extends SingleClassifierEnhancerBoundary {

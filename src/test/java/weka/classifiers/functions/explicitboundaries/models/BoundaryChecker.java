@@ -4,14 +4,17 @@
 package weka.classifiers.functions.explicitboundaries.models;
 
 import weka.classifiers.functions.explicitboundaries.ClassifierWithBoundaries;
+import weka.classifiers.functions.explicitboundaries.DecisionBoundary;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.Utils;
+import static org.junit.Assert.*;
+
 
 /**
  * @author pawel trajdos
  * @since 2.3.0
- * @version 2.3.0
+ * @version 2.5.0
  *
  */
 public class BoundaryChecker {
@@ -22,29 +25,32 @@ public class BoundaryChecker {
 			classifier.buildClassifier(data);
 			int numClasses = data.numClasses();
 			for (Instance instance : data) {
-				double val = classifier.getBoundary().classify(instance);
+				
+				DecisionBoundary bnd = classifier.getBoundary();
+				double val = bnd.classify(instance);
 				double classVal = classifier.classifyInstance(instance);
 				double[] distribution = classifier.distributionForInstance(instance);
 				
 				double funVal = classifier.getBoundary().getValue(instance);
-				double phantomClassVal = classVal*2.0 -1;
+				double phantomClassVal = 1 - classVal*2.0;
 				
 				int maxIdx = Utils.maxIndex(distribution);
-				if(val >=0 && val <=numClasses)
-					return false;
+				
+				if(!(val >=0 && val <=numClasses))
+					fail("Wrong class index");
 				
 				if(!Utils.eq(val, classVal))
-					return false;
+					fail("Inconsistent prediction -- boundary and classifyInstance");
 				
 				if(!Utils.eq(val, maxIdx))
-					return false;
+					fail("Boundary class index is not compatible with highest value in distribution response");
 				
 				if(funVal*phantomClassVal<0)
-					return false;
+					fail("Sign disagreement in boundary discriminant value"); // TODO something is wrong
 				
 			}
 		} catch (Exception e) {
-			return false;
+			fail("Exception has been caught: "+ e.getLocalizedMessage());
 		}
 	
 		return true;

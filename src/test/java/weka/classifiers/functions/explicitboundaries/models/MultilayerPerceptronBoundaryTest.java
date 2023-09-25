@@ -49,7 +49,9 @@ public class MultilayerPerceptronBoundaryTest extends MultilayerPerceptronTest {
 		 gen.setNumStringAttributes(0);
 		 
 		 Instances dataset = gen.generateData();
-		 BoundaryChecker.checkBoundaries((ClassifierWithBoundaries) this.getClassifier(), dataset);
+		 
+		 boolean check = BoundaryChecker.checkBoundaries((ClassifierWithBoundaries) this.getClassifier(), dataset);
+		 assertTrue("Boundary response check", check);
 	 }
 	 
 	 public void testOneAttribute() {

@@ -37,8 +37,8 @@ import weka.tools.data.splitters.CopySplitter;
 
 /**
  * @author pawel trajdos
- * @since 2.4.1
- * @version 2.4.1
+ * @since 2.5.0
+ * @version 2.5.0
  *
  */
 public class BoundaryAndCentroidsClassifier extends SingleClassifierEnhancerBoundary {

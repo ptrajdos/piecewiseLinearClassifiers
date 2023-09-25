@@ -66,7 +66,9 @@ public class NearestCentroidBoundaryTest extends NearestCentroidClassifierTest{
 		 gen.setNumStringAttributes(0);
 		 
 		 Instances dataset = gen.generateData();
-		 BoundaryChecker.checkBoundaries((ClassifierWithBoundaries) this.getClassifier(), dataset);
+		 
+		 boolean check = BoundaryChecker.checkBoundaries((ClassifierWithBoundaries) this.getClassifier(), dataset);
+		 assertTrue("Boundary response check", check);
 	 }
 	 
 	 public void testOneAttribute() {

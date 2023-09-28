@@ -155,15 +155,7 @@
 	    <artifactId>LibSVM</artifactId>
 	    <version>1.0.10</version>
 	</dependency>
-
-	<dependency>
-	    <groupId>tw.edu.ntu.csie</groupId>
-	    <artifactId>libsvm</artifactId>
-	    <version>3.31</version>
-	    <classifier>sources</classifier>
-	</dependency>
-
-    
+  
   </dependencies>
   
   <properties>

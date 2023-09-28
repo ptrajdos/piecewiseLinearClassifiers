@@ -46,8 +46,7 @@ public class BoundaryChecker {
 					fail("Boundary class index is not compatible with highest value in distribution response");
 				
 				if(funVal*phantomClassVal<0)
-					fail("Sign disagreement in boundary discriminant value"); // TODO something is wrong
-				
+					fail("Sign disagreement in boundary discriminant value"); 				
 			}
 		} catch (Exception e) {
 			fail("Exception has been caught: "+ e.getLocalizedMessage());

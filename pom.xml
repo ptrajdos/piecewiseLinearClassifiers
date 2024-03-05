@@ -7,7 +7,7 @@
   <groupId>com.github.ptrajdos</groupId>
   <artifactId>PiecewiseLinearClassifiers</artifactId>
   <packaging>jar</packaging>
-  <version>2.5.0</version>
+  <version>2.6.0</version>
 
   <name>PiecewiseLinearClassifiers</name>
   <description> Weka implementation of the piecewise linear classifiers </description>
@@ -116,13 +116,13 @@
     <dependency>
         <groupId>com.github.ptrajdos</groupId>
         <artifactId>WekaTools</artifactId>
-        <version>[2.1.0,)</version>
+        <version>[2.2.0,)</version>
     </dependency>
     
      <dependency>
         <groupId>com.github.ptrajdos</groupId>
         <artifactId>WekaTools</artifactId>
-        <version>[2.1.0,)</version>
+        <version>[2.2.0,)</version>
         <type>test-jar</type>
         <scope>test</scope>
     </dependency>

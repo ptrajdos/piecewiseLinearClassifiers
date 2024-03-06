@@ -29,9 +29,28 @@ public class BoundaryAndCentroidsClassifierMulticlassTest extends AbstractClassi
 		return new BoundaryAndCentroidsClassifierMulticlass();
 	}
 	
-	public void testOnCondensedData() {
-		 AbstractClassifier classifier = (AbstractClassifier) this.getClassifier();
+	public void testSomeOptions() {
+		BoundaryAndCentroidsClassifierMulticlass classifier = (BoundaryAndCentroidsClassifierMulticlass) this.getClassifier();
 		 classifier.setDoNotCheckCapabilities(true);
+		 classifier.setUseSoftMax(true);
+		 
+		 String[] options = classifier.getOptions();
+		 assertNotNull("Options null",options);
+		
+	}
+	
+	public void testOnCondensedData() {
+		BoundaryAndCentroidsClassifierMulticlass classifier = (BoundaryAndCentroidsClassifierMulticlass) this.getClassifier();
+		 classifier.setDoNotCheckCapabilities(true);
+		 classifier.setUseSoftMax(false);
+		 
+		 classifier.setProportion(-1);
+		 classifier.setProportion(2);
+		 classifier.setProportion(0.5);
+		 
+		 String[] options = classifier.getOptions();
+		 assertNotNull("Options null",options);
+		 
 		 RandomDataGenerator gen = new RandomDataGenerator();
 		 gen.setNumNominalAttributes(0);
 		 gen.setNumStringAttributes(0);

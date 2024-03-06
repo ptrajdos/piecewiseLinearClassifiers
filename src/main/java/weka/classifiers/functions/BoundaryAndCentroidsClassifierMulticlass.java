@@ -88,8 +88,9 @@ public class BoundaryAndCentroidsClassifierMulticlass extends SingleClassifierEn
 	protected double maxSearch = 5.0;
 	protected int nBisectIterations = 1000;
 	
-	// TODO Options
 	protected MultivariateFunction clusterCombiner;
+	
+	protected boolean useSoftMax = true;
 	
 	
 	/**
@@ -280,7 +281,16 @@ public class BoundaryAndCentroidsClassifierMulticlass extends SingleClassifierEn
 					
 		}
 		
-		clusterDistribution =  UtilsPT.softMax(clusterDistribution);
+		if(this.useSoftMax) {
+			clusterDistribution =  UtilsPT.softMax(clusterDistribution);
+		}else {
+			double sum = Utils.sum(clusterDistribution);
+			if(sum> 5.0 * this.eps) {
+				Utils.normalize(clusterDistribution, sum);
+			}else {
+				clusterDistribution =  UtilsPT.softMax(clusterDistribution);
+			}
+		}
 		
 		double[] distribution = this.m_Classifier.distributionForInstance(instance);
 		
@@ -517,6 +527,8 @@ public class BoundaryAndCentroidsClassifierMulticlass extends SingleClassifierEn
 		
 		this.setClusterCombiner((MultivariateFunction) UtilsPT.parseObjectOptions(options, "CC", new MeanFunction(), MultivariateFunction.class ));
 		
+		this.setUseSoftMax(Utils.getFlag("USM", options));
+		
 		
 		super.setOptions(options);
 	}
@@ -567,6 +579,9 @@ public class BoundaryAndCentroidsClassifierMulticlass extends SingleClassifierEn
 		
 		options.add("-CC");
 		options.add(UtilsPT.getClassAndOptions(this.getClusterCombiner()));
+		
+		if(this.isUseSoftMax())
+			options.add("-USM");
 		
 		
 		Collections.addAll(options, super.getOptions());
@@ -690,6 +705,19 @@ public class BoundaryAndCentroidsClassifierMulticlass extends SingleClassifierEn
 		return "Method of combining cluster responses";
 	}
 	
+	
+	public String useSoftMaxTipText() {
+		return "Determines whether softmax cluster potential normalization is applied.";
+	}
+	
+	public boolean isUseSoftMax() {
+		return useSoftMax;
+	}
+
+	public void setUseSoftMax(boolean useSoftMax) {
+		this.useSoftMax = useSoftMax;
+	}
+
 	public Capabilities getCapabilities() {
 		Capabilities caps =super.getCapabilities();
 		caps.disableAll();
@@ -703,3 +731,4 @@ public class BoundaryAndCentroidsClassifierMulticlass extends SingleClassifierEn
 	
 
 }
+

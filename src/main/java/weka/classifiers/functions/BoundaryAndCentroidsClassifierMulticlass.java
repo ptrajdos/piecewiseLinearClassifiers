@@ -176,7 +176,7 @@ public class BoundaryAndCentroidsClassifierMulticlass extends SingleClassifierEn
 		}
 		
 		int numClasses = data.numClasses(); // This should be 2
-		int[] classSpecClusterNumber = this.classSpecClusterer.numberOfClassSpecificClusters();
+		int[] classSpecClusterNumber = this.classSpecClusterer.numberOfClassSpecificClusters();//separate number for each class
 		
 		Instances[] classSplittedData = InstancesOperator.classSpecSplit(data);
 		Instances[][] classClusterSplittedData = new Instances[numClasses][];
@@ -203,7 +203,7 @@ public class BoundaryAndCentroidsClassifierMulticlass extends SingleClassifierEn
 			
 			for(int i=0; i<nInstances; i++) {
 				Instance tmpInstance = classSplittedData[c].get(i);
-				double[][] classClusterResponse = this.classSpecClusterer.classSpecificDistributionForInstance(tmpInstance);
+				double[][] classClusterResponse = this.classSpecClusterer.classSpecificDistributionForInstance(tmpInstance);//class x cluster
 				int bestFitClusterIdx = Utils.maxIndex(classClusterResponse[c]);
 				
 				classClusterSplittedData[c][bestFitClusterIdx].add(tmpInstance);
@@ -230,7 +230,7 @@ public class BoundaryAndCentroidsClassifierMulticlass extends SingleClassifierEn
 			for(int i =0; i<nClusters;i++) {
 				
 				
-				double[] distances = new double[classClusterSplittedData[c][i].numInstances()];
+				double[] distances = new double[classClusterSplittedData[c][i].numInstances()];//Zero length!
 				
 				for(int d=0; d<distances.length;d++) {
 					distances[d] = this.classProtos[c][i].distance(classClusterSplittedData[c][i].get(d));

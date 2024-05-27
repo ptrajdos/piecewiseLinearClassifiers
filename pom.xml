@@ -100,7 +100,7 @@
     <dependency>
       <groupId>com.github.ptrajdos</groupId>
       <artifactId>WekaEnsembleSystems</artifactId>
-      <version>[1.6.0,)</version>
+      <version>[1.13.0,)</version>
     </dependency>
     
     
@@ -108,7 +108,7 @@
     <dependency>
         <groupId>com.github.ptrajdos</groupId>
         <artifactId>WekaNearestCentroid</artifactId>
-        <version>[4.0.0,)</version>
+        <version>[4.0.2,)</version>
         <type>test-jar</type>
         <scope>test</scope>
     </dependency>

@@ -43,7 +43,7 @@ import weka.tools.data.splitters.CopySplitter;
 /**
  * @author pawel trajdos
  * @since 2.6.0
- * @version 2.6.0
+ * @version 2.6.1
  *
  */
 public class BoundaryAndCentroidsClassifierMulticlass extends SingleClassifierEnhancer {
@@ -122,25 +122,17 @@ public class BoundaryAndCentroidsClassifierMulticlass extends SingleClassifierEn
 		
 		int numIinsts = data.numInstances();
 		this.classFreqs = InstancesOperator.classFreq(data);
-		double[] classCounts = new double[this.classFreqs.length];
 		
-		for(int i =0;i<classFreqs.length;i++) {
-			classCounts[i] = Math.ceil(classFreqs[i]*numIinsts);
-		}
 		
 		this.defaultModel = null;
-		if(Utils.smOrEq(classCounts[0], 1) | Utils.smOrEq(classCounts[1], 1)) {
-			this.defaultModel = new ZeroR();
-			this.defaultModel.buildClassifier(data);
-			return;
-		}
+		
 		this.dataSplitter.train(data);
 		Instances[] splitted = this.dataSplitter.split(data);
 		
 		//Checking if the default model should be used. 
 		for(int i=0;i<splitted.length;i++) {
 			Instances tmpInstances = splitted[i];
-			int[] classCounts2 = InstancesOperator.objPerClass(tmpInstances);
+			int[] classCounts2 = InstancesOperator.uniqObjPerClass(tmpInstances);
 			for (int cnt : classCounts2) {
 				if( cnt <=1 ) {
 					this.defaultModel = new ZeroR();
@@ -204,7 +196,7 @@ public class BoundaryAndCentroidsClassifierMulticlass extends SingleClassifierEn
 			for(int i=0; i<nInstances; i++) {
 				Instance tmpInstance = classSplittedData[c].get(i);
 				double[][] classClusterResponse = this.classSpecClusterer.classSpecificDistributionForInstance(tmpInstance);//class x cluster
-				int bestFitClusterIdx = Utils.maxIndex(classClusterResponse[c]);
+				int bestFitClusterIdx = Utils.maxIndex(classClusterResponse[c]);//TODO if all responses equal, then always select first!
 				
 				classClusterSplittedData[c][bestFitClusterIdx].add(tmpInstance);
 			}	

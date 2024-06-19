@@ -6,10 +6,10 @@
 PackageName= PiecewiseLinearClassifiers
 
 # Version (required)
-Version=2.6.0
+Version=2.6.1
 
 #Date
-Date=2024-02-05
+Date=2024-06-19
 
 # Title (required)
 Title= PiecewiseLinearClassifiers
